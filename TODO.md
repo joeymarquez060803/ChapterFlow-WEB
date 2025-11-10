@@ -1,0 +1,4 @@
+- [x] Add backdrop div to HTML
+- [x] Style backdrop in CSS for dim effect
+- [x] Update JS to toggle backdrop active class
+- [x] Test dim effect

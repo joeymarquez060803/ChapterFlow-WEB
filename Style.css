@@ -76,3 +76,66 @@ h2   {
 .hamburger:hover .line {
     background-color: orangered;
 }
+
+.slide-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0px;
+    height: 100vh;
+    background-color: rgb(225, 223, 223);
+    transition: width 0.3s ease;
+    z-index: 1000;
+}
+
+.slide-nav.active {
+    width: 250px;
+}
+
+.slide-nav.active .close-btn {
+    opacity: 1;
+    visibility: visible;
+}
+
+.close-btn {
+    position: absolute;
+    top: 50%;
+    right: -15px;
+    transform: translateY(-50%);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid black;
+    font-size: 20px;
+    color: black;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, background-color 0.3s ease;
+}
+
+.close-btn:hover {
+    background-color: lightgray;
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 999;
+}
+
+.backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
