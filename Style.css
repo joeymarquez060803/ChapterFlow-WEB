@@ -139,3 +139,40 @@ h2   {
     opacity: 1;
     visibility: visible;
 }
+
+.slide-nav p, .slide-nav .login-btn {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(-500%);
+}
+
+.slide-nav.active p, .slide-nav.active .login-btn {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(0);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.slide-nav p {
+    margin: 100px 20px 20px 20px;
+    font-size: 18px;
+    color: black;
+    text-align: center;
+}
+
+.login-btn {
+    margin: 20px auto;
+    padding: 10px 20px;
+    border: 1px solid black;
+    background-color: rgb(72, 172, 206);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    display: block;
+}
+
+.login-btn:hover {
+    background-color: lightblue;
+    color: black;
+}

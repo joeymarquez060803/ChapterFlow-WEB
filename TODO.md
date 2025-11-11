@@ -2,3 +2,5 @@
 - [x] Style backdrop in CSS for dim effect
 - [x] Update JS to toggle backdrop active class
 - [x] Test dim effect
+- [x] Add "Please log in first" text and "Log in" button to slide-nav
+- [x] Style the new elements in slide-nav
