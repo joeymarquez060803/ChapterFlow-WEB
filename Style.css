@@ -41,15 +41,15 @@ h2   {
     color: orangered;
 }
 
-.navbar a:last-child {  
-    border: 1px solid black;  
-    background-color: rgb(72, 172, 206);  
+.navbar a:last-child {
+    border: 1px solid black;
+    background-color: rgb(72, 172, 206);
     border-radius: 10px;
+    color: black;
 }
 
 .navbar a:last-child:hover {  
-    background-color: lightblue;  
-    color: black;  
+    background-color: lightgray;  
 }
 
 .hamburger {
@@ -165,7 +165,7 @@ h2   {
     padding: 10px 20px;
     border: 1px solid black;
     background-color: rgb(72, 172, 206);
-    color: white;
+    color: black;
     font-size: 16px;
     cursor: pointer;
     border-radius: 5px;
@@ -173,6 +173,54 @@ h2   {
 }
 
 .login-btn:hover {
-    background-color: lightblue;
+    background-color: lightgray;
+}
+
+.center-logo {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 250px;
+}
+
+.chapterflow-title {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 85px;
     color: black;
+    text-align: center;
+    font-family: 'Merriweather', serif;
+}
+
+h3 {
+    position: absolute;
+    top: 57%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    font-weight: normal;
+    color: black;
+    text-align: center;
+
+}
+
+.explore-btn {
+    position: absolute;
+    top: 69%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    background-color: rgb(72, 172, 206);
+    border: 1px solid black;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.explore-btn:hover {
+    background-color: lightgray;
 }
