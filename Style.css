@@ -270,6 +270,14 @@ h3 {
   border: 1px solid #ccc;
 }
 
+#passwordInput {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
 /* submit */
 #submitBtn {
   padding: 10px 20px;
@@ -283,3 +291,37 @@ h3 {
 #submitBtn:hover {
   background-color: #3a6fd2;
 }
+
+.password-container {
+  position: relative;
+  width: 90%;
+  margin: 15px auto;
+}
+
+.password-container input {
+  width: 100%;
+  padding: 10px 40px 10px 10px; /* leave space for eye */
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* Eye icon */
+.eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  background-image: url('https://cdn-icons-png.flaticon.com/512/709/709612.png'); /* eye icon */
+  background-size: cover;
+  cursor: pointer;
+  opacity: 0.4; /* faded by default */
+  transition: opacity 0.2s ease;
+}
+
+.eye:active {
+  opacity: 0.7; /* slightly brighter when clicked */
+}
+

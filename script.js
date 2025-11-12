@@ -15,30 +15,57 @@ document.addEventListener('DOMContentLoaded', function() {
         backdrop.classList.remove('active');
     });
 
-    // Log in & Sign up modal
-    const modal = document.getElementById('authModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const closeModal = document.querySelector('.modal .close');
+   // Log in & Sign up modal
+const modal = document.getElementById('authModal');
+const modalTitle = document.getElementById('modalTitle');
+const closeModal = document.querySelector('.modal .close');
+const submitBtn = document.getElementById('submitBtn');
 
-    // Only select Log in and Sign up links
-    const loginLinks = Array.from(document.querySelectorAll('.nav-links a'))
-        .filter(link => link.textContent === "Log in" || link.textContent === "Sign up");
+// Only select Log in and Sign up links
+const loginLinks = Array.from(document.querySelectorAll('.nav-links a'))
+  .filter(link => link.textContent === "Log in" || link.textContent === "Sign up");
 
-    loginLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            modal.style.display = 'block';
-            modalTitle.textContent = link.textContent; 
-        });
-    });
+loginLinks.forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    modal.style.display = 'block';
+    modalTitle.textContent = link.textContent;
 
-    closeModal.addEventListener('click', function() {
-        modal.style.display = 'none';
-    });
-
-    window.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
+    // Change button text depending on which link was clicked
+    if (link.textContent === "Log in") {
+      submitBtn.textContent = "Log in";
+    } else {
+      submitBtn.textContent = "Create Account";
+    }
+  });
 });
+
+closeModal.addEventListener('click', function() {
+  modal.style.display = 'none';
+});
+
+window.addEventListener('click', function(e) {
+  if (e.target === modal) {
+    modal.style.display = 'none';
+  }
+});
+
+
+const passwordInput = document.getElementById('passwordInput');
+const togglePassword = document.getElementById('togglePassword');
+
+togglePassword.addEventListener('mousedown', () => {
+  passwordInput.type = 'text'; // show password while holding
+});
+
+togglePassword.addEventListener('mouseup', () => {
+  passwordInput.type = 'password'; // hide when released
+});
+
+togglePassword.addEventListener('mouseleave', () => {
+  passwordInput.type = 'password'; // hide if mouse leaves icon
+});
+
+
+
+})
