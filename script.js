@@ -15,6 +15,18 @@ document.addEventListener('DOMContentLoaded', function() {
         backdrop.classList.remove('active');
     });
 
+    // Event listener for slide nav login button
+    const slideLoginBtn = document.querySelector('.login-btn');
+    slideLoginBtn.addEventListener('click', function() {
+        // Close the slide nav
+        slideNav.classList.remove('active');
+        backdrop.classList.remove('active');
+        // Show modal
+        modal.style.display = 'block';
+        modalTitle.textContent = 'Log in';
+        submitBtn.textContent = 'Log in';
+    });
+
    // Log in & Sign up modal
 const modal = document.getElementById('authModal');
 const modalTitle = document.getElementById('modalTitle');
