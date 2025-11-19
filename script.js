@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
         profileContainer.innerHTML = `
             <img src="https://via.placeholder.com/50x50/cccccc/000000?text=U" alt="Profile Picture" class="profile-pic">
             <p class="username">${user.displayName || user.email.split('@')[0]}</p>
+            <button class="edit-profile-btn">Edit Profile</button>
             <div class="slide-nav-buttons">
                 <button class="slide-nav-btn">Upload</button>
                 <button class="slide-nav-btn">View Uploads</button>
@@ -113,25 +114,46 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         slideNav.appendChild(profileContainer);
 
-        // Add event listeners for buttons
+        
+        const editProfileBtn = profileContainer.querySelector('.edit-profile-btn');
         const uploadBtn = profileContainer.querySelector('.slide-nav-btn:nth-child(1)');
         const viewUploadsBtn = profileContainer.querySelector('.slide-nav-btn:nth-child(2)');
         const historyBtn = profileContainer.querySelector('.slide-nav-btn:nth-child(3)');
         const pointsBtn = profileContainer.querySelector('.slide-nav-btn:nth-child(4)');
         const logoutBtn = profileContainer.querySelector('.logout-btn');
 
-        // Placeholder event listeners (prevent default for now)
-        [uploadBtn, viewUploadsBtn, historyBtn, pointsBtn].forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Add functionality here later
-            });
+        
+        editProfileBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'edit-profile.html';  
         });
 
+        uploadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'upload.html';  
+        });
+
+        viewUploadsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'view-uploads.html';  
+        });
+
+        historyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'history.html';  
+        });
+
+        pointsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'points-rewards.html';  
+        });
+
+        
         logoutBtn.addEventListener('click', async () => {
             try {
                 await window.signOut(auth);
                 alert('Logged out successfully!');
+                window.location.href = 'ChapterFlow.html';  
             } catch (error) {
                 alert('Error logging out: ' + error.message);
             }
