@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    
     const hamburger = document.querySelector('.hamburger');
     const slideNav = document.querySelector('.slide-nav');
     const closeBtn = document.querySelector('.close-btn');
@@ -15,69 +14,170 @@ document.addEventListener('DOMContentLoaded', function() {
         backdrop.classList.remove('active');
     });
 
-    // Event listener for slide nav login button
+    // Log in & Sign up modal
+    const modal = document.getElementById('authModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const closeModal = document.querySelector('.modal .close');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Slide nav login button
     const slideLoginBtn = document.querySelector('.login-btn');
     slideLoginBtn.addEventListener('click', function() {
-        // Close the slide nav
         slideNav.classList.remove('active');
         backdrop.classList.remove('active');
-        // Show modal
         modal.style.display = 'block';
         modalTitle.textContent = 'Log in';
         submitBtn.textContent = 'Log in';
     });
 
-   // Log in & Sign up modal
-const modal = document.getElementById('authModal');
-const modalTitle = document.getElementById('modalTitle');
-const closeModal = document.querySelector('.modal .close');
-const submitBtn = document.getElementById('submitBtn');
+    // Nav login/signup links
+    const loginLinks = Array.from(document.querySelectorAll('.nav-links a'))
+        .filter(link => link.textContent === "Log in" || link.textContent === "Sign up");
 
-// Only select Log in and Sign up links
-const loginLinks = Array.from(document.querySelectorAll('.nav-links a'))
-  .filter(link => link.textContent === "Log in" || link.textContent === "Sign up");
+    loginLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            modal.style.display = 'block';
+            modalTitle.textContent = link.textContent;
+            submitBtn.textContent = link.textContent === "Log in" ? "Log in" : "Create Account";
+        });
+    });
 
-loginLinks.forEach(link => {
-  link.addEventListener('click', function(e) {
-    e.preventDefault();
-    modal.style.display = 'block';
-    modalTitle.textContent = link.textContent;
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+        document.getElementById('usernameInput').value = '';
+        document.getElementById('passwordInput').value = '';
+    });
 
-    // Change button text depending on which link was clicked
-    if (link.textContent === "Log in") {
-      submitBtn.textContent = "Log in";
-    } else {
-      submitBtn.textContent = "Create Account";
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('passwordInput').value = '';
+        }
+    });
+
+    const passwordInput = document.getElementById('passwordInput');
+    const togglePassword = document.getElementById('togglePassword');
+
+    togglePassword.addEventListener('mousedown', () => passwordInput.type = 'text');
+    togglePassword.addEventListener('mouseup', () => passwordInput.type = 'password');
+    togglePassword.addEventListener('mouseleave', () => passwordInput.type = 'password');
+
+    // Firebase Auth
+    let auth;
+    function initializeAuth() {
+        auth = window.firebaseAuth;
+        if (auth) {
+            window.onAuthStateChanged(auth, (user) => {
+                if (user) updateUIForLoggedInUser(user);
+                else updateUIForLoggedOutUser();
+
+                // Remove loading class once Firebase finishes checking
+                document.body.classList.remove('loading');
+            });
+        }
     }
-  });
+
+    function updateUIForLoggedInUser(user) {
+        const navLinks = document.querySelectorAll('.nav-links a');
+        navLinks.forEach(link => {
+            if (link.textContent === "Log in" || link.textContent === "Sign up") {
+                link.style.display = 'none';
+            }
+        });
+
+        const loginBtn = slideNav.querySelector('.login-btn');
+        const loginText = slideNav.querySelector('p');
+
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (loginText && loginText.textContent === "Please log in first") loginText.style.display = 'none';
+
+        const existingProfile = slideNav.querySelector('.profile-container');
+        if (existingProfile) existingProfile.remove();
+
+        const profileContainer = document.createElement('div');
+        profileContainer.className = 'profile-container';
+        profileContainer.innerHTML = `
+            <img src="https://via.placeholder.com/50x50/cccccc/000000?text=U" alt="Profile Picture" class="profile-pic">
+            <p class="username">${user.displayName || user.email.split('@')[0]}</p>
+            <div class="slide-nav-buttons">
+                <button class="slide-nav-btn">Upload</button>
+                <button class="slide-nav-btn">View Uploads</button>
+                <button class="slide-nav-btn">History</button>
+                <button class="slide-nav-btn">Points & Rewards</button>
+                <button class="slide-nav-btn logout-btn">Log out</button>
+            </div>
+        `;
+        slideNav.appendChild(profileContainer);
+
+        // Add event listeners for buttons
+        const uploadBtn = profileContainer.querySelector('.slide-nav-btn:nth-child(1)');
+        const viewUploadsBtn = profileContainer.querySelector('.slide-nav-btn:nth-child(2)');
+        const historyBtn = profileContainer.querySelector('.slide-nav-btn:nth-child(3)');
+        const pointsBtn = profileContainer.querySelector('.slide-nav-btn:nth-child(4)');
+        const logoutBtn = profileContainer.querySelector('.logout-btn');
+
+        // Placeholder event listeners (prevent default for now)
+        [uploadBtn, viewUploadsBtn, historyBtn, pointsBtn].forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Add functionality here later
+            });
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await window.signOut(auth);
+                alert('Logged out successfully!');
+            } catch (error) {
+                alert('Error logging out: ' + error.message);
+            }
+        });
+    }
+
+    function updateUIForLoggedOutUser() {
+        const navLinks = document.querySelectorAll('.nav-links a');
+        navLinks.forEach(link => {
+            if (link.textContent === "Log in" || link.textContent === "Sign up") {
+                link.style.display = 'inline';
+            }
+        });
+
+        const profileContainer = slideNav.querySelector('.profile-container');
+        if (profileContainer) profileContainer.remove();
+
+        const loginBtn = slideNav.querySelector('.login-btn');
+        const loginText = slideNav.querySelector('p');
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (loginText) loginText.style.display = 'block';
+    }
+
+    submitBtn.addEventListener('click', async function() {
+        const email = document.getElementById('usernameInput').value;
+        const password = document.getElementById('passwordInput').value;
+
+        if (!email || !password) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        try {
+            if (modalTitle.textContent === 'Log in') {
+                await window.signInWithEmailAndPassword(auth, email, password);
+                modal.style.display = 'none';
+                alert('Logged in successfully!');
+            } else {
+                await window.createUserWithEmailAndPassword(auth, email, password);
+                modal.style.display = 'none';
+                alert('Account created successfully!');
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    initializeAuth();
 });
-
-closeModal.addEventListener('click', function() {
-  modal.style.display = 'none';
-});
-
-window.addEventListener('click', function(e) {
-  if (e.target === modal) {
-    modal.style.display = 'none';
-  }
-});
-
-
-const passwordInput = document.getElementById('passwordInput');
-const togglePassword = document.getElementById('togglePassword');
-
-togglePassword.addEventListener('mousedown', () => {
-  passwordInput.type = 'text'; // show password while holding
-});
-
-togglePassword.addEventListener('mouseup', () => {
-  passwordInput.type = 'password'; // hide when released
-});
-
-togglePassword.addEventListener('mouseleave', () => {
-  passwordInput.type = 'password'; // hide if mouse leaves icon
-});
-
-
-
-})

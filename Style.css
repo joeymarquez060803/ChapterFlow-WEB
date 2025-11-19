@@ -22,17 +22,21 @@ h2   {
 }
 
 .nav-links {
+    position: absolute;
+    right: 20px;
+    top: 15px;
     display: flex;
-    justify-content: center;
-    margin-left: 850px;
+    justify-content: flex-end;
+    gap: 0px; 
+    right: 70px;
 }
 
 .navbar a {
     color: black;
     text-decoration: none;
-    margin-right: 20px;
+    margin-right: 20px;  /
+    margin-right: 0;  
     font-size: 19px;
-    
     cursor: pointer;
     padding: 5px 10px;
 }
@@ -140,13 +144,13 @@ h2   {
     visibility: visible;
 }
 
-.slide-nav p, .slide-nav .login-btn {
+.slide-nav p, .slide-nav .login-btn, .slide-nav .profile-container {
     visibility: hidden;
     opacity: 0;
     transform: translateX(-500%);
 }
 
-.slide-nav.active p, .slide-nav.active .login-btn {
+.slide-nav.active p, .slide-nav.active .login-btn, .slide-nav.active .profile-container {
     visibility: visible;
     opacity: 1;
     transform: translateX(0);
@@ -323,5 +327,53 @@ h3 {
 
 .eye:active {
   opacity: 0.7; /* slightly brighter when clicked */
+}
+
+/* Profile container in slide nav */
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: -80px;
+}
+
+.username {
+    font-size: 16px;
+    color: black;
+    margin: 0;
+}
+
+.slide-nav-buttons {
+    position: absolute;
+    bottom: -500px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.slide-nav-btn {
+    background: none;
+    border: none;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px 0;
+    text-align: left;
+}
+
+.slide-nav-btn:hover {
+    text-decoration: underline;
+}
+
+body.loading .nav-links a {
+    visibility: hidden;
 }
 

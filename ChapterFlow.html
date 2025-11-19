@@ -6,64 +6,101 @@
     <title>My Website Project</title>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase SDK (moved to head for proper loading) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut  // Added for logout functionality
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLdDLpq-jQeCbH6f9CjWQmySsM4u7-I5E",
+            authDomain: "chapterflow-97f3b.firebaseapp.com",
+            projectId: "chapterflow-97f3b",
+            storageBucket: "chapterflow-97f3b.firebasestorage.app",
+            messagingSenderId: "726223862210",
+            appId: "1:726223862210:web:6e59309112d934120c7e5b",
+            measurementId: "G-KFCVLPY2RH"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // Make auth and functions globally available for script.js
+        window.firebaseAuth = auth;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signOut = signOut;
+    </script>
+    
+    <!-- Your main script (loaded after Firebase) -->
     <script src="script.js" defer></script>
 </head>
 
-
 <body>
 
-<header>
-  <nav class="navbar">
-    <button class="hamburger" aria-label="Open menu">
-      <span class="line"></span>
-      <span class="line"></span>
-      <span class="line"></span>
-    </button>
-    <img class="logo" src="https://i.imgur.com/5bwCrpX.png" alt="Logo">
-    <h2>ChapterFlow</h2>
-    <div class="nav-links">
-      <a href="ChapterFlow.html">Home</a>
-      <a href="#">About</a>
-      <a href="#">Log in</a>
-      <a href="#">Sign up</a>
+      <body class="loading"></body>
+
+    <!-- Your existing body content remains unchanged -->
+    <header>
+        <nav class="navbar">
+            <button class="hamburger" aria-label="Open menu">
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+            </button>
+            <img class="logo" src="https://i.imgur.com/5bwCrpX.png" alt="Logo">
+            <h2>ChapterFlow</h2>
+            <div class="nav-links">
+                <a href="ChapterFlow.html">Home</a>
+                <a href="#">About</a>
+                <a href="#">Log in</a>
+                <a href="#">Sign up</a>
+            </div>
+        </nav>
+
+        <div class="slide-nav">
+            <button class="close-btn"><</button>
+            <p>Please log in first</p>
+            <button class="login-btn">Log in</button>
+        </div>
+        <div class="backdrop"></div>
+    </header>
+
+    <img class="center-logo" src="https://i.imgur.com/5bwCrpX.png" alt="Logo">
+    <h1 class="chapterflow-title">ChapterFlow</h1>
+
+    <h3>Read your favorite stories and discover new ones — all in one place.<br>
+    You can even upload your own and earn rewards as you read and write</h3>
+
+    <button class="explore-btn" onclick="location.href='explore.html'">Explore</button>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Log In</h2>
+
+            <input type="email" placeholder="Enter your email" id="usernameInput">
+
+            <div class="password-container">
+                <input type="password" id="passwordInput" placeholder="Enter your password">
+                <span id="togglePassword" class="eye"></span>
+            </div>
+            
+            <button id="submitBtn">Submit</button>
+        </div>
     </div>
-  </nav>
-
-  <div class="slide-nav">
-    <button class="close-btn"></button>
-    <p>Please log in first</p>
-    <button class="login-btn">Log in</button>
-  </div>
-  <div class="backdrop"></div>
-</header>
-
-
-<img class="center-logo" src="https://i.imgur.com/5bwCrpX.png" alt="Logo">
-<h1 class="chapterflow-title">ChapterFlow</h1>
-
-
-
-<h3>Read your favorite stories and discover new ones — all in one place.<br>
-You can even upload your own and earn rewards as you read and write</h3>
-
-<button class="explore-btn" onclick="location.href='explore.html'">Explore</button>
-
-<div id="authModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2 id="modalTitle">Log In</h2>
-
-    <input type="text" placeholder="Enter your username" id="usernameInput">
-
-    <div class="password-container">
-      <input type="password" id="passwordInput" placeholder="Enter your password">
-      <span id="togglePassword" class="eye"></span>
-    </div>
-    
-    <button id="submitBtn">Submit</button>
-  </div>
-</div>
-
 
 </body>
 </html>
