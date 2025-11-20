@@ -391,3 +391,18 @@ body.loading .nav-links a {
     visibility: hidden;
 }
 
+/* -------------------------
+   FOOTER (fixed bottom)
+-------------------------- */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: silver;
+    text-align: center;
+    padding: 10px 0;
+    border-top: 1px solid black;
+    font-size: 14px;
+    z-index: 50; /* stays above bg but NOT above modal or slidebar */
+}
