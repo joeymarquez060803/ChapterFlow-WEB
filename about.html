@@ -5,6 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - ChapterFlow</title>
     <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <a href="ChapterFlow.html" class="back-btn">← Back</a>
+
+    <h1>About ChapterFlow</h1>
+
+    <p>
+        ChapterFlow is a campus-based platform designed for both readers and aspiring authors.  
+        Our mission is to give local writers a haven where they can freely publish their work  
+        while giving readers a simple, relaxing place to explore new stories.
+    </p>
+
+    <br>
+
+    <p>
+        Readers can enjoy a reward system where you earn points the more you read.  
+        Verified users — those who reach a certain number of reading hours will gain access  
+        to exclusive perks and features within the platform.
+    </p>
+
+    <br>
+
+    <p>
+        Whether you're here to write, read, or discover new talent, ChapterFlow is your space  
+        to connect, grow, and let your imagination flow.
+    </p>
+
+    <br><br>
+
+    <!-- ========================== -->
+    <!--    IMAGE SLIDESHOW START   -->
+    <!-- ========================== -->
+
+    <div class="slideshow-container">
+
+        <!-- Slides -->
+        <div class="slides fade">
+            <img src="https://upload.wikimedia.org/wikipedia/en/4/4b/My_Bloody_Valentine_-_Loveless.png" alt="Image 1">
+        </div>
+
+        <div class="slides fade">
+            <img src="https://img.freepik.com/free-photo/attractive-young-woman-working-laptop-early-morning_169016-24935.jpg?semt=ais_hybrid&w=740&q=80" alt="Image 2">
+        </div>
+
+        <div class="slides fade">
+            <img src="https://media.istockphoto.com/id/543042274/photo/books-in-second-hand-bookshop.jpg?s=612x612&w=0&k=20&c=3XYYWrdQ3JrXa5Web1O0WCUEvMGp0LRKzYL3S1143lI=" alt="Image 3">
+        </div>
+
+        <!-- Arrows -->
+        <a class="prev" onclick="plusSlides(-1)">❮</a>
+        <a class="next" onclick="plusSlides(1)">❯</a>
+
+    </div>
+
+    <br>
+
+    <!-- JS for slideshow -->
+    <script>
+        let slideIndex = 0;
+        showSlides();
+
+        function showSlides() {
+    let slides = document.getElementsByClassName("slides");
+
+    for (let i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+    }
+
+    slideIndex++;
+    if (slideIndex > slides.length) {
+        slideIndex = 1;
+    }
+
+    slides[slideIndex - 1].style.display = "block";
+    setTimeout(showSlides, 5000); // or your chosen speed
+}
+
+
+        function plusSlides(n) {
+    let slides = document.getElementsByClassName("slides");
+    slideIndex += n;
+
+    if (slideIndex > slides.length) {
+        slideIndex = 1;
+    }
+    if (slideIndex < 1) {
+        slideIndex = slides.length;
+    }
+
+    showSpecificSlide(slideIndex);
+}
+
+function showSpecificSlide(n) {
+    let slides = document.getElementsByClassName("slides");
+
+    for (let i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+    }
+
+    slides[n - 1].style.display = "block";
+}
+
+    </script>
+
+    <!-- ========================== -->
+    <!--         CSS BELOW          -->
+    <!-- ========================== -->
 
     <style>
         body {
@@ -40,35 +149,61 @@
             font-size: 20px;
             line-height: 1.6;
         }
+
+        /* =============== SLIDESHOW CSS =============== */
+
+        .slideshow-container {
+            position: relative;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .slides img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .slides {
+            display: none;
+        }
+
+        /* Arrows */
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            padding: 16px;
+            margin-top: -22px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            transition: 0.3s;
+            user-select: none;
+        }
+
+        .prev {
+            left: 0;
+        }
+
+        .next {
+            right: 0;
+        }
+
+        .prev:hover, .next:hover {
+            background: rgba(0,0,0,0.6);
+        }
+
+        .fade {
+            animation: fadeEffect 1s;
+        }
+
+        @keyframes fadeEffect {
+            from { opacity: .4 }
+            to { opacity: 1 }
+        }
     </style>
-</head>
-
-<body>
-
-    <a href="ChapterFlow.html" class="back-btn">← Back</a>
-
-    <h1>About ChapterFlow</h1>
-
-    <p>
-        ChapterFlow is a campus-based platform designed for both readers and aspiring authors.  
-        Our mission is to give local writers a haven where they can freely publish their work  
-        while giving readers a simple, relaxing place to explore new stories.
-    </p>
-
-    <br>
-
-    <p>
-        Readers can enjoy a reward system where you earn points the more you read.  
-        Verified users — those who reach a certain number of reading hours will gain access  
-        to exclusive perks and features within the platform.
-    </p>
-
-    <br>
-
-    <p>
-        Whether you're here to write, read, or discover new talent, ChapterFlow is your space  
-        to connect, grow, and let your imagination flow.
-    </p>
 
 </body>
 </html>
