@@ -406,3 +406,45 @@ body.loading .nav-links a {
     font-size: 14px;
     z-index: 50; /* stays above bg but NOT above modal or slidebar */
 }
+
+.profile-section {
+    width: 100%;                /* Full width of screen */
+    padding: 20px;
+
+    background-color: #f9f9f9;
+
+    border-top: 3px solid #ccc;
+    border-left: 3px solid #ccc;
+    border-right: 3px solid #ccc;
+    border-bottom: 3px solid #ccc;
+
+    display: flex;
+    justify-content: center;     /* Center content horizontally */
+    align-items: center;
+
+    box-sizing: border-box;      /* Prevent padding from breaking layout */
+}
+
+.inprofile-pic {
+    width: 200px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.profile-info {
+    text-align: left;
+}
+
+.profile-info h2 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.profile-info p {
+    margin-top: 5px;
+    font-size: 16px;
+}
+

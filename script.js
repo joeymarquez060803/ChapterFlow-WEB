@@ -1,4 +1,98 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Immediately show nav on chapterflow.html by removing loading class and forcing header display
+    if (window.location.href.includes('chapterflow.html')) {
+        document.body.classList.remove('loading');
+        document.querySelector('header').style.display = 'block';  // Force show header/nav instantly
+    }
+
+    // Profile Picture Upload Functionality (Appwrite with Firebase sync)
+    const profilePic = document.getElementById('profile-pic');
+    const profilePicUpload = document.getElementById('profile-pic-upload');
+
+    console.log('Profile pic element:', profilePic);  // Debug
+    console.log('Profile pic upload element:', profilePicUpload);  // Debug
+
+    if (profilePic && profilePicUpload) {
+        // Make profile pic clickable to trigger file input
+        profilePic.addEventListener('click', () => {
+            console.log('Profile pic clicked');
+            profilePicUpload.click();
+        });
+
+        // Handle file selection and upload
+        profilePicUpload.addEventListener('change', async (e) => {
+            console.log('File selected');
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file type and size
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {  // 5MB limit
+                alert('File size must be less than 5MB.');
+                return;
+            }
+
+            try {
+                // Check if Appwrite is loaded
+                if (typeof Appwrite === 'undefined') {
+                    alert('Appwrite SDK not loaded. Please refresh the page.');
+                    return;
+                }
+
+                console.log('Initializing Appwrite client');
+                // Initialize Appwrite client
+                const client = new Appwrite.Client()
+                    .setEndpoint('https://nyc.cloud.appwrite.io/v1')
+                    .setProject('69230def0009866e3192');  // Your Project ID
+
+                const storage = new Appwrite.Storage(client);
+                const user = window.firebaseAuth.currentUser;
+                if (!user) {
+                    alert('You must be logged in to upload a profile picture.');
+                    return;
+                }
+
+                console.log('Uploading file to Appwrite');
+                // Upload the file using the correct object syntax
+                const response = await storage.createFile({
+                    bucketId: '69230e950007fef02b5b',  // Your Bucket ID
+                    fileId: Appwrite.ID.unique(),
+                    file: file
+                });
+                const fileId = response.$id;
+
+                // Get the download URL
+                const downloadURL = storage.getFileDownload('69230e950007fef02b5b', fileId);
+
+                console.log('Updating Firebase Auth');
+                // Update the user's photoURL in Firebase Auth (with error handling)
+                if (user.updateProfile) {
+                    await user.updateProfile({ photoURL: downloadURL });
+                } else {
+                    console.warn('Firebase updateProfile not available, using localStorage as fallback');
+                    localStorage.setItem('profilePicURL', downloadURL);
+                }
+
+                // Update the UI immediately
+                profilePic.src = downloadURL;
+                alert('Profile picture updated successfully!');
+
+                // Refresh the slide nav if it's open
+                const slideNavPic = document.querySelector('.profile-container .profile-pic');
+                if (slideNavPic) slideNavPic.src = downloadURL;
+
+            } catch (error) {
+                console.error('Upload error details:', error);
+                alert('Failed to upload profile picture: ' + error.message + ' (Check console for more details)');
+            }
+        });
+    } else {
+        console.error('Profile pic or upload input not found - check HTML IDs');
+    }
+
     const hamburger = document.querySelector('.hamburger');
     const slideNav = document.querySelector('.slide-nav');
     const closeBtn = document.querySelector('.close-btn');
@@ -101,9 +195,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const profileContainer = document.createElement('div');
         profileContainer.className = 'profile-container';
         profileContainer.innerHTML = `
-            <img src="https://via.placeholder.com/50x50/cccccc/000000?text=U" alt="Profile Picture" class="profile-pic">
+            <img src="${user.photoURL || localStorage.getItem('profilePicURL') || 'https://via.placeholder.com/50x50/cccccc/000000?text=U'}" alt="Profile Picture" class="profile-pic">
             <p class="username">${user.displayName || user.email.split('@')[0]}</p>
-            <button class="edit-profile-btn">Edit Profile</button>
+            <button class="edit-profile-btn">Profile</button>
             <div class="slide-nav-buttons">
                 <button class="slide-nav-btn">Upload</button>
                 <button class="slide-nav-btn">View Uploads</button>
@@ -125,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         editProfileBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            window.location.href = 'edit-profile.html';  
+            window.location.href = './Slide nav buttons/edit-profile.html';  // Updated path to subfolder
         });
 
         uploadBtn.addEventListener('click', (e) => {
@@ -158,6 +252,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Error logging out: ' + error.message);
             }
         });
+
+        // Populate profile info on edit-profile.html
+        if (window.location.href.includes('edit-profile.html')) {
+            const profilePic = document.getElementById('profile-pic');
+            const userName = document.getElementById('user-name');
+            const userEmail = document.getElementById('user-email');
+            
+            if (profilePic) profilePic.src = user.photoURL || localStorage.getItem('profilePicURL') || 'https://via.placeholder.com/200x200/cccccc/000000?text=U';
+            if (userName) userName.textContent = user.displayName || user.email.split('@')[0];
+            if (userEmail) userEmail.textContent = user.email;
+        }
     }
 
     function updateUIForLoggedOutUser() {

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - ChapterFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">  <!-- Adjusted path to parent directory -->
+    
+    <!-- Appwrite SDK for uploads -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@latest"></script>
+    
+    <!-- Firebase SDK (moved to head for proper loading) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut  // Added for logout functionality
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLdDLpq-jQeCbH6f9CjWQmySsM4u7-I5E",
+            authDomain: "chapterflow-97f3b.firebaseapp.com",
+            projectId: "chapterflow-97f3b",
+            storageBucket: "chapterflow-97f3b.firebasestorage.app",
+            messagingSenderId: "726223862210",
+            appId: "1:726223862210:web:6e59309112d934120c7e5b",
+            measurementId: "G-KFCVLPY2RH"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // Make auth and functions globally available for script.js
+        window.firebaseAuth = auth;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signOut = signOut;
+    </script>
+    
+    <!-- Your main script (loaded after Firebase) -->
+    <script src="../script.js" defer></script>  <!-- Adjusted path to parent directory -->
+</head>
+
+<body>
+    <!-- Profile Section -->
+    <div class="profile-section">
+        <img id="profile-pic" src="https://via.placeholder.com/100x100/cccccc/000000?text=U" alt="Profile Picture" class="inprofile-pic">  <!-- Changed class to match CSS -->
+        <div class="profile-info">
+            <h2 id="user-name">User Name</h2>
+            <p id="user-email">user@example.com</p>
+        </div>
+    </div>
+
+    <!-- Hidden file input for upload -->
+    <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
+
+    <!-- Add more profile content here (e.g., edit forms, settings) -->
+    <!-- Example: <div class="profile-content"> <h3>Edit Your Profile</h3> ... </div> -->
+
+    <!-- Modal for auth (included in case needed) -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Log In</h2>
+            <input type="email" placeholder="Enter your email" id="usernameInput">
+            <div class="password-container">
+                <input type="password" id="passwordInput" placeholder="Enter your password">
+                <span id="togglePassword" class="eye"></span>
+            </div>
+            <button id="submitBtn">Submit</button>
+        </div>
+    </div>
+</body>
+</html>
