@@ -7,51 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
-    <!-- Firebase SDK (moved to head for proper loading) -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            onAuthStateChanged, 
-            signOut  // Added for logout functionality
-        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDLdDLpq-jQeCbH6f9CjWQmySsM4u7-I5E",
-            authDomain: "chapterflow-97f3b.firebaseapp.com",
-            projectId: "chapterflow-97f3b",
-            storageBucket: "chapterflow-97f3b.firebasestorage.app",
-            messagingSenderId: "726223862210",
-            appId: "1:726223862210:web:6e59309112d934120c7e5b",
-            measurementId: "G-KFCVLPY2RH"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-
-        // Make auth and functions globally available for script.js
-        window.firebaseAuth = auth;
-        window.onAuthStateChanged = onAuthStateChanged;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-        window.signOut = signOut;
-    </script>
+    <!-- Appwrite SDK (loaded before your main script) -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
     
-    <!-- Your main script (loaded after Firebase) -->
+    <!-- Your main script (loaded after Appwrite) -->
     <script src="script.js" defer></script>
 </head>
 
-<body>
-
-      <body class="loading"></body>
-
+<body class="loading">
     <!-- Your existing body content remains unchanged -->
     <header>
         <nav class="navbar">
@@ -60,7 +23,7 @@
                 <span class="line"></span>
                 <span class="line"></span>
             </button>
-            <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69234e03001004a20cdd/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+            <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
             <h2>ChapterFlow</h2>
             <div class="nav-links">
                 <a href="ChapterFlow.html">Home</a>
@@ -79,15 +42,14 @@
     </header>
 
     <div class="main-content">
-    <img class="center-logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69234e03001004a20cdd/view?project=69230def0009866e3192&mode=admin" alt="Logo">
-    <h1 class="chapterflow-title">ChapterFlow</h1>
+        <img class="center-logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+        <h1 class="chapterflow-title">ChapterFlow</h1>
 
-    <h3>Read your favorite stories and discover new ones — all in one place.<br>
-    You can even upload your own and earn rewards as you read and write</h3>
+        <h3>Read your favorite stories and discover new ones — all in one place.<br>
+        You can even upload your own and earn rewards as you read and write</h3>
 
-    <button class="explore-btn" onclick="location.href='explore.html'">Explore</button>
-</div>
-
+        <button class="explore-btn" onclick="location.href='explore.html'">Explore</button>
+    </div>
 
     <div id="authModal" class="modal">
         <div class="modal-content">
@@ -105,10 +67,8 @@
         </div>
     </div>
 
-<footer class="footer">
-    <p>© 2025 ChapterFlow — All Rights Reserved</p>
-</footer>
-
-
+    <footer class="footer">
+        <p>© 2025 ChapterFlow — All Rights Reserved</p>
+    </footer>
 </body>
 </html>
