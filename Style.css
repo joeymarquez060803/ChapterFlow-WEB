@@ -31,30 +31,54 @@ h2   {
     right: 90px;
 }
 
+/* Nav bar links: Home, About, Log in, Sign up */
 .navbar a {
     color: black;
     text-decoration: none;
-    margin-right: 20px;  
-    margin-right: 0;  
+    margin-right: 0;
     font-size: 19px;
     cursor: pointer;
     padding: 5px 10px;
+    font-family: "Merriweather", serif;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    transition: color 150ms ease, transform 120ms ease, background-color 150ms ease;
 }
 
+/* default hover color for all nav links */
 .navbar a:hover {
     color: orangered;
 }
 
-.navbar a:last-child {
-    border: 1px solid black;
-    background-color: rgb(72, 172, 206);
+/* Home, About, Log in: match slide-nav hover/click feel */
+.navbar .nav-main-link:hover,
+.navbar .nav-login-link:hover {
+    color: orangered;
+    transform: translateX(4px);   /* smooth slide right on hover */
+}
+
+.navbar .nav-main-link:active,
+.navbar .nav-login-link:active {
+    transform: translateX(2px);   /* tiny movement when clicked */
+}
+
+/* Sign up CTA button: new background color */
+/* Sign up button in nav bar */
+.navbar .nav-signup-cta {
+    border: 1px solid black;      /* 1px black border (normal) */
     border-radius: 10px;
+    background-color: rgb(72, 172, 206); /* or whatever color you want */
     color: black;
 }
 
-.navbar a:last-child:hover {  
-    background-color: lightgray;  
+/* Hover state for Sign up */
+.navbar .nav-signup-cta:hover {
+    border: 1px solid black;      /* keep border black on hover */
+    background-color: lightgray;  /* or your hover color */
+    color: black;
 }
+
+
 
 .hamburger {
     display: flex;
@@ -180,6 +204,11 @@ h2   {
     background-color: lightgray;
 }
 
+body {
+    background-color: #f2edda;
+}
+
+
 .center-logo {
     position: absolute;
     top: 30%;
@@ -208,7 +237,6 @@ h3 {
     font-weight: normal;
     color: black;
     text-align: center;
-
 }
 
 .explore-btn {
@@ -217,16 +245,13 @@ h3 {
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 10px 20px;
-    background-color: rgb(72, 172, 206);
     border: 1px solid black;
     color: black;
     font-size: 16px;
     cursor: pointer;
     border-radius: 10px;
-}
+    font-weight: bold;
 
-.explore-btn:hover {
-    background-color: lightgray;
 }
 
 /* Modal background */
@@ -351,41 +376,56 @@ h3 {
 }
 
 .slide-nav-buttons {
-    position: absolute;
-    bottom: -480px;
-    left: 20px;
+    margin-top: 220px;      /* space under "Profile" */
+    margin-right: 50px ;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    gap: 14px;             /* spacing between buttons */
 }
 
-.slide-nav-btn {
-    background: none;
-    border: none;
-    color: black;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 5px 0;
-    text-align: left;
+/* extra spacing between: Upload, View Uploads, History, Points & Rewards, Log out */
+.slide-nav-buttons .slide-nav-btn {
+    margin-bottom: 20px;   /* increase/decrease this value to taste */
 }
 
-.slide-nav-btn:hover {
-    text-decoration: underline;
-}
 
+/* Slide-nav buttons: Profile + other items */
+.slide-nav-btn,
 .edit-profile-btn {
     background: none;
     border: none;
+    font-family: "Merriweather", serif;   /* same as nav bar */
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
     color: black;
-    font-size: 16px;
     cursor: pointer;
-    padding: 5px 0;
+    padding: 10px 0;
+    transition: color 0.15s ease, transform 0.12s ease;
+}
+
+/* keep original alignment differences */
+.slide-nav-btn {
+    text-align: left;
+}
+
+.edit-profile-btn {
     text-align: center;
 }
 
+/* Hover: turn orangered and slide slightly */
+.slide-nav-btn:hover,
 .edit-profile-btn:hover {
-    text-decoration: underline;
+    color: orangered;
+    transform: translateX(4px);
 }
+
+/* Active state: tiny movement for click feedback */
+.slide-nav-btn:active,
+.edit-profile-btn:active {
+    transform: translateX(2px);
+}
+
 
 body.loading .nav-links a {
     visibility: hidden;
@@ -407,50 +447,471 @@ body.loading .nav-links a {
     z-index: 50; /* stays above bg but NOT above modal or slidebar */
 }
 
-.profile-section {
-    width: 100%;                /* Full width of screen */
-    padding: 20px;
-
-    background-color: #f9f9f9;
-
-    border-top: 3px solid #ccc;
-    border-left: 3px solid #ccc;
-    border-right: 3px solid #ccc;
-    border-bottom: 3px solid #ccc;
-
-    display: flex;
-    justify-content: center;     /* Center content horizontally */
-    align-items: center;
-
-    box-sizing: border-box;      /* Prevent padding from breaking layout */
-}
-
-.inprofile-pic {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-}
-
-
-.profile-info {
-    text-align: left;
-}
-
-.profile-info h2 {
-    margin: 0;
-    margin-left: 20px;
-    font-size: 30px;
-}
-
-.profile-info p {
-    margin-top: 5px;
-    margin-left: 20px;
-    font-size: 16px;
-}
-
+/* Utility class */
 .hidden {
     display: none !important;
 }
+
+/* =========================================================
+   EDIT PROFILE PAGE STYLES
+   ========================================================= */
+
+:root {
+    --khaki: #c8b38a;
+    --page-cream: #faf8f0;
+}
+
+/* Only edit-profile page body uses this class */
+body.edit-profile-page {
+    margin: 0;
+    font-family: 'Merriweather', serif;
+    background: var(--page-cream);
+}
+
+/* Wrapper that handles the khaki band behind the card */
+.profile-page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 100px 16px 40px; /* space above & below card */
+}
+
+/* Khaki band: page background from top to (about) middle of card */
+.profile-page::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 220px;         /* this is the cut-off; adjust if needed */
+    background: var(--khaki);
+    z-index: -1;           /* behind the card */
+}
+
+/* CARD BOX */
+.profile-section {
+    position: relative;
+    max-width: 820px;
+    width: 90%;
+    margin: 0 auto;
+    padding: 90px 40px 40px;
+    border: none;
+    border-radius: 18px;
+    background: #ffffff;    /* card is pure white */
+    box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 125px;
+}
+
+/* AVATAR WITH HOVER OVERLAY */
+.avatar-wrapper {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #ffffff;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: inherit;
+}
+
+.avatar-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+    color: #ffffff;
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none; /* clicks still hit the image */
+}
+
+.avatar-overlay svg {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 4px;
+    opacity: 0.9;
+}
+
+.avatar-wrapper:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.avatar-wrapper:hover {
+    transform: translateX(-50%) scale(1.03);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.avatar-wrapper:active {
+    transform: translateX(-50%) scale(0.97);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+
+/* TEXT STACK */
+.profile-info {
+    margin-top: -8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+#user-name {
+    margin: 0 0 2px;
+    font-size: 24px;
+    padding-left: 20px;
+}
+
+#user-email {
+    margin: 10px 0 15px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* NAME EDIT UI */
+#name-display-wrapper {
+    position: relative;
+    display: inline-block;
+    padding-right: 28px; /* room for pencil */
+}
+
+.edit-name-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.08);
+    backdrop-filter: blur(4px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 120ms ease, transform 120ms ease;
+    padding: 0;
+}
+
+#name-display-wrapper:hover .edit-name-btn {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.edit-name-btn svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0.85;
+}
+
+.name-editor {
+    margin-top: 6px;
+    display: none;          /* hidden by default */
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.name-editor input {
+    font-family: inherit;
+    font-size: 20px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.2);
+    min-width: 220px;
+}
+
+.name-editor button {
+    font-family: inherit;
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.06);
+    cursor: pointer;
+}
+
+.name-editor.is-open {
+    display: flex;          /* only shown when JS adds .is-open */
+}
+
+/* POINTS + CREATE BUTTON */
+.points-row {
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+}
+
+.points-label {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.points-create-btn {
+    padding: 6px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--khaki);
+    background: transparent;
+    color: #5a4c2a;
+    font-size: 14px;
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.15s ease;
+}
+
+.points-create-btn:hover {
+    background: var(--khaki);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    transform: translateY(-1px);
+}
+
+.points-create-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+/* -------------------- THEME COLORS & TYPOGRAPHY -------------------- */
+:root {
+    /* keep khaki + page cream for edit-profile and add nav-specific colors */
+    --khaki: #c8b38a;
+    --page-cream: #faf8f0;
+    --accent-red: #e45b34;
+    --nav-text: #2e2415;
+    --silver: #c0c0c0;
+}
+
+/* -------------------- NAVBAR -------------------- */
+
+/* base bar: still fixed from earlier rules, but now khaki + novel-ish text */
+.navbar {
+    background-color: var(--khaki);
+    color: var(--nav-text);
+}
+
+/* title text */
+.site-title {
+    font-family: "Merriweather", serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+}
+
+/* logo inside navbar */
+.navbar .logo {
+    height: 40px;
+    object-fit: contain;
+}
+
+/* nav links row (right side) */
+.navbar .nav-links {
+    position: absolute;
+    right: 90px;
+    top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* base nav buttons (Home, About, Log in) */
+.navbar .nav-link {
+    font-family: "Merriweather", serif;          /* simple, bookish serif */
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    text-decoration: none;
+    color: var(--nav-text);
+    background: none;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    transition: color 150ms ease;
+    transition: color 150ms ease, transform 120ms ease; /* 👈 add transform */
+}
+
+/* same behavior pre-login & logged-in */
+.navbar .nav-link:hover {
+    color: var(--accent-red);                    /* orange-red hover */
+}
+
+.navbar .nav-link:active {
+    color: var(--accent-red);
+}
+
+/* Home + About: match slide-nav hover / click feel */
+.navbar .nav-main-link:hover {
+    color: orangered;           /* same color as slide-nav buttons */
+    transform: translateX(4px); /* slide a bit to the right */
+}
+
+.navbar .nav-main-link:active {
+    transform: translateX(2px); /* tiny movement on click */
+}
+
+
+/* Sign up = pill button like "Create", but silver */
+.navbar .nav-signup-cta {
+    border-radius: 999px;
+    border: 1px solid black;
+    background-color: silver;
+    padding: 0.35rem 1.2rem;
+    font-weight: 600;
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+    transition:
+        background-color 150ms ease,
+        color 150ms ease,
+        box-shadow 150ms ease;
+}
+
+.navbar .nav-signup-cta:hover {
+    background-color: lightgray;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.navbar .nav-signup-cta:active {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+/* -------------------- EXPLORE BUTTON (like Create, NO POSITION JUMP) -------------------- */
+
+/* Base positioning (absolute center, top: 72%) comes from earlier rules;
+   here we only override look + animation so it doesn’t move on hover. */
+.explore-btn {
+    padding: 0.7rem 2.3rem;
+    border-radius: 999px;
+    border: 1px solid black;   /* ← changed */
+    background: silver;
+    font-family: "Merriweather", serif;
+    font-size: 1rem;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+.explore-btn:hover {
+    background-color: lightgray;
+    color: white;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    /* no transform here -> no jumping */
+}
+
+.explore-btn:active {
+    box-shadow: 0 1px 5px rgba(0,0,0,0.25);
+}
+
+/* -------------------- SLIDE NAV (both states) -------------------- */
+
+/* slide nav background khaki like edit-profile */
+.slide-nav {
+    background-color: var(--khaki);
+    color: var(--nav-text);
+}
+
+/* keep close button readable on khaki */
+.slide-nav .close-btn {
+    color: var(--nav-text);
+}
+
+/* ---------- PRE-LOGGED IN: LOG IN BUTTON (inside slide nav) ---------- */
+
+.slide-nav .login-btn {
+    margin: 1rem auto 0;
+    padding: 0.6rem 1.8rem;
+    border-radius: 999px;              /* like Create */
+    border: 1px solid black;   /* silver border */
+    background: silver;
+    font-family: "Merriweather", serif; /* same as nav bar buttons */
+    font-size: 0.95rem;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease;
+    
+    
+}
+
+.slide-nav .login-btn:hover {
+    background-color: lightgray;   /* silver fill on hover */
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    transform: translateY(-1px);
+}
+
+.slide-nav .login-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+/* ---------- LOGGED-IN SLIDE NAV: TEXT BUTTONS ---------- */
+/* When you’re logged in, give the buttons (Profile, Upload, etc.)
+   the class "slide-link" in your HTML/JS. */
+
+.slide-nav .slide-link {
+    display: block;
+    width: 100%;
+    padding: 0.4rem 0;
+    margin-bottom: 0.75rem;           /* spacing between items */
+    text-align: left;
+    background: none;
+    border: none;
+    font-family: "Merriweather", serif; /* same font as navbar buttons */
+    font-size: 0.95rem;
+    color: var(--nav-text);
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.slide-nav .slide-link:hover {
+    color: var(--accent-red);          /* orange-red hover */
+    transform: translateX(4px);
+}
+
+.slide-nav .slide-link:active {
+    transform: translateX(2px);
+}
+
+/* -------------------- FOOTER -------------------- */
+
+.footer {
+    background-color: var(--khaki);
+    color: var(--nav-text);
+}
+
+.footer p {
+    margin: 0;
+}
+
 

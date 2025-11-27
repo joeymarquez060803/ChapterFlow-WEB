@@ -4,44 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile - ChapterFlow</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">  <!-- Adjusted path to parent directory -->
+    <link rel="stylesheet" href="../style.css">
 
     <!-- Appwrite SDK for uploads and auth -->
     <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
-
     <!-- Your main script (loaded after Appwrite) -->
-    <script src="../script.js" defer></script>  <!-- Adjusted path to parent directory -->
+    <script src="../script.js" defer></script>
 </head>
 
-<body class="loading">
-    <!-- Profile Section (JS hides it instantly to prevent placeholder flash) -->
-    <div class="profile-section" aria-busy="true">
-        <img id="profile-pic"
-             src="https://via.placeholder.com/100x100/cccccc/000000?text=U"
-             alt="Profile Picture"
-             class="inprofile-pic">
-        <div class="profile-info">
-            <h2 id="user-name">User Name</h2>
-            <p id="user-email">user@example.com</p>
-        </div>
-    </div>
+<body class="loading edit-profile-page">
+    <div class="profile-page">
+        <div class="profile-section" aria-busy="true">
 
-    <!-- Hidden file input for upload -->
-    <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
-
-    <!-- Modal for auth (included in case needed) -->
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 id="modalTitle">Log In</h2>
-            <input type="email" placeholder="Enter your email" id="usernameInput">
-            <div class="password-container">
-                <input type="password" id="passwordInput" placeholder="Enter your password">
-                <span id="togglePassword" class="eye"></span>
+            <!-- AVATAR WITH HOVER OVERLAY -->
+            <div class="avatar-wrapper" id="avatar-wrapper">
+                <img
+                    id="profile-pic"
+                    src="https://via.placeholder.com/100x100/cccccc/000000?text=U"
+                    alt="Profile Picture"
+                >
+                <div class="avatar-overlay">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M9 4.5L7.5 6H5A2 2 0 003 8v8a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-2.5L15 4.5H9z"
+                              fill="currentColor" />
+                        <circle cx="12" cy="12" r="3.5" fill="#ffffff" />
+                    </svg>
+                    <span>Upload</span>
+                </div>
             </div>
-            <button id="submitBtn">Submit</button>
+
+            <div class="profile-info">
+                <!-- Display mode -->
+                <div id="name-display-wrapper">
+                    <h2 id="user-name">User Name</h2>
+                    <button id="edit-name-btn" class="edit-name-btn" type="button" aria-label="Edit username">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M3 17.25V21h3.75L19.81 7.94l-3.75-3.75L3 17.25Z"
+                                  stroke="currentColor" stroke-width="1.6" />
+                            <path d="M14.06 4.19l3.75 3.75"
+                                  stroke="currentColor" stroke-width="1.6" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Edit mode -->
+                <div id="name-editor" class="name-editor">
+                    <input id="name-input" type="text" maxlength="40" autocomplete="name" />
+                    <button id="save-name-btn" type="button">Save</button>
+                    <button id="cancel-name-btn" type="button">Cancel</button>
+                </div>
+
+                <p id="user-email">user@example.com</p>
+
+                <div class="points-row">
+                    <span class="points-label">Points</span>
+                    <button class="points-create-btn" type="button">Create</button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
 </body>
 </html>

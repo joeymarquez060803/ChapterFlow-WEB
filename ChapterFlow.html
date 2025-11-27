@@ -15,7 +15,6 @@
 </head>
 
 <body class="loading">
-    <!-- Your existing body content remains unchanged -->
     <header>
         <nav class="navbar">
             <button class="hamburger" aria-label="Open menu">
@@ -23,19 +22,29 @@
                 <span class="line"></span>
                 <span class="line"></span>
             </button>
+
             <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
-            <h2>ChapterFlow</h2>
+
+            <h2 class="site-title">ChapterFlow</h2>
+
             <div class="nav-links">
-                <a href="ChapterFlow.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="#">Log in</a>
-                <a href="#">Sign up</a>
+                <!-- text buttons, same style pre-login & logged-in -->
+                <a href="ChapterFlow.html" class="nav-link nav-main-link">Home</a>
+                <a href="about.html" class="nav-link nav-main-link">About</a>
+
+                <!-- Log in stays text button -->
+                <a href="#" class="nav-link nav-auth-link nav-login-link">Log in</a>
+
+                <!-- Sign up styled like Create button (silver version) -->
+                <a href="#" class="nav-link nav-auth-link nav-signup-cta">Sign up</a>
             </div>
         </nav>
 
         <div class="slide-nav">
-            <button class="close-btn"><</button>
-            <p>Please log in first</p>
+            <button class="close-btn" aria-label="Close menu">&lt;</button>
+            <p class="slide-message">Please log in first</p>
+
+            <!-- Pre-logged in Log in button -->
             <button class="login-btn">Log in</button>
         </div>
         <div class="backdrop"></div>
@@ -45,9 +54,12 @@
         <img class="center-logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
         <h1 class="chapterflow-title">ChapterFlow</h1>
 
-        <h3>Read your favorite stories and discover new ones — all in one place.<br>
-        You can even upload your own and earn rewards as you read and write</h3>
+        <h3>
+            Read your favorite stories and discover new ones — all in one place.<br>
+            You can even upload your own and earn rewards as you read and write
+        </h3>
 
+        <!-- Explore styled like Create button (khaki version) -->
         <button class="explore-btn" onclick="location.href='explore.html'">Explore</button>
     </div>
 
@@ -71,4 +83,5 @@
         <p>© 2025 ChapterFlow — All Rights Reserved</p>
     </footer>
 </body>
+
 </html>
