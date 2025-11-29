@@ -9,7 +9,9 @@
     display: flex;
     align-items: center;
     border-bottom: 1px solid black;
+    z-index: 900;  /* ✅ keep header above cards */
 }
+
 
 .logo {  
     height: 50px; 
@@ -1014,6 +1016,34 @@ body.edit-profile-page {
 .reading-hub p {
   margin-bottom: 1.25rem;
 }
+
+/* Make Reading Hub text more airy */
+.reading-hub > p,
+.hub-section > p {
+  max-width: 800px;
+  margin: 0 auto 2.2rem !important;   /* more space under the text */
+  line-height: 1.9;                   /* more space between lines */
+  font-size: 0.98rem;                 /* tweak if needed */
+}
+
+/* Extra breathing room between paragraph and cards */
+.hub-section .stories-grid {
+  margin-top: 1.5rem;
+}
+
+/* Section container spacing */
+.hub-section {
+  max-width: 1100px;
+  margin: 0 auto 3rem;
+}
+
+/* Extra separation between "Created by Students" and "Available on Campus" */
+.hub-section + .hub-section {
+  margin-top: 3.5rem;
+  padding-top: 2.3rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
 
 /* grid of story cards */
 .stories-grid {
