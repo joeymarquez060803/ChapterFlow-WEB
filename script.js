@@ -7,6 +7,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const header = document.querySelector('header');
   const navLinksContainer = document.querySelector('.nav-links');
+    // Home hero buttons (only exist on ChapterFlow.html)
+  const exploreBtn = document.querySelector('.explore-btn');
+  const homeHubBtn = document.querySelector('.reading-hub-btn');
+  // Is this the Reading Hub page?
+  const isReadingHubPage = window.location.href.toLowerCase().includes('readinghub.html');
+
+  // Elements that only exist (or mainly exist) on readinghub.html
+  const readingHubSection   = document.querySelector('.reading-hub');
+  const readingHubLockedMsg = document.querySelector('.locked-message');
+
 
   // Prevent nav flicker/layout shift on ChapterFlow.html:
   // hide the entire .nav-links container during auth loading.
@@ -419,7 +429,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (isChapterFlowPage && navLinksContainer) navLinksContainer.style.display = '';
   }
 
-  async function updateUIForLoggedInUser(user) {
+    async function updateUIForLoggedInUser(user) {
+    // Hide "Log in / Sign up" in navbar
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach((link) => {
       const text = (link.textContent || '').trim();
@@ -428,7 +439,8 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-        if (slideNav) {
+    // ----- Slide nav (left hamburger menu) -----
+    if (slideNav) {
       const loginBtn = slideNav.querySelector('.login-btn');
       const loginText = slideNav.querySelector('p');
 
@@ -437,9 +449,11 @@ document.addEventListener('DOMContentLoaded', function () {
         loginText.style.display = 'none';
       }
 
+      // Remove any old profile widget first
       const existingProfile = slideNav.querySelector('.profile-container');
       if (existingProfile) existingProfile.remove();
 
+      // Build logged-in profile block
       const profileContainer = document.createElement('div');
       profileContainer.className = 'profile-container';
       profileContainer.innerHTML = `
@@ -458,13 +472,11 @@ document.addEventListener('DOMContentLoaded', function () {
       await applyProfilePictureToUI(user);
 
       const editProfileBtn = profileContainer.querySelector('.edit-profile-btn');
-
-      // ✅ Get all slide-nav buttons in order
-      const slideButtons = profileContainer.querySelectorAll('.slide-nav-buttons .slide-nav-btn');
-      const createBtn  = slideButtons[0]; // "Create"
-      const historyBtn = slideButtons[1]; // "History"
-      const pointsBtn  = slideButtons[2]; // "Points & Rewards"
-      const logoutBtn  = profileContainer.querySelector('.logout-btn'); // "Log out"
+      const slideButtons   = profileContainer.querySelectorAll('.slide-nav-buttons .slide-nav-btn');
+      const createBtn      = slideButtons[0];
+      const historyBtn     = slideButtons[1];
+      const pointsBtn      = slideButtons[2];
+      const logoutBtn      = profileContainer.querySelector('.logout-btn');
 
       if (editProfileBtn) {
         editProfileBtn.addEventListener('click', (e) => {
@@ -476,7 +488,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (createBtn) {
         createBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          // If your page is named differently, change this path:
           window.location.href = './Slide nav buttons/upload.html';
         });
       }
@@ -508,22 +519,34 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
 
+    // ----- HOME PAGE: swap Explore ↔ Reading Hub button -----
+    if (isChapterFlowPage) {
+      if (exploreBtn)  exploreBtn.style.display = 'none';
+      if (homeHubBtn)  homeHubBtn.style.display = 'inline-block';
+    }
 
+    // ----- READING HUB PAGE: show cards, hide lock message -----
+    if (isReadingHubPage) {
+      if (readingHubSection)  readingHubSection.style.display = 'block';
+      if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'none';
+    }
+
+    // ----- Edit profile page extra UI -----
     if (isEditProfilePage) {
-      const userName = document.getElementById('user-name');
+      const userName  = document.getElementById('user-name');
       const userEmail = document.getElementById('user-email');
 
-      if (userName) userName.textContent = (user.name || user.email.split('@')[0]);
+      if (userName)  userName.textContent  = (user.name || user.email.split('@')[0]);
       if (userEmail) userEmail.textContent = user.email;
 
       await applyProfilePictureToUI(user);
-
       setupEditableUsername(user);
       revealEditProfileSectionWhenReady();
     }
   }
 
   function updateUIForLoggedOutUser() {
+    // Show "Log in / Sign up" again
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach((link) => {
       const text = (link.textContent || '').trim();
@@ -532,16 +555,30 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
+    // Slide nav: remove profile, show "Please log in first"
     if (slideNav) {
       const profileContainer = slideNav.querySelector('.profile-container');
       if (profileContainer) profileContainer.remove();
 
-      const loginBtn = slideNav.querySelector('.login-btn');
+      const loginBtn  = slideNav.querySelector('.login-btn');
       const loginText = slideNav.querySelector('p');
-      if (loginBtn) loginBtn.style.display = 'block';
+      if (loginBtn)  loginBtn.style.display = 'block';
       if (loginText) loginText.style.display = 'block';
     }
+
+    // HOME PAGE: show Explore, hide Reading Hub button
+    if (isChapterFlowPage) {
+      if (exploreBtn)  exploreBtn.style.display = 'inline-block';
+      if (homeHubBtn)  homeHubBtn.style.display = 'none';
+    }
+
+    // READING HUB PAGE: hide cards, show "Please log in" message
+    if (isReadingHubPage) {
+      if (readingHubSection)  readingHubSection.style.display = 'none';
+      if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'block';
+    }
   }
+
 
   if (submitBtn) {
     submitBtn.addEventListener('click', async function () {

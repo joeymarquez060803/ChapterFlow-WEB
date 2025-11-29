@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reading Hub - ChapterFlow</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Appwrite SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+
+  <!-- Your main script -->
+  <script src="script.js" defer></script>
+</head>
+<body class="loading">
+  <header>
+    <nav class="navbar">
+      <button class="hamburger" aria-label="Open menu">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </button>
+
+      <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+      <h2>ChapterFlow</h2>
+
+      <div class="nav-links">
+        <a href="ChapterFlow.html" class="nav-link nav-main-link">Home</a>
+        <a href="about.html" class="nav-link nav-main-link">About</a>
+        <a href="#" class="nav-link nav-auth-link nav-login-link">Log in</a>
+        <a href="#" class="nav-link nav-auth-link nav-signup-cta">Sign up</a>
+      </div>
+    </nav>
+
+    <div class="slide-nav">
+      <button class="close-btn"><</button>
+      <p class="slide-message">Please log in first</p>
+      <button class="login-btn">Log in</button>
+    </div>
+    <div class="backdrop"></div>
+  </header>
+
+  <main>
+    <h1 style="text-align:center; margin-top:110px;">Reading Hub</h1>
+    <p class="locked-message" style="text-align:center; max-width:700px; margin:0 auto 2rem; display:none;">
+      Please log in to access the Reading Hub.
+    </p>
+
+    <!-- 📚 READING HUB CONTENT -->
+    <section class="reading-hub">
+      <p style="max-width:800px; margin:0 auto 1.5rem;">
+        Browse novels, light novels, and poetry made by your fellow students.  
+        Earn points as you read and discover new stories inside campus.
+      </p>
+
+      <div class="stories-grid">
+        <article class="story-card">
+          <span class="tag novel">Novel</span>
+          <img src="https://media.assettype.com/gulfnews%2F2025-11-11%2Fmzk9b427%2FYes-Man.jpeg?w=480&auto=format%2Ccompress&fit=max" alt="Book Cover">
+          <div class="story-card-body">
+            <h3>An Elegy for King</h3>
+            <p class="genre">Drama / Romance / Erotic</p>
+            <p class="author">Verzola</p>
+            <button class="read-btn">Read</button>
+          </div>
+        </article>
+
+        <article class="story-card">
+          <span class="tag lightnovel">Light Novel</span>
+          <img src="https://m.media-amazon.com/images/M/MV5BYjUyN2JkMjMtNTY2Yy00ZDg2LWI0OTQtOTVkYzgxYTgxMDRhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Book Cover">
+          <div class="story-card-body">
+            <h3>The Dreamybull Chronicles: Defenitive Edition</h3>
+            <p class="genre">Adventure / Slice of Life / Action</p>
+            <p class="author">UnliRiceKing</p>
+            <button class="read-btn">Read</button>
+          </div>
+        </article>
+
+        <article class="story-card">
+          <span class="tag poetry">Poetry</span>
+          <img src="covers/sample3.jpg" alt="Book Cover">
+          <div class="story-card-body">
+            <h3>Petals and Paper</h3>
+            <p class="genre">Spoken Word / Emotional</p>
+            <p class="author">User: Welnis3759</p>
+            <button class="read-btn">Read</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  
+
+ 
+</body>
+</html>

@@ -6,6 +6,7 @@
     <title>ChapterFlow</title>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="footer.css">
     
     <!-- Appwrite SDK (loaded before your main script) -->
     <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
@@ -28,14 +29,9 @@
             <h2 class="site-title">ChapterFlow</h2>
 
             <div class="nav-links">
-                <!-- text buttons, same style pre-login & logged-in -->
                 <a href="ChapterFlow.html" class="nav-link nav-main-link">Home</a>
                 <a href="about.html" class="nav-link nav-main-link">About</a>
-
-                <!-- Log in stays text button -->
                 <a href="#" class="nav-link nav-auth-link nav-login-link">Log in</a>
-
-                <!-- Sign up styled like Create button (silver version) -->
                 <a href="#" class="nav-link nav-auth-link nav-signup-cta">Sign up</a>
             </div>
         </nav>
@@ -50,19 +46,28 @@
         <div class="backdrop"></div>
     </header>
 
-    <div class="main-content">
-        <img class="center-logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
-        <h1 class="chapterflow-title">ChapterFlow</h1>
+    <!-- MAIN CONTENT AREA -->
+    <main>
+        <!-- Hero section: only logo + title + subtitle + Explore -->
+        <div class="main-content">
+            <img class="center-logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+            <h1 class="chapterflow-title">ChapterFlow</h1>
 
-        <h3>
-            Read your favorite stories and discover new ones — all in one place.<br>
-            You can even upload your own and earn rewards as you read and write
-        </h3>
+            <h3>
+                Read your favorite stories and discover new ones — all in one place.<br>
+                You can even upload your own and earn rewards as you read and write.
+            </h3>
 
-        <!-- Explore styled like Create button (khaki version) -->
-        <button class="explore-btn" onclick="location.href='explore.html'">Explore</button>
-    </div>
+            <button class="explore-btn" onclick="location.href='explore.html'">Explore</button>
 
+            <button class="reading-hub-btn" onclick="location.href='readinghub.html'">Reading Hub</button>
+        </div>
+
+        <!-- 🔥 Reading Hub (scrolls below hero) -->
+        
+    </main>
+
+    <!-- Auth Modal (unchanged) -->
     <div id="authModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
