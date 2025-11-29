@@ -450,33 +450,44 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       // Remove any old profile widget first
-      const existingProfile = slideNav.querySelector('.profile-container');
-      if (existingProfile) existingProfile.remove();
+      // Remove any old profile widget first
+const existingProfile = slideNav.querySelector('.profile-container');
+if (existingProfile) existingProfile.remove();
 
-      // Build logged-in profile block
-      const profileContainer = document.createElement('div');
-      profileContainer.className = 'profile-container';
-      profileContainer.innerHTML = `
-        <img src="${DEFAULT_AVATAR_SMALL}" alt="Profile Picture" class="profile-pic">
-        <p class="username">${user.name || user.email.split('@')[0]}</p>
-        <button class="edit-profile-btn">Profile</button>
-        <div class="slide-nav-buttons">
-          <button class="slide-nav-btn">Create</button>
-          <button class="slide-nav-btn">History</button>
-          <button class="slide-nav-btn">Points & Rewards</button>
-          <button class="slide-nav-btn logout-btn">Log out</button>
-        </div>
-      `;
-      slideNav.appendChild(profileContainer);
+// Also remove any old action buttons block (.slide-nav-buttons)
+const existingActions = slideNav.querySelector('.slide-nav-buttons');
+if (existingActions) existingActions.remove();
 
-      await applyProfilePictureToUI(user);
+// Build logged-in profile block (ONLY profile pic + username + Profile button)
+const profileContainer = document.createElement('div');
+profileContainer.className = 'profile-container';
+profileContainer.innerHTML = `
+  <img src="${DEFAULT_AVATAR_SMALL}" alt="Profile Picture" class="profile-pic">
+  <p class="username">${user.name || user.email.split('@')[0]}</p>
+  <button class="edit-profile-btn">Profile</button>
+`;
+slideNav.appendChild(profileContainer);
 
-      const editProfileBtn = profileContainer.querySelector('.edit-profile-btn');
-      const slideButtons   = profileContainer.querySelectorAll('.slide-nav-buttons .slide-nav-btn');
-      const createBtn      = slideButtons[0];
-      const historyBtn     = slideButtons[1];
-      const pointsBtn      = slideButtons[2];
-      const logoutBtn      = profileContainer.querySelector('.logout-btn');
+// Build a completely separate block for Create / History / Points & Rewards / Log out
+const actionsContainer = document.createElement('div');
+actionsContainer.className = 'slide-nav-buttons';
+actionsContainer.innerHTML = `
+  <button class="slide-nav-btn">Create</button>
+  <button class="slide-nav-btn">History</button>
+  <button class="slide-nav-btn">Points & Rewards</button>
+  <button class="slide-nav-btn logout-btn">Log out</button>
+`;
+slideNav.appendChild(actionsContainer);
+
+await applyProfilePictureToUI(user);
+
+const editProfileBtn = profileContainer.querySelector('.edit-profile-btn');
+const slideButtons   = actionsContainer.querySelectorAll('.slide-nav-btn');
+const createBtn      = slideButtons[0];
+const historyBtn     = slideButtons[1];
+const pointsBtn      = slideButtons[2];
+const logoutBtn      = actionsContainer.querySelector('.logout-btn');
+
 
       if (editProfileBtn) {
         editProfileBtn.addEventListener('click', (e) => {
@@ -557,14 +568,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Slide nav: remove profile, show "Please log in first"
     if (slideNav) {
-      const profileContainer = slideNav.querySelector('.profile-container');
-      if (profileContainer) profileContainer.remove();
+  const profileContainer = slideNav.querySelector('.profile-container');
+  if (profileContainer) profileContainer.remove();
 
-      const loginBtn  = slideNav.querySelector('.login-btn');
-      const loginText = slideNav.querySelector('p');
-      if (loginBtn)  loginBtn.style.display = 'block';
-      if (loginText) loginText.style.display = 'block';
-    }
+  const actionsContainer = slideNav.querySelector('.slide-nav-buttons');
+  if (actionsContainer) actionsContainer.remove();
+
+  const loginBtn  = slideNav.querySelector('.login-btn');
+  const loginText = slideNav.querySelector('p');
+  if (loginBtn)  loginBtn.style.display = 'block';
+  if (loginText) loginText.style.display = 'block';
+}
+
 
     // HOME PAGE: show Explore, hide Reading Hub button
     if (isChapterFlowPage) {

@@ -114,6 +114,7 @@ h2   {
     background-color: rgb(225, 223, 223);
     transition: width 0.3s ease;
     z-index: 1000;
+    
 }
 
 .slide-nav.active {
@@ -168,18 +169,32 @@ h2   {
     visibility: visible;
 }
 
-.slide-nav p, .slide-nav .login-btn, .slide-nav .profile-container {
+.slide-nav p,
+.slide-nav .login-btn,
+.slide-nav .profile-container,
+.slide-nav .slide-nav-buttons,
+.slide-nav .slide-nav-btn,
+.slide-nav .slide-link,
+.slide-nav .edit-profile-btn {
     visibility: hidden;
     opacity: 0;
     transform: translateX(-500%);
 }
 
-.slide-nav.active p, .slide-nav.active .login-btn, .slide-nav.active .profile-container {
+
+.slide-nav.active p,
+.slide-nav.active .login-btn,
+.slide-nav.active .profile-container,
+.slide-nav.active .slide-nav-buttons,
+.slide-nav.active .slide-nav-btn,
+.slide-nav.active .slide-link,
+.slide-nav.active .edit-profile-btn {
     visibility: visible;
     opacity: 1;
     transform: translateX(0);
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
+
 
 .slide-nav p {
     margin: 100px 20px 20px 20px;
@@ -225,9 +240,9 @@ body {
 }
 
 .center-logo {
-    height: 250px;
+    height: 280px;
     display: block;
-    margin: 0 auto 1rem;
+    margin: 0 auto -1rem;
 }
 
 .chapterflow-title {
@@ -235,7 +250,7 @@ body {
     color: black;
     text-align: center;
     font-family: 'Merriweather', serif;
-    margin: 0 0 1rem;
+    margin: 0 0 1.5rem;
 }
 
 .main-content h3 {
@@ -407,6 +422,7 @@ body {
     flex-direction: column;
     align-items: center;
     margin-top: 50px;
+    margin-bottom: 20px;
 }
 
 .profile-pic {
@@ -423,13 +439,18 @@ body {
 }
 
 .slide-nav-buttons {
-    margin-top: 220px;      /* space under "Profile" */
-    margin-right: 50px ;
+    position: absolute;      /* anchor inside .slide-nav */
+    bottom: 25px;            /* distance from bottom edge of slide nav */
+    left: 20px;              /* indent from the left */
+    right: 20px;             /* optional: keeps them away from right edge */
+
     display: flex;
+    margin-left: 20px;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;             /* spacing between buttons */
+    gap: 15px;
+    margin: 0;               /* make sure old margins don’t interfere */
 }
+
 
 /* extra spacing between: Upload, View Uploads, History, Points & Rewards, Log out */
 .slide-nav-buttons .slide-nav-btn {
@@ -510,6 +531,33 @@ body.edit-profile-page {
     align-items: flex-start;
     padding: 100px 16px 40px; /* space above & below card */
 }
+
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background-color: silver;
+    border: 1px solid black;
+    text-decoration: none;
+    font-family: 'Merriweather', serif;
+    font-size: 0.95rem;
+    color: #000;
+    cursor: pointer;
+    z-index: 10; /* make sure it sits above the card */
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.15s ease;
+}
+
+.back-btn:hover {
+    background-color: lightgray;
+    color: black;
+}
+
 
 /* Khaki band: page background from top to (about) middle of card */
 .profile-page::before {
@@ -705,9 +753,9 @@ body.edit-profile-page {
 .points-create-btn {
     padding: 6px 18px;
     border-radius: 999px;
-    border: 1px solid var(--khaki);
-    background: transparent;
-    color: #5a4c2a;
+    border: 1px solid black;
+    background-color: lightgray;
+    color: black;
     font-size: 14px;
     cursor: pointer;
     transition:
@@ -1054,3 +1102,5 @@ body.edit-profile-page {
 .tag.poetry {
   background-color: #d65cff;  /* purple */
 }
+
+
