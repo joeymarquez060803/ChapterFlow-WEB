@@ -492,28 +492,28 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
       if (editProfileBtn) {
         editProfileBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          window.location.href = './Slide nav buttons/edit-profile.html';
+          window.location.href = '../Slide nav buttons/edit-profile.html';
         });
       }
 
       if (createBtn) {
         createBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          window.location.href = './Slide nav buttons/upload.html';
+          window.location.href = '../Slide nav buttons/upload.html';
         });
       }
 
       if (historyBtn) {
         historyBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          window.location.href = './Slide nav buttons/history.html';
+          window.location.href = '../Slide nav buttons/history.html';
         });
       }
 
       if (pointsBtn) {
         pointsBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          window.location.href = './Slide nav buttons/points-rewards.html';
+          window.location.href = '../Slide nav buttons/points-rewards.html';
         });
       }
 
@@ -522,7 +522,7 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
           try {
             await account.deleteSession('current');
             alert('Logged out successfully!');
-            window.location.href = 'ChapterFlow.html';
+            window.location.href = '../ChapterFlow.html';
           } catch (error) {
             alert('Error logging out: ' + error.message);
           }
@@ -626,5 +626,221 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
     });
   }
 
+   // ===========================
+  // READING BUBBLE (chapter pages only)
+  // ===========================
+  (function setupReadingBubble() {
+    // we only want the bubble on CHAPTER pages, not on the book info page
+    const isReaderPage = document.querySelector('main.reader-page');
+    const hasMeta = document.querySelector('.reader-meta'); // book info page has this
+    const isChapterView = isReaderPage && !hasMeta;
+
+    if (!isChapterView) return; // do nothing on other pages
+
+    // --- create bubble DOM ---
+    const bubble = document.createElement('div');
+    bubble.className = 'reading-bubble panel-left';  // default: panel on left
+
+    bubble.innerHTML = `
+      <div class="reading-bubble-main" title="Reading assistant">
+        ⏱
+      </div>
+      <div class="reading-bubble-panel">
+        <p class="rb-time">Reading time: 0:00</p>
+        <p class="rb-next">Next point in: 5:00</p>
+        <button type="button" class="rb-prev-btn" style="display:none;">Previous chapter</button>
+        <button type="button" class="rb-next-btn">Next chapter</button>
+      </div>
+    `;
+
+    document.body.appendChild(bubble);
+
+    const mainBtn = bubble.querySelector('.reading-bubble-main');
+    const panel = bubble.querySelector('.reading-bubble-panel');
+    const timeLabel = bubble.querySelector('.rb-time');
+    const nextLabel = bubble.querySelector('.rb-next');
+    const prevBtn = bubble.querySelector('.rb-prev-btn');
+    const nextBtn = bubble.querySelector('.rb-next-btn');
+
+    // --- choose which side the panel should open on ---
+    function updatePanelSide() {
+      const rect = bubble.getBoundingClientRect();
+      const threshold = 160; // px from the left edge to switch side
+
+      if (rect.left < threshold) {
+        // bubble too close to left edge -> open panel on the RIGHT
+        bubble.classList.add('panel-right');
+        bubble.classList.remove('panel-left');
+      } else {
+        // otherwise open panel on the LEFT
+        bubble.classList.add('panel-left');
+        bubble.classList.remove('panel-right');
+      }
+    }
+
+    // initial side decision
+    updatePanelSide();
+
+    // --- toggle open/close ---
+    mainBtn.addEventListener('click', () => {
+      bubble.classList.toggle('open');
+    });
+
+    // --- simple previous / next wiring based on current filename ---
+    const path = window.location.pathname;
+    const isCh1 = path.includes('story-king-ch1');
+    const isCh2 = path.includes('story-king-ch2');
+    const isCh3 = path.includes('story-king-ch3'); // last
+
+    if (isCh1) {
+      prevBtn.style.display = 'none';
+      nextBtn.textContent = 'Next chapter';
+      nextBtn.addEventListener('click', () => {
+        window.location.href = 'story-king-ch2.html';
+      });
+    } else if (isCh2) {
+      prevBtn.style.display = 'inline-block';
+      prevBtn.textContent = 'Previous chapter';
+      nextBtn.textContent = 'Next chapter';
+      prevBtn.addEventListener('click', () => {
+        window.location.href = 'story-king-ch1.html';
+      });
+      nextBtn.addEventListener('click', () => {
+        window.location.href = 'story-king-ch3.html';
+      });
+    } else if (isCh3) {
+      prevBtn.style.display = 'inline-block';
+      prevBtn.textContent = 'Previous chapter';
+      nextBtn.textContent = 'Back to book';
+      prevBtn.addEventListener('click', () => {
+        window.location.href = 'story-king-ch2.html';
+      });
+      nextBtn.addEventListener('click', () => {
+        window.location.href = 'story-king.html';
+      });
+    } else {
+      prevBtn.style.display = 'none';
+      nextBtn.style.display = 'none';
+    }
+
+    // --- draggable behaviour (mouse + touch) ---
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    function startDrag(clientX, clientY) {
+      isDragging = true;
+      const rect = bubble.getBoundingClientRect();
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+      mainBtn.style.cursor = 'grabbing';
+      // switch to top/left positioning while dragging
+      bubble.style.left = rect.left + 'px';
+      bubble.style.top = rect.top + 'px';
+      bubble.style.right = 'auto';
+      bubble.style.bottom = 'auto';
+    }
+
+    function moveDrag(clientX, clientY) {
+      if (!isDragging) return;
+      const x = clientX - offsetX;
+      const y = clientY - offsetY;
+      bubble.style.left = x + 'px';
+      bubble.style.top = y + 'px';
+    }
+
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+      mainBtn.style.cursor = 'grab';
+      updatePanelSide(); // re-evaluate side after dragging
+    }
+
+    mainBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      startDrag(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      moveDrag(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mouseup', endDrag);
+
+    mainBtn.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startDrag(t.clientX, t.clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      moveDrag(t.clientX, t.clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchend', endDrag);
+
+    // also adjust side if the window is resized
+    window.addEventListener('resize', updatePanelSide);
+
+    // --- reading timer with inactivity detection + localStorage ---
+    const STORAGE_KEY = 'cf_readtime_elegy';  // unique per book
+
+    let secondsRead = 0;
+    let lastActivity = Date.now();
+    const INACTIVITY_LIMIT_MS = 60000;   // 60s no activity = pause
+    const POINT_INTERVAL_SEC = 300;      // 5 min per point (for display only)
+
+    // try to restore from localStorage
+    try {
+      const saved = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+      if (!Number.isNaN(saved) && saved >= 0) {
+        secondsRead = saved;
+      }
+    } catch (e) {
+      console.warn('Could not read reading time from storage', e);
+    }
+
+    function recordActivity() {
+      lastActivity = Date.now();
+    }
+
+    ['mousemove', 'keydown', 'scroll', 'touchstart'].forEach((evt) => {
+      document.addEventListener(evt, recordActivity, { passive: true });
+    });
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function updateLabels() {
+      timeLabel.textContent = `Reading time: ${formatTime(secondsRead)}`;
+      const intoInterval = secondsRead % POINT_INTERVAL_SEC;
+      const remaining = POINT_INTERVAL_SEC - intoInterval || POINT_INTERVAL_SEC;
+      nextLabel.textContent = `Next point in: ${formatTime(remaining)}`;
+    }
+
+    updateLabels();
+
+    setInterval(() => {
+      const now = Date.now();
+      const inactiveFor = now - lastActivity;
+      if (inactiveFor < INACTIVITY_LIMIT_MS) {
+        secondsRead += 1;
+        updateLabels();
+
+        // save to localStorage so it survives page changes
+        try {
+          localStorage.setItem(STORAGE_KEY, String(secondsRead));
+        } catch (e) {
+          console.warn('Could not save reading time', e);
+        }
+      }
+    }, 1000);
+  })();
+
+
   checkAuthState();
 });
+

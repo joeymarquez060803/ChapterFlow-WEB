@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>An Elegy for King – ChapterFlow</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+  <script src="../script.js" defer></script>
+</head>
+<body class="loading">
+  <header>
+    <nav class="navbar">
+      <button class="hamburger" aria-label="Open menu">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </button>
+
+      <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+      <h2>ChapterFlow</h2>
+
+      <div class="nav-links">
+        <a href="../ChapterFlow.html" class="nav-link nav-main-link">Home</a>
+        <a href="../readinghub.html" class="nav-link nav-main-link">Reading Hub</a>
+        <a href="../about.html" class="nav-link nav-main-link">About</a>
+        <a href="#" class="nav-link nav-auth-link nav-login-link">Log in</a>
+        <a href="#" class="nav-link nav-auth-link nav-signup-cta">Sign up</a>
+      </div>
+    </nav>
+
+    <div class="slide-nav">
+      <button class="close-btn"><</button>
+      <p class="slide-message">Please log in first</p>
+      <button class="login-btn">Log in</button>
+    </div>
+    <div class="backdrop"></div>
+  </header>
+
+  <main class="reader-page">
+    <a href="../readinghub.html" class="back-to-hub">← Back to Reading Hub</a>
+
+    <!-- Story meta -->
+    <section class="reader-meta">
+      <img
+        src="https://media.assettype.com/gulfnews%2F2025-11-11%2Fmzk9b427%2FYes-Man.jpeg?w=480&auto=format%2Ccompress&fit=max"
+        alt="An Elegy for King Cover"
+        class="reader-cover"
+      >
+
+      <div class="reader-info">
+        <h1>An Elegy for King</h1>
+        <p class="reader-author">By Verzola</p>
+        <p class="reader-genre">Drama / Romance (placeholder)</p>
+
+        <p class="reader-synopsis">
+          This is a placeholder synopsis for your project. An Elegy for King follows a student whose
+          quiet routine starts to change after an unexpected confession. The focus here is to show
+          a proper story page with meta info and chapter navigation, not to finish a full novel.
+        </p>
+
+        <div class="reader-notable">
+          <h3>Other works by Verzola (placeholder)</h3>
+          <ul>
+            <li><em>Rain on the Third Floor</em> – short story</li>
+            <li><em>Ink-Stained Uniforms</em> – poetry collection</li>
+            <li><em>Before the Bell Rings</em> – novella draft</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter list (each opens its own page) -->
+    <section class="reader-chapters">
+      <h2>Chapters</h2>
+      <ul>
+        <li><a href="story-king-ch1.html">Chapter 1 – The Quiet Start</a></li>
+        <li><a href="story-king-ch2.html">Chapter 2 – After Class</a></li>
+        <li><a href="story-king-ch3.html">Chapter 3 – Things Left Unsaid</a></li>
+      </ul>
+    </section>
+
+    <hr class="reader-divider">
+
+    <section class="reader-content">
+      <p>
+        Choose a chapter above to start reading. Each chapter opens in its own distraction-free page,
+        so you can focus on the story without scrolling past everything else.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
