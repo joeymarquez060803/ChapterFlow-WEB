@@ -496,12 +496,13 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
         });
       }
 
-      if (createBtn) {
-        createBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          window.location.href = './Slide nav buttons/upload.html';
-        });
-      }
+     if (createBtn) {
+  createBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../Slide nav buttons/Create/upload.html';
+  });
+}
+
 
       if (historyBtn) {
         historyBtn.addEventListener('click', (e) => {

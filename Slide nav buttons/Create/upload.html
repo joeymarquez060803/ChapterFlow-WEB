@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Chapter - ChapterFlow</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+
+  <!-- Material Icons for toolbar -->
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+
+  <!-- Appwrite SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+  <!-- Your main script (auth, slide nav, etc.) -->
+  <script src="../script.js" defer></script>
+
+  <style>
+    /* --- Page layout --- */
+    body.upload-page {
+      margin: 0;
+      font-family: "Merriweather", serif;
+      background-color: #faf8f0;
+    }
+
+    .upload-wrapper {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 120px 16px 40px;
+    }
+
+    .upload-card {
+      max-width: 1400px; /* overall card width */
+      width: 100%;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+      padding: 28px 28px 20px;
+    }
+
+    .upload-card-header {
+      margin-bottom: 18px;
+    }
+
+    .upload-card-header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .upload-card-header p {
+      margin: 6px 0 0;
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    /* --- Form fields --- */
+    .upload-field-group {
+      margin-bottom: 16px;
+    }
+
+    .upload-field-group label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+    }
+
+    .upload-input {
+      width: 100%;
+      padding: 12px 10px;          /* taller title inputs */
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.16);
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: #faf8f0;
+    }
+
+    .upload-input:focus {
+      outline: none;
+      border-color: #c8b38a;
+      box-shadow: 0 0 0 2px rgba(200,179,138,0.3);
+    }
+
+    /* --- Material Symbols icon font --- */
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* --- Toolbar + editor --- */
+    .editor-shell {
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.12);
+      background: #fdfbf4;
+      display: flex;
+      flex-direction: column;
+      overflow: visible;
+    }
+
+    .editor-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 10px 8px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      background: #f2ebda;
+      min-height: 100px; /* tall enough for two rows */
+    }
+
+    /* left side: FONT SIZE selector only */
+    .toolbar-left {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .toolbar-left label {
+      margin-bottom: 2px;
+    }
+
+    .toolbar-left select {
+      font-family: "Merriweather", serif;
+      font-size: 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.2);
+      padding: 3px 12px;
+      background: #fdfbf4;
+      cursor: pointer;
+    }
+
+    /* centered icon rows */
+    .toolbar-top,
+    .toolbar-middle {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .editor-btn {
+      border: none;
+      background: transparent;
+      padding: 4px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: #5a4c2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      transition: background-color 0.15s ease, transform 0.12s ease, color 0.15s ease;
+    }
+
+    .editor-btn:hover {
+      background-color: rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+      color: #3b2f17;
+    }
+
+    .editor-btn:active {
+      transform: translateY(0);
+    }
+
+    .editor-page {
+      display: flex;
+      justify-content: center;
+      padding: 14px 10px 10px;
+    }
+
+    .editor-page textarea {
+      width: 100%;
+      max-width: 1150px;        /* 🔧 overall page width */
+      min-height: 800px;        /* 🔧 base height of writing area */
+      resize: vertical;
+      border-radius: 12px;      /* page corners */
+      border: 1px solid rgba(0,0,0,0.12);  /* page border */
+      padding: 20px 22px;
+      font-family: inherit;
+      font-size: 1rem;          /* default font size (will be overridden by selector) */
+      line-height: 1.6;
+      background: #ffffff;      /* page background white */
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08); /* page shadow */
+    }
+
+    .editor-page textarea:focus {
+      outline: none;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    .editor-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-ghost,
+    .btn-primary {
+      padding: 0.45rem 1.4rem;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: 1px solid #c8b38a;
+      background: transparent;
+      color: #5a4c2a;
+      transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.12s ease;
+    }
+
+    .btn-ghost:hover {
+      background-color: #f2ebda;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: #c8b38a;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #b39b6d;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active,
+    .btn-ghost:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    @media (max-width: 600px) {
+      .upload-card {
+        padding: 20px 16px 16px;
+      }
+      .editor-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .toolbar-left {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .editor-toolbar {
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+
+<body class="loading upload-page">
+  <div class="upload-wrapper">
+    <section class="upload-card">
+      <header class="upload-card-header">
+        <h1>New Chapter</h1>
+        <p>Write your light/web novel chapter, then publish it to ChapterFlow.</p>
+      </header>
+
+      <!-- Work / chapter meta -->
+      <div class="upload-field-group">
+        <label for="work-title">Work Title</label>
+        <input
+          id="work-title"
+          class="upload-input"
+          type="text"
+          placeholder="e.g. The Midnight Library on Campus"
+        >
+      </div>
+
+      <div class="upload-field-group">
+        <label for="chapter-title">Chapter Title</label>
+        <input
+          id="chapter-title"
+          class="upload-input"
+          type="text"
+          placeholder="e.g. Chapter 1 – The Transfer Student"
+        >
+      </div>
+
+      <!-- Editor -->
+      <div class="editor-shell">
+        <div class="editor-toolbar">
+          <!-- left-side: FONT SIZE selector -->
+          <div class="toolbar-left">
+            <div>
+              <label for="font-size-select">Font size</label>
+              <select id="font-size-select">
+                <option value="14">14</option>
+                <option value="16" selected>16</option>
+                <option value="18">18</option>
+                <option value="20">20</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- top row: bold / italic / underline / heading -->
+          <div class="toolbar-top">
+            <button type="button" class="editor-btn" data-role="bold" title="Bold">
+              <span class="material-symbols-outlined">format_bold</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="italic" title="Italic">
+              <span class="material-symbols-outlined">format_italic</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="underline" title="Underline">
+              <span class="material-symbols-outlined">format_underlined</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="heading" title="Heading">
+              <span class="material-symbols-outlined">title</span>
+            </button>
+          </div>
+
+          <!-- second row: alignment -->
+          <div class="toolbar-middle">
+            <button type="button" class="editor-btn" data-role="align-left" title="Align left">
+              <span class="material-symbols-outlined">format_align_left</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="align-center" title="Center">
+              <span class="material-symbols-outlined">format_align_center</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="align-right" title="Align right">
+              <span class="material-symbols-outlined">format_align_right</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="justify" title="Justify">
+              <span class="material-symbols-outlined">format_align_justify</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="editor-page" id="editor-page">
+          <textarea
+            id="chapter-body"
+            placeholder="Start writing your chapter here..."
+          ></textarea>
+        </div>
+
+        <div class="editor-footer">
+          <span id="editor-stats">0 words · 0 characters</span>
+
+          <div class="editor-actions">
+            <button type="button" class="btn-ghost" id="save-draft-btn">Save draft</button>
+            <button type="button" class="btn-primary" id="publish-btn">Publish</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const bodyEl = document.getElementById('chapter-body');
+      const workTitleEl = document.getElementById('work-title');
+      const chapterTitleEl = document.getElementById('chapter-title');
+      const statsEl = document.getElementById('editor-stats');
+      const toolbarButtons = document.querySelectorAll('.editor-btn');
+      const saveDraftBtn = document.getElementById('save-draft-btn');
+      const publishBtn = document.getElementById('publish-btn');
+      const fontSizeSelect = document.getElementById('font-size-select');
+
+      const DRAFT_KEY = 'chapterflow:draft';
+
+      function updateStats() {
+        const text = bodyEl.value.trim();
+        const wordCount = text ? text.split(/\s+/).length : 0;
+        const charCount = bodyEl.value.length;
+        statsEl.textContent = wordCount + ' words · ' + charCount + ' characters';
+      }
+
+      function surroundSelection(before, after) {
+        const textarea = bodyEl;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+
+        if (start == null || end == null) return;
+
+        const selected = textarea.value.slice(start, end);
+        const replacement = before + selected + after;
+
+        textarea.setRangeText(replacement, start, end, 'end');
+        textarea.focus();
+        updateStats();
+      }
+
+      function headingCurrentLine() {
+        const textarea = bodyEl;
+        const pos = textarea.selectionStart || 0;
+        const value = textarea.value;
+
+        const lineStart = value.lastIndexOf('\n', pos - 1) + 1;
+        const lineEnd = value.indexOf('\n', pos);
+        const end = lineEnd === -1 ? value.length : lineEnd;
+        const line = value.slice(lineStart, end);
+
+        let newLine;
+        if (line.startsWith('# ')) {
+          newLine = line.replace(/^#\s+/, '');
+        } else {
+          newLine = '# ' + line;
+        }
+
+        textarea.setRangeText(newLine, lineStart, end, 'end');
+        textarea.focus();
+        updateStats();
+      }
+
+      function applyFontSize(size) {
+        if (!size) return;
+        bodyEl.style.fontSize = size + 'px';
+      }
+
+      // Toolbar button behavior
+      toolbarButtons.forEach(btn => {
+        const role = btn.dataset.role;
+        btn.addEventListener('click', () => {
+          if (!role) return;
+          if (role === 'bold') surroundSelection('**', '**');
+          if (role === 'italic') surroundSelection('*', '*');
+          if (role === 'underline') surroundSelection('__', '__');
+          if (role === 'heading') headingCurrentLine();
+
+          if (role === 'align-left') bodyEl.style.textAlign = 'left';
+          if (role === 'align-center') bodyEl.style.textAlign = 'center';
+          if (role === 'align-right') bodyEl.style.textAlign = 'right';
+          if (role === 'justify') bodyEl.style.textAlign = 'justify';
+        });
+      });
+
+      bodyEl.addEventListener('input', updateStats);
+      bodyEl.addEventListener('keyup', updateStats);
+      bodyEl.addEventListener('change', updateStats);
+
+      // Font size selector
+      if (fontSizeSelect) {
+        fontSizeSelect.addEventListener('change', () => {
+          applyFontSize(fontSizeSelect.value);
+        });
+        applyFontSize(fontSizeSelect.value || '16');
+      }
+
+      function loadDraft() {
+        try {
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (!raw) return;
+          const data = JSON.parse(raw);
+          if (data.workTitle) workTitleEl.value = data.workTitle;
+          if (data.chapterTitle) chapterTitleEl.value = data.chapterTitle;
+          if (data.body) bodyEl.value = data.body;
+          if (data.fontSize && fontSizeSelect) {
+            fontSizeSelect.value = data.fontSize;
+            applyFontSize(data.fontSize);
+          }
+          updateStats();
+        } catch (e) {
+          console.warn('Failed to load draft', e);
+        }
+      }
+
+      function saveDraft() {
+        const payload = {
+          workTitle: workTitleEl.value.trim(),
+          chapterTitle: chapterTitleEl.value.trim(),
+          body: bodyEl.value,
+          fontSize: fontSizeSelect ? fontSizeSelect.value : null
+        };
+        try {
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+          alert('Draft saved locally on this browser.');
+        } catch (e) {
+          alert('Could not save draft (storage error).');
+        }
+      }
+
+      function publishChapter() {
+        const workTitle = workTitleEl.value.trim();
+        const chapterTitle = chapterTitleEl.value.trim();
+        const body = bodyEl.value.trim();
+
+        if (!workTitle || !chapterTitle || !body) {
+          alert('Please fill in Work Title, Chapter Title, and the chapter text.');
+          return;
+        }
+
+        console.log('PUBLISH PAYLOAD', {
+          workTitle,
+          chapterTitle,
+          body,
+          fontSize: fontSizeSelect ? fontSizeSelect.value : null
+        });
+        alert('Chapter ready to send! (Hook this into Appwrite when you’re ready.)');
+      }
+
+      saveDraftBtn.addEventListener('click', saveDraft);
+      publishBtn.addEventListener('click', publishChapter);
+
+      // init
+      updateStats();
+      loadDraft();
+    })();
+  </script>
+</body>
+</html>
