@@ -24,7 +24,7 @@
       </button>
 
       <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
-      <h2>ChapterFlow</h2>
+      <h2><a href="ChapterFlow.html">ChapterFlow</a></h2>
 
       <div class="nav-links">
         <a href="ChapterFlow.html" class="nav-link nav-main-link">Home</a>
@@ -43,108 +43,86 @@
   </header>
 
   <main>
-    <h1 style="text-align:center; margin-top:110px;">Reading Hub</h1>
-    <p class="locked-message" style="text-align:center; max-width:700px; margin:0 auto 2rem; display:none;">
-      Please log in to access the Reading Hub.
+  <h1 style="text-align:center; margin-top:110px;">Reading Hub</h1>
+
+  <!-- shown only when logged out (your JS can toggle this) -->
+  <p class="locked-message" style="text-align:center; max-width:700px; margin:0 auto 2rem; display:none;">
+    Please log in to access the Reading Hub.
+  </p>
+
+  <section class="reading-hub">
+
+    <!-- 🔹 Created by Students (top section, you can add real user works later) -->
+    <h2 class="section-title">Created by Students</h2>
+    <p class="section-desc">
+      A space for campus writers to share their own stories, poems, and light novels.
+      These are original works made by students, for students.
     </p>
 
-        <!-- 📚 READING HUB CONTENT -->
-    <section class="reading-hub">
-      <p style="max-width:800px; margin:0 auto 2rem;">
-        Browse novels, light novels, and poetry made by your fellow students.  
-        Earn points as you read and discover new stories inside campus.
-      </p>
-
-      <!-- 🔹 User-created stories -->
-      <div class="hub-section">
-        <h2>Created by Students</h2>
-        <p style="max-width:800px; margin:0 auto 1.5rem;">
-          These are stories written and published by members of our campus — classmates, friends,
-          and other students who decided to share their worlds.
-        </p>
-
-        <div class="stories-grid">
-          <article class="story-card">
-            <span class="tag novel">Novel</span>
-            <img src="https://media.assettype.com/gulfnews%2F2025-11-11%2Fmzk9b427%2FYes-Man.jpeg?w=480&auto=format%2Ccompress&fit=max" alt="Book Cover">
-            <div class="story-card-body">
-              <h3>An Elegy for King</h3>
-              <p class="genre">Drama / Romance / Erotic</p>
-              <p class="author">Verzola</p>
-              <button class="read-btn">Read</button>
-            </div>
-          </article>
-
-          <article class="story-card">
-            <span class="tag lightnovel">Light Novel</span>
-            <img src="https://m.media-amazon.com/images/M/MV5BYjUyN2JkMjMtNTY2Yy00ZDg2LWI0OTQtOTVkYzgxYTgxMDRhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Book Cover">
-            <div class="story-card-body">
-              <h3>The Dreamybull Chronicles: Definitive Edition</h3>
-              <p class="genre">Adventure / Slice of Life / Action</p>
-              <p class="author">UnliRiceKing</p>
-              <button class="read-btn">Read</button>
-            </div>
-          </article>
-
-          <article class="story-card">
-            <span class="tag poetry">Poetry</span>
-            <img src="covers/sample3.jpg" alt="Book Cover">
-            <div class="story-card-body">
-              <h3>Petals and Paper</h3>
-              <p class="genre">Spoken Word / Emotional</p>
-              <p class="author">User: Welnis3759</p>
-              <button class="read-btn">Read</button>
-            </div>
-          </article>
+    <div class="stories-grid">
+      <!-- You can add real student-created cards here later -->
+      <!-- Example placeholder card (optional, you can delete this): -->
+      <!--
+      <article class="story-card">
+        <span class="tag student">Student Work</span>
+        <img src="https://via.placeholder.com/300x400" alt="Student Story Cover">
+        <div class="story-card-body">
+          <h3>Untitled Draft</h3>
+          <p class="genre">Campus Life / Slice of Life</p>
+          <p class="author">Student Writer</p>
+          <button class="read-btn" disabled>Coming Soon</button>
         </div>
-      </div>
+      </article>
+      -->
+    </div>
 
-      <!-- 🔹 Other available books -->
-      <div class="hub-section">
-        <h2>Available on Campus</h2>
-        <p style="max-width:800px; margin:0 auto 1.5rem;">
-          A selection of titles available inside campus — great if you want to explore
-          something beyond student works while still earning points.
-        </p>
+    <!-- 🔹 Available on Campus (your 3 books go here) -->
+    <h2 class="section-title" style="margin-top:2.5rem;">Available on Campus</h2>
+    <p class="section-desc">
+      Curated titles that you can explore anytime inside campus — sample novels,
+      light novels, and poetry collections to showcase how ChapterFlow works as a reading platform.
+    </p>
 
-        <div class="stories-grid">
-          <article class="story-card">
-            <span class="tag novel">Novel</span>
-            <img src="covers/sample1.jpg" alt="Book Cover">
-            <div class="story-card-body">
-              <h3>Midnight in the Library</h3>
-              <p class="genre">Mystery / Supernatural</p>
-              <p class="author">Campus Collection</p>
-              <button class="read-btn">Read</button>
-            </div>
-          </article>
-
-          <article class="story-card">
-            <span class="tag lightnovel">Light Novel</span>
-            <img src="covers/sample2.jpg" alt="Book Cover">
-            <div class="story-card-body">
-              <h3>Hallway Stories</h3>
-              <p class="genre">Slice of Life / School</p>
-              <p class="author">Campus Collection</p>
-              <button class="read-btn">Read</button>
-            </div>
-          </article>
-
-          <article class="story-card">
-            <span class="tag poetry">Poetry</span>
-            <img src="covers/sample3.jpg" alt="Book Cover">
-            <div class="story-card-body">
-              <h3>Chalk Dust & Sunsets</h3>
-              <p class="genre">Poetry / Reflection</p>
-              <p class="author">Campus Collection</p>
-              <button class="read-btn">Read</button>
-            </div>
-          </article>
+    <div class="stories-grid campus-grid">
+      <!-- Book 1 -->
+      <article class="story-card">
+        <span class="tag novel">Novel</span>
+        <img src="https://media.assettype.com/gulfnews%2F2025-11-11%2Fmzk9b427%2FYes-Man.jpeg?w=480&auto=format%2Ccompress&fit=max" alt="An Elegy for King">
+        <div class="story-card-body">
+          <h3>An Elegy for King</h3>
+          <p class="genre">Drama / Romance (placeholder)</p>
+          <p class="author">Verzola</p>
+          <button class="read-btn" onclick="location.href='books/story-king.html'">Read</button>
         </div>
-      </div>
-    </section>
+      </article>
 
-  </main>
+      <!-- Book 2 -->
+      <article class="story-card">
+        <span class="tag lightnovel">Light Novel</span>
+        <img src="https://m.media-amazon.com/images/M/MV5BYjUyN2JkMjMtNTY2Yy00ZDg2LWI0OTQtOTVkYzgxYTgxMDRhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="The Dreamybull Chronicles">
+        <div class="story-card-body">
+          <h3>The Dreamybull Chronicles: Definitive Edition</h3>
+          <p class="genre">Adventure / Slice of Life / Action</p>
+          <p class="author">UnliRiceKing</p>
+          <button class="read-btn" onclick="location.href='books/story-dreamybull.html'">Read</button>
+        </div>
+      </article>
+
+      <!-- Book 3 -->
+      <article class="story-card">
+        <span class="tag poetry">Poetry</span>
+        <img src="covers/sample3.jpg" alt="Petals and Paper">
+        <div class="story-card-body">
+          <h3>Petals and Paper</h3>
+          <p class="genre">Spoken Word / Emotional</p>
+          <p class="author">User: Welnis3759</p>
+          <button class="read-btn" onclick="location.href='books/story-petals.html'">Read</button>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
 
   
 
