@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Story - ChapterFlow</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="upload.css">
+
+  <!-- Material Icons for toolbar -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+
+  <!-- Appwrite SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+  <!-- Your main script (auth, slide nav, etc.) -->
+  <script src="../script.js" defer></script>
+  <script src="upload.js" defer></script>
+</head>
+
+<body class="loading upload-page">
+  <a href="../../ChapterFlow.html" class="upload-back-btn">&larr; Back</a>
+  <div class="upload-wrapper">
+    <section class="upload-card">
+  <header class="upload-card-header">
+    <h1>Create Your Story</h1>
+
+        <p>Create a series and/or write a chapter to publish on ChapterFlow.</p>
+      </header>
+
+      <!-- Story / series selection & creation -->
+      <div class="upload-field-group series-group">
+        <label for="series-select-btn">Select Story</label>
+        <div class="series-main-row">
+          <button type="button" id="series-select-btn" class="series-select-btn">
+            Select Story
+          </button>
+          <span id="series-status" class="series-status">No story selected</span>
+        </div>
+
+        <div id="series-dropdown" class="series-dropdown hidden">
+          <p class="series-dropdown-label">Choose an existing story:</p>
+          <div id="series-list" class="series-list"></div>
+          <button type="button" id="series-create-new-btn" class="series-create-new-btn">
+            + Create New
+          </button>
+        </div>
+
+        <div id="series-panel" class="series-panel hidden">
+          <p id="series-step-label" class="series-step-label"></p>
+
+          <!-- Step 1: Series title -->
+          <div id="series-title-step" class="series-step">
+            <input
+              type="text"
+              id="series-title-input"
+              class="series-input"
+              placeholder="Series title"
+            />
+            <div class="series-actions">
+              <button type="button" class="series-save-btn" data-step="title">Save</button>
+              <button type="button" class="series-cancel-btn" data-step="title">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Series description -->
+          <div id="series-description-step" class="series-step hidden">
+            <textarea
+              id="series-description-input"
+              class="series-input series-input--multiline"
+              placeholder="Describe your series (optional)"
+            ></textarea>
+            <div class="series-actions">
+              <button type="button" class="series-back-btn" data-step="description">Back</button>
+              <button type="button" class="series-save-btn" data-step="description">Save</button>
+              <button type="button" class="series-cancel-btn" data-step="description">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Series cover -->
+          <div id="series-cover-step" class="series-step hidden">
+            <div class="series-cover-row">
+              <input type="file" id="series-cover-input" accept="image/*" class="hidden" />
+              <button type="button" id="series-cover-btn" class="series-cover-btn">
+                Upload cover
+              </button>
+              <span id="series-cover-name" class="series-cover-name">No file chosen</span>
+            </div>
+            <div class="series-actions">
+              <button type="button" class="series-back-btn" data-step="cover">Back</button>
+              <button type="button" class="series-save-btn" data-step="cover">Save</button>
+              <button type="button" class="series-cancel-btn" data-step="cover">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter meta -->
+      <div class="upload-field-group">
+        <label for="chapter-title">Chapter Title</label>
+        <input
+          id="chapter-title"
+          class="upload-input"
+          type="text"
+          placeholder="e.g. Chapter 1 – The Transfer Student"
+        />
+      </div>
+
+      <!-- Editor -->
+      <div class="editor-shell">
+        <div class="editor-toolbar">
+          <!-- Font size selector (left) -->
+          <div class="toolbar-left">
+            <div>
+              <label for="font-size-select">Font size</label>
+              <select id="font-size-select">
+                <option value="12">12</option>
+                <option value="14">14</option>
+                <option value="16" selected>16</option>
+                <option value="18">18</option>
+                <option value="20">20</option>
+                <option value="22">22</option>
+                <option value="24">24</option>
+                <option value="28">28</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Top row: bold / italic / underline (Heading removed) -->
+          <div class="toolbar-top">
+            <button type="button" class="editor-btn" data-role="bold" title="Bold">
+              <span class="material-symbols-outlined">format_bold</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="italic" title="Italic">
+              <span class="material-symbols-outlined">format_italic</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="underline" title="Underline">
+              <span class="material-symbols-outlined">format_underlined</span>
+            </button>
+          </div>
+
+          <!-- Second row: Insert image + Align left/center/right (Justify removed) -->
+          <div class="toolbar-middle">
+            <button type="button" class="editor-btn" id="insert-image-btn" title="Insert image">
+              <span class="material-symbols-outlined">image</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="align-left" title="Align left">
+              <span class="material-symbols-outlined">format_align_left</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="align-center" title="Center">
+              <span class="material-symbols-outlined">format_align_center</span>
+            </button>
+            <button type="button" class="editor-btn" data-role="align-right" title="Align right">
+              <span class="material-symbols-outlined">format_align_right</span>
+            </button>
+          </div>
+
+          <!-- Hidden file input for Insert image -->
+          <input type="file" id="insert-image-input" accept="image/*" class="hidden" />
+        </div>
+
+        <!-- Writing area -->
+        <div class="editor-page">
+          <div
+            id="chapter-body"
+            class="editor-content"
+            contenteditable="true"
+            data-placeholder="Start writing your chapter here..."
+          ></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="editor-footer">
+          <span id="editor-stats">0 words · 0 characters</span>
+
+          <div class="editor-actions">
+            <button type="button" class="btn-ghost" id="save-draft-btn">Save draft</button>
+            <button type="button" class="btn-primary" id="publish-btn">Publish</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
