@@ -61,6 +61,75 @@ document.addEventListener('DOMContentLoaded', function () {
     console.error('Appwrite SDK not loaded. Auth and uploads may not work.');
   }
 
+   // ===========================
+  // REAL POINTS stored in Appwrite prefs
+  // ===========================
+  const POINTS_PREF_KEY = 'readingPoints';
+
+  // Show points ONLY in the top navbar
+  function updateHeaderPoints(points) {
+    const navContainer = document.querySelector('.nav-links');
+    if (!navContainer) return;
+
+    let badge = navContainer.querySelector('.nav-points-display');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'nav-points-display';
+      navContainer.appendChild(badge);
+    }
+    badge.textContent = `Points: ${points}`;
+  }
+
+  // OPTIONAL: If you ever want to show points on profile page
+  function updateProfilePoints(points) {
+    const span = document.getElementById('profile-points-value');
+    if (span) {
+      span.textContent = points;
+    }
+  }
+
+  // Read points from Appwrite account prefs
+  async function getUserPoints(user) {
+    if (!account || !user) return 0;
+    try {
+      const prefs = await account.getPrefs();
+      const raw = prefs?.[POINTS_PREF_KEY];
+      const n = Number(raw);
+      if (!Number.isFinite(n) || n < 0) return 0;
+      return Math.floor(n);
+    } catch (e) {
+      console.warn('Failed to load points prefs:', e);
+      return 0;
+    }
+  }
+
+  // Save points to Appwrite prefs + refresh navbar/profile UI
+  async function setUserPoints(user, points) {
+    if (!account || !user) return;
+    const safePoints = Math.max(0, Math.floor(Number(points) || 0));
+
+    try {
+      await account.updatePrefs({ [POINTS_PREF_KEY]: safePoints });
+    } catch (e) {
+      console.warn('Failed to save points prefs:', e);
+    }
+
+    updateHeaderPoints(safePoints);
+    updateProfilePoints(safePoints);
+  }
+
+  // Helpers you can call anywhere
+  async function addUserPoints(user, delta) {
+    const current = await getUserPoints(user);
+    return setUserPoints(user, current + (Number(delta) || 0));
+  }
+
+  async function subtractUserPoints(user, delta) {
+    const current = await getUserPoints(user);
+    return setUserPoints(user, current - (Number(delta) || 0));
+  }
+
+
   // -------------------------------
   // Profile picture persistence (per-account)
   // -------------------------------
@@ -429,6 +498,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (isChapterFlowPage && navLinksContainer) navLinksContainer.style.display = '';
   }
 
+  // Generate a unique-ish code for each redemption
+  function generateRewardCode(user, rewardId) {
+    const userPart = (user.$id || '').slice(-4).toUpperCase();      // last 4 chars of user id
+    const timePart = Date.now().toString(36).toUpperCase();         // timestamp in base36
+    const randPart = Math.floor(Math.random() * 46656)              // 0..36^3-1
+      .toString(36)
+      .padStart(3, '0')
+      .toUpperCase();
+
+    // Example: PEN-AB12-LKJ3F-0X9
+    return `${rewardId}-${userPart}-${timePart}-${randPart}`;
+  }
+
+
     async function updateUIForLoggedInUser(user) {
     // Hide "Log in / Sign up" in navbar
     const navLinks = document.querySelectorAll('.nav-links a');
@@ -438,6 +521,11 @@ document.addEventListener('DOMContentLoaded', function () {
         link.style.display = 'none';
       }
     });
+
+     // 🔹 NEW: points for this user
+  const userPoints = await getUserPoints(user);
+  updateHeaderPoints(userPoints);    // NAVBAR ONLY
+  updateProfilePoints(userPoints);   // OPTIONAL (profile page)
 
     // ----- Slide nav (left hamburger menu) -----
     if (slideNav) {
@@ -556,43 +644,49 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
     }
   }
 
-  function updateUIForLoggedOutUser() {
-    // Show "Log in / Sign up" again
-    const navLinks = document.querySelectorAll('.nav-links a');
-    navLinks.forEach((link) => {
-      const text = (link.textContent || '').trim();
-      if (text === 'Log in' || text === 'Sign up') {
-        link.style.display = 'inline';
-      }
-    });
-
-    // Slide nav: remove profile, show "Please log in first"
-    if (slideNav) {
-  const profileContainer = slideNav.querySelector('.profile-container');
-  if (profileContainer) profileContainer.remove();
-
-  const actionsContainer = slideNav.querySelector('.slide-nav-buttons');
-  if (actionsContainer) actionsContainer.remove();
-
-  const loginBtn  = slideNav.querySelector('.login-btn');
-  const loginText = slideNav.querySelector('p');
-  if (loginBtn)  loginBtn.style.display = 'block';
-  if (loginText) loginText.style.display = 'block';
-}
-
-
-    // HOME PAGE: show Explore, hide Reading Hub button
-    if (isChapterFlowPage) {
-      if (exploreBtn)  exploreBtn.style.display = 'inline-block';
-      if (homeHubBtn)  homeHubBtn.style.display = 'none';
+function updateUIForLoggedOutUser() {
+  // Show "Log in / Sign up" again
+  const navLinks = document.querySelectorAll('.nav-links a');
+  navLinks.forEach((link) => {
+    const text = (link.textContent || '').trim();
+    if (text === 'Log in' || text === 'Sign up') {
+      link.style.display = 'inline';
     }
+  });
 
-    // READING HUB PAGE: hide cards, show "Please log in" message
-    if (isReadingHubPage) {
-      if (readingHubSection)  readingHubSection.style.display = 'none';
-      if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'block';
-    }
+  // 🔹 Remove header points badge when logged out
+  const navContainer = document.querySelector('.nav-links');
+  if (navContainer) {
+    const badge = navContainer.querySelector('.nav-points-display');
+    if (badge) badge.remove();
   }
+
+  // Slide nav: remove profile, show "Please log in first"
+  if (slideNav) {
+    const profileContainer = slideNav.querySelector('.profile-container');
+    if (profileContainer) profileContainer.remove();
+
+    const actionsContainer = slideNav.querySelector('.slide-nav-buttons');
+    if (actionsContainer) actionsContainer.remove();
+
+    const loginBtn  = slideNav.querySelector('.login-btn');
+    const loginText = slideNav.querySelector('p');
+    if (loginBtn)  loginBtn.style.display = 'block';
+    if (loginText) loginText.style.display = 'block';
+  }
+
+  // HOME PAGE: show Explore, hide Reading Hub button
+  if (isChapterFlowPage) {
+    if (exploreBtn)  exploreBtn.style.display = 'inline-block';
+    if (homeHubBtn)  homeHubBtn.style.display = 'none';
+  }
+
+  // READING HUB PAGE: hide cards, show "Please log in" message
+  if (isReadingHubPage) {
+    if (readingHubSection)   readingHubSection.style.display = 'none';
+    if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'block';
+  }
+}
 
 
   if (submitBtn) {
@@ -626,221 +720,314 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
     });
   }
 
-   // ===========================
-  // READING BUBBLE (chapter pages only)
-  // ===========================
-  (function setupReadingBubble() {
-    // we only want the bubble on CHAPTER pages, not on the book info page
-    const isReaderPage = document.querySelector('main.reader-page');
-    const hasMeta = document.querySelector('.reader-meta'); // book info page has this
-    const isChapterView = isReaderPage && !hasMeta;
+ // ===========================
+// READING BUBBLE (chapter pages only, REAL points)
+// ===========================
+(function setupReadingBubble() {
+  // only on chapter-reading pages (no header/book-info)
+  const isReaderPage = document.querySelector('main.reader-page');
+  const hasMeta = document.querySelector('.reader-meta'); // book info page has this
+  const isChapterView = isReaderPage && !hasMeta;
 
-    if (!isChapterView) return; // do nothing on other pages
+  if (!isChapterView) return;
+  if (typeof account === 'undefined' || !account) return;
 
-    // --- create bubble DOM ---
-    const bubble = document.createElement('div');
-    bubble.className = 'reading-bubble panel-left';  // default: panel on left
+  // --- identify the book so all its chapters share progress ---
+  const pathname = window.location.pathname;
+  const filename = pathname.split('/').pop() || '';
+  const baseName = filename.replace(/\.html$/i, '');
+  const bookId = baseName.replace(/-ch\d+$/i, '');
+  const STORAGE_KEY = `cf_progress:${bookId || 'default'}`;
 
-    bubble.innerHTML = `
-      <div class="reading-bubble-main" title="Reading assistant">
-        ⏱
-      </div>
-      <div class="reading-bubble-panel">
-        <p class="rb-time">Reading time: 0:00</p>
-        <p class="rb-next">Next point in: 5:00</p>
-        <button type="button" class="rb-prev-btn" style="display:none;">Previous chapter</button>
-        <button type="button" class="rb-next-btn">Next chapter</button>
-      </div>
-    `;
+  const INACTIVITY_LIMIT_MS = 60000;  // 60s no activity = pause
+  const POINT_INTERVAL_SEC = 300;     // 5 min per 1 point
 
-    document.body.appendChild(bubble);
+  let secondsRead = 0;
+  let pointsAwarded = 0; // how many 5-min chunks already converted to points
 
-    const mainBtn = bubble.querySelector('.reading-bubble-main');
-    const panel = bubble.querySelector('.reading-bubble-panel');
-    const timeLabel = bubble.querySelector('.rb-time');
-    const nextLabel = bubble.querySelector('.rb-next');
-    const prevBtn = bubble.querySelector('.rb-prev-btn');
-    const nextBtn = bubble.querySelector('.rb-next-btn');
-
-    // --- choose which side the panel should open on ---
-    function updatePanelSide() {
-      const rect = bubble.getBoundingClientRect();
-      const threshold = 160; // px from the left edge to switch side
-
-      if (rect.left < threshold) {
-        // bubble too close to left edge -> open panel on the RIGHT
-        bubble.classList.add('panel-right');
-        bubble.classList.remove('panel-left');
-      } else {
-        // otherwise open panel on the LEFT
-        bubble.classList.add('panel-left');
-        bubble.classList.remove('panel-right');
+  // --- load local progress (so time continues across chapters) ---
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (typeof data.secondsRead === 'number' && data.secondsRead >= 0) {
+        secondsRead = data.secondsRead;
+      }
+      if (typeof data.pointsAwarded === 'number' && data.pointsAwarded >= 0) {
+        pointsAwarded = data.pointsAwarded;
       }
     }
+  } catch (e) {
+    console.warn('Failed to load reading progress', e);
+  }
 
-    // initial side decision
-    updatePanelSide();
-
-    // --- toggle open/close ---
-    mainBtn.addEventListener('click', () => {
-      bubble.classList.toggle('open');
-    });
-
-    // --- simple previous / next wiring based on current filename ---
-    const path = window.location.pathname;
-    const isCh1 = path.includes('story-king-ch1');
-    const isCh2 = path.includes('story-king-ch2');
-    const isCh3 = path.includes('story-king-ch3'); // last
-
-    if (isCh1) {
-      prevBtn.style.display = 'none';
-      nextBtn.textContent = 'Next chapter';
-      nextBtn.addEventListener('click', () => {
-        window.location.href = 'story-king-ch2.html';
-      });
-    } else if (isCh2) {
-      prevBtn.style.display = 'inline-block';
-      prevBtn.textContent = 'Previous chapter';
-      nextBtn.textContent = 'Next chapter';
-      prevBtn.addEventListener('click', () => {
-        window.location.href = 'story-king-ch1.html';
-      });
-      nextBtn.addEventListener('click', () => {
-        window.location.href = 'story-king-ch3.html';
-      });
-    } else if (isCh3) {
-      prevBtn.style.display = 'inline-block';
-      prevBtn.textContent = 'Previous chapter';
-      nextBtn.textContent = 'Back to book';
-      prevBtn.addEventListener('click', () => {
-        window.location.href = 'story-king-ch2.html';
-      });
-      nextBtn.addEventListener('click', () => {
-        window.location.href = 'story-king.html';
-      });
-    } else {
-      prevBtn.style.display = 'none';
-      nextBtn.style.display = 'none';
-    }
-
-    // --- draggable behaviour (mouse + touch) ---
-    let isDragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    function startDrag(clientX, clientY) {
-      isDragging = true;
-      const rect = bubble.getBoundingClientRect();
-      offsetX = clientX - rect.left;
-      offsetY = clientY - rect.top;
-      mainBtn.style.cursor = 'grabbing';
-      // switch to top/left positioning while dragging
-      bubble.style.left = rect.left + 'px';
-      bubble.style.top = rect.top + 'px';
-      bubble.style.right = 'auto';
-      bubble.style.bottom = 'auto';
-    }
-
-    function moveDrag(clientX, clientY) {
-      if (!isDragging) return;
-      const x = clientX - offsetX;
-      const y = clientY - offsetY;
-      bubble.style.left = x + 'px';
-      bubble.style.top = y + 'px';
-    }
-
-    function endDrag() {
-      if (!isDragging) return;
-      isDragging = false;
-      mainBtn.style.cursor = 'grab';
-      updatePanelSide(); // re-evaluate side after dragging
-    }
-
-    mainBtn.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      startDrag(e.clientX, e.clientY);
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      moveDrag(e.clientX, e.clientY);
-    });
-
-    window.addEventListener('mouseup', endDrag);
-
-    mainBtn.addEventListener('touchstart', (e) => {
-      const t = e.touches[0];
-      startDrag(t.clientX, t.clientY);
-    }, { passive: true });
-
-    window.addEventListener('touchmove', (e) => {
-      const t = e.touches[0];
-      moveDrag(t.clientX, t.clientY);
-    }, { passive: true });
-
-    window.addEventListener('touchend', endDrag);
-
-    // also adjust side if the window is resized
-    window.addEventListener('resize', updatePanelSide);
-
-    // --- reading timer with inactivity detection + localStorage ---
-    const STORAGE_KEY = 'cf_readtime_elegy';  // unique per book
-
-    let secondsRead = 0;
-    let lastActivity = Date.now();
-    const INACTIVITY_LIMIT_MS = 60000;   // 60s no activity = pause
-    const POINT_INTERVAL_SEC = 300;      // 5 min per point (for display only)
-
-    // try to restore from localStorage
+  function saveProgress() {
     try {
-      const saved = parseInt(localStorage.getItem(STORAGE_KEY), 10);
-      if (!Number.isNaN(saved) && saved >= 0) {
-        secondsRead = saved;
-      }
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ secondsRead, pointsAwarded })
+      );
     } catch (e) {
-      console.warn('Could not read reading time from storage', e);
+      console.warn('Failed to save reading progress', e);
     }
+  }
 
-    function recordActivity() {
-      lastActivity = Date.now();
+  // --- bubble DOM ---
+  const bubble = document.createElement('div');
+  bubble.className = 'reading-bubble panel-left';
+
+  bubble.innerHTML = `
+    <div class="reading-bubble-main" title="Reading assistant">⏱</div>
+    <div class="reading-bubble-panel">
+      <p class="rb-time">Reading time: 0:00</p>
+      <p class="rb-next">Next point in: 5:00</p>
+      <button type="button" class="rb-prev-btn" style="display:none;">Previous chapter</button>
+      <button type="button" class="rb-next-btn">Next chapter</button>
+    </div>
+  `;
+
+  document.body.appendChild(bubble);
+
+  const mainBtn   = bubble.querySelector('.reading-bubble-main');
+  const panel     = bubble.querySelector('.reading-bubble-panel');
+  const timeLabel = bubble.querySelector('.rb-time');
+  const nextLabel = bubble.querySelector('.rb-next');
+  const prevBtn   = bubble.querySelector('.rb-prev-btn');
+  const nextBtn   = bubble.querySelector('.rb-next-btn');
+
+  // --- decide which side the panel opens on (left/right) ---
+  function updatePanelSide() {
+    const rect = bubble.getBoundingClientRect();
+    const threshold = 160;
+
+    if (rect.left < threshold) {
+      bubble.classList.add('panel-right');
+      bubble.classList.remove('panel-left');
+    } else {
+      bubble.classList.add('panel-left');
+      bubble.classList.remove('panel-right');
     }
+  }
 
-    ['mousemove', 'keydown', 'scroll', 'touchstart'].forEach((evt) => {
-      document.addEventListener(evt, recordActivity, { passive: true });
+  updatePanelSide();
+
+  mainBtn.addEventListener('click', () => {
+    bubble.classList.toggle('open');
+  });
+
+  // --- prev / next chapter wiring (adjust filenames to your own) ---
+  const path = window.location.pathname;
+  const isCh1 = path.includes('story-king-ch1');
+  const isCh2 = path.includes('story-king-ch2');
+  const isCh3 = path.includes('story-king-ch3');
+
+  if (isCh1) {
+    prevBtn.style.display = 'none';
+    nextBtn.textContent = 'Next chapter';
+    nextBtn.addEventListener('click', () => {
+      window.location.href = 'story-king-ch2.html';
     });
+  } else if (isCh2) {
+    prevBtn.style.display = 'inline-block';
+    prevBtn.textContent = 'Previous chapter';
+    nextBtn.textContent = 'Next chapter';
+    prevBtn.addEventListener('click', () => {
+      window.location.href = 'story-king-ch1.html';
+    });
+    nextBtn.addEventListener('click', () => {
+      window.location.href = 'story-king-ch3.html';
+    });
+  } else if (isCh3) {
+    prevBtn.style.display = 'inline-block';
+    prevBtn.textContent = 'Previous chapter';
+    nextBtn.textContent = 'Back to book';
+    prevBtn.addEventListener('click', () => {
+      window.location.href = 'story-king-ch2.html';
+    });
+    nextBtn.addEventListener('click', () => {
+      window.location.href = 'story-king.html';
+    });
+  } else {
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
+  }
 
-    function formatTime(sec) {
-      const m = Math.floor(sec / 60);
-      const s = sec % 60;
-      return `${m}:${s.toString().padStart(2, '0')}`;
-    }
+  // --- draggable behaviour ---
+  let isDragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
 
-    function updateLabels() {
-      timeLabel.textContent = `Reading time: ${formatTime(secondsRead)}`;
-      const intoInterval = secondsRead % POINT_INTERVAL_SEC;
-      const remaining = POINT_INTERVAL_SEC - intoInterval || POINT_INTERVAL_SEC;
-      nextLabel.textContent = `Next point in: ${formatTime(remaining)}`;
-    }
+  function startDrag(clientX, clientY) {
+    isDragging = true;
+    const rect = bubble.getBoundingClientRect();
+    offsetX = clientX - rect.left;
+    offsetY = clientY - rect.top;
+    mainBtn.style.cursor = 'grabbing';
+    bubble.style.left = rect.left + 'px';
+    bubble.style.top  = rect.top + 'px';
+    bubble.style.right = 'auto';
+    bubble.style.bottom = 'auto';
+  }
 
-    updateLabels();
+  function moveDrag(clientX, clientY) {
+    if (!isDragging) return;
+    const x = clientX - offsetX;
+    const y = clientY - offsetY;
+    bubble.style.left = x + 'px';
+    bubble.style.top  = y + 'px';
+  }
 
-    setInterval(() => {
-      const now = Date.now();
-      const inactiveFor = now - lastActivity;
-      if (inactiveFor < INACTIVITY_LIMIT_MS) {
-        secondsRead += 1;
-        updateLabels();
+  function endDrag() {
+    if (!isDragging) return;
+    isDragging = false;
+    mainBtn.style.cursor = 'grab';
+    updatePanelSide();
+  }
 
-        // save to localStorage so it survives page changes
-        try {
-          localStorage.setItem(STORAGE_KEY, String(secondsRead));
-        } catch (e) {
-          console.warn('Could not save reading time', e);
-        }
+  mainBtn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    startDrag(e.clientX, e.clientY);
+  });
+  window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+  window.addEventListener('mouseup', endDrag);
+
+  mainBtn.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    startDrag(t.clientX, t.clientY);
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    moveDrag(t.clientX, t.clientY);
+  }, { passive: true });
+
+  window.addEventListener('touchend', endDrag);
+  window.addEventListener('resize', updatePanelSide);
+
+  // --- reading timer + REAL points ---
+  let lastActivity = Date.now();
+
+  function recordActivity() {
+    lastActivity = Date.now();
+  }
+
+  ['mousemove', 'keydown', 'scroll', 'touchstart'].forEach((evt) => {
+    document.addEventListener(evt, recordActivity, { passive: true });
+  });
+
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  function updateLabels() {
+    timeLabel.textContent = `Reading time: ${formatTime(secondsRead)}`;
+    const thresholds = Math.floor(secondsRead / POINT_INTERVAL_SEC);
+    const nextThresholdSec = (thresholds + 1) * POINT_INTERVAL_SEC;
+    const remaining = nextThresholdSec - secondsRead;
+    nextLabel.textContent = `Next point in: ${formatTime(remaining)}`;
+  }
+
+  updateLabels();
+
+  setInterval(() => {
+    const now = Date.now();
+    const inactiveFor = now - lastActivity;
+    if (inactiveFor < INACTIVITY_LIMIT_MS) {
+      secondsRead += 1;
+
+      const thresholds = Math.floor(secondsRead / POINT_INTERVAL_SEC);
+
+      if (thresholds > pointsAwarded) {
+        const delta = thresholds - pointsAwarded;
+        pointsAwarded = thresholds;
+        saveProgress();
+
+        // 🔹 ADD REAL POINTS into Appwrite prefs
+        (async () => {
+          const userNow = await getLoggedInUserSafe();
+          if (userNow) {
+            await addUserPoints(userNow, delta);
+          }
+        })();
+      } else {
+        saveProgress();
       }
-    }, 1000);
-  })();
 
+      updateLabels();
+    }
+  }, 1000);
+})();
+
+  // ===========================
+  // POINTS & REWARDS PAGE (redeem items)
+  // ===========================
+  async function setupRewardsPage() {
+    const isPointsPage = window.location.href.toLowerCase().includes('points-rewards.html');
+    if (!isPointsPage) return;
+    if (!account) return;
+
+    const user = await getLoggedInUserSafe();
+    if (!user) {
+      alert('Please log in to redeem rewards.');
+      return;
+    }
+
+    const buttons = document.querySelectorAll('.reward-redeem');
+    buttons.forEach((btn) => {
+      const cost = parseInt(btn.dataset.cost, 10) || 0;
+      const rewardId = btn.dataset.rewardId || 'REWARD';
+
+      btn.addEventListener('click', async () => {
+        const currentUser = await getLoggedInUserSafe();
+        if (!currentUser) {
+          alert('Please log in to redeem rewards.');
+          return;
+        }
+
+        const currentPoints = await getUserPoints(currentUser);
+        if (currentPoints < cost) {
+          alert(`You need ${cost} points, but you only have ${currentPoints}.`);
+          return;
+        }
+
+        const ok = confirm(`Redeem this reward for ${cost} points?`);
+        if (!ok) return;
+
+        // Subtract points
+        const newBalance = currentPoints - cost;
+        await setUserPoints(currentUser, newBalance);
+
+        // Generate code
+        const code = generateRewardCode(currentUser, rewardId);
+
+        // Show code in alert
+        alert(
+          `Success! You redeemed this reward.\n\n` +
+          `Your new balance: ${newBalance} points.\n\n` +
+          `Your code: ${code}\n` +
+          `Show this code to us.`
+        );
+
+        // Also show the code in the card on the page
+        const card = btn.closest('.reward-card');
+        if (card) {
+          const msg = card.querySelector('.reward-code-message');
+          if (msg) {
+            msg.textContent = `Your code: ${code} — show this code to us.`;
+          }
+        }
+
+        // Optional: disable the button so they don't spam redeem that same item immediately
+        // (You can remove this if you want them to redeem multiple times)
+        // btn.disabled = true;
+        // btn.textContent = 'Redeemed';
+      });
+    });
+  }
 
   checkAuthState();
+  setupRewardsPage();
 });
 
