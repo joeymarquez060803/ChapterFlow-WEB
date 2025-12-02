@@ -16,92 +16,175 @@
   <script src="../script.js" defer></script>
 
   <style>
-    /* Minimal layout for this page — you can move/override in Style.css later */
+    /* --- ChapterFlow-ish palette (local to this page) --- */
+    :root {
+      --cf-khaki-light: #f6efe2;
+      --cf-khaki: #e3cfaa;
+      --cf-khaki-deep: #d0b586;
+      --cf-brown: #5b4636;
+      --cf-brown-soft: #6e5540;
+      --cf-ink: #2f2720;
+    }
 
     main.rewards-main {
-      max-width: 960px;
-      margin: 120px auto 3rem;
-      padding: 0 1.5rem;
+      max-width: 1000px;
+      margin: 130px auto 3.5rem;
+      padding: 2.5rem 2.25rem 2.75rem;
       font-family: "Merriweather", serif;
+      background: var(--cf-khaki-light);
+      border-radius: 26px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* subtle top band */
+    main.rewards-main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      top: 0;
+      height: 54%;
+      background: linear-gradient(
+        135deg,
+        var(--cf-khaki-deep),
+        var(--cf-khaki-light)
+      );
+      opacity: 0.75;
+      z-index: -1;
     }
 
     .rewards-header {
-      text-align: center;
-      margin-bottom: 2rem;
+      text-align: left;
+      margin-bottom: 1.75rem;
     }
 
     .rewards-header h1 {
-      margin-bottom: 0.5rem;
-      font-size: 2rem;
+      margin-bottom: 0.35rem;
+      font-size: 2.1rem;
+      color: var(--cf-ink);
+      letter-spacing: 0.03em;
     }
 
     .rewards-header p {
       font-size: 0.95rem;
-      opacity: 0.8;
+      color: rgba(32, 24, 18, 0.8);
+      max-width: 520px;
     }
 
     .rewards-balance {
-      text-align: center;
-      margin-bottom: 2.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
       font-weight: 600;
+      color: var(--cf-brown);
+      margin-bottom: 2.1rem;
     }
 
     .rewards-balance span {
       font-weight: 700;
+      padding: 0.15rem 0.7rem;
+      border-radius: 999px;
+      background: var(--cf-khaki);
+      color: var(--cf-ink);
+      min-width: 3ch;
+      text-align: center;
     }
 
     .rewards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.8rem;
     }
 
     .reward-card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 1rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 18px;
+      padding: 1.3rem 1.3rem 1.2rem;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
+      border: 1px solid rgba(126, 96, 68, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reward-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      top: 0;
+      height: 40%;
+      background: radial-gradient(circle at top left,
+        rgba(219, 188, 135, 0.35),
+        transparent 60%);
+      z-index: -1;
     }
 
     .reward-card img {
-      width: 140px;
-      height: 140px;
+      width: 135px;
+      height: 135px;
       object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 0.75rem;
+      border-radius: 16px;
+      margin-bottom: 0.85rem;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
     }
 
     .reward-card h2 {
       font-size: 1.1rem;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.15rem;
+      color: var(--cf-ink);
     }
 
     .reward-cost {
       font-size: 0.9rem;
-      opacity: 0.8;
-      margin-bottom: 0.5rem;
+      color: var(--cf-brown-soft);
+      margin-bottom: 0.25rem;
     }
 
     .reward-note {
-      font-size: 0.8rem;
-      opacity: 0.7;
-      margin-bottom: 0.75rem;
+      font-size: 0.78rem;
+      color: rgba(40, 30, 22, 0.8);
+      margin-bottom: 0.9rem;
     }
 
     .reward-exchange-btn {
-      padding: 0.5rem 1.2rem;
+      padding: 0.5rem 1.5rem;
       border-radius: 999px;
       border: none;
       cursor: pointer;
       font-weight: 600;
-      /* style this to match your brand if you want */
+      font-size: 0.9rem;
+      background: var(--cf-brown);
+      color: #fdf9f1;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+      transition:
+        background 0.15s ease,
+        transform 0.12s ease,
+        box-shadow 0.12s ease;
     }
 
-    /* Simple modal */
+    .reward-exchange-btn:hover {
+      background: #443326;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+    }
+
+    .reward-exchange-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    /* --- Modal --- */
 
     .reward-modal-backdrop {
       position: fixed;
@@ -118,88 +201,137 @@
     }
 
     .reward-modal {
-      background: #fff;
-      border-radius: 12px;
-      max-width: 420px;
+      background: #fffaf2;
+      border-radius: 20px;
+      max-width: 430px;
       width: 90%;
-      padding: 1.5rem 1.25rem 1.25rem;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+      padding: 1.6rem 1.4rem 1.35rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
       position: relative;
       text-align: left;
       font-family: "Merriweather", serif;
+      border-top: 5px solid var(--cf-khaki-deep);
     }
 
     .reward-modal-close {
       position: absolute;
       top: 0.6rem;
-      right: 0.7rem;
+      right: 0.75rem;
       border: none;
       background: transparent;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       cursor: pointer;
       line-height: 1;
+      color: var(--cf-brown-soft);
     }
 
     .reward-modal h2 {
       margin-top: 0;
-      margin-bottom: 0.5rem;
-      font-size: 1.25rem;
+      margin-bottom: 0.35rem;
+      font-size: 1.3rem;
+      color: var(--cf-ink);
     }
 
     .reward-modal p {
       font-size: 0.9rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
+      color: rgba(32, 24, 18, 0.9);
     }
 
     .reward-modal .modal-actions {
-      margin-top: 1rem;
+      margin-top: 1.1rem;
       display: flex;
-      gap: 0.5rem;
+      gap: 0.6rem;
       justify-content: flex-end;
       align-items: center;
       flex-wrap: wrap;
     }
 
     .reward-modal button {
-      padding: 0.45rem 1rem;
+      padding: 0.45rem 1.1rem;
       border-radius: 999px;
       border: none;
       cursor: pointer;
       font-weight: 600;
+      font-size: 0.88rem;
     }
 
     .modal-cancel-btn {
-      background: #eee;
+      background: #eee5d8;
+      color: var(--cf-brown-soft);
+    }
+
+    .modal-cancel-btn:hover {
+      background: #e0d2bf;
+    }
+
+    .modal-exchange-btn {
+      background: var(--cf-brown);
+      color: #fdf9f1;
+      box-shadow: 0 7px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-exchange-btn:hover:not(:disabled) {
+      background: #443326;
+    }
+
+    .modal-exchange-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
     }
 
     .modal-error {
       color: #c0392b;
       font-size: 0.8rem;
-      margin-top: 0.25rem;
+      margin-top: 0.15rem;
       min-height: 1em;
     }
 
     .exchange-result {
       margin-top: 0.9rem;
       padding: 0.7rem 0.8rem;
-      border-radius: 8px;
-      background: #f5f5f5;
+      border-radius: 10px;
+      background: #f6efe2;
       font-size: 0.9rem;
+      border: 1px dashed var(--cf-khaki-deep);
     }
 
     .exchange-code {
       font-family: monospace;
-      font-size: 0.95rem;
+      font-size: 0.98rem;
       background: #fff;
-      padding: 0.35rem 0.55rem;
-      border-radius: 6px;
+      padding: 0.35rem 0.6rem;
+      border-radius: 8px;
       display: inline-block;
-      margin: 0.2rem 0 0.4rem;
+      margin: 0.25rem 0 0.4rem;
+      letter-spacing: 0.06em;
+      color: var(--cf-brown);
     }
 
     .small-note {
       font-size: 0.8rem;
-      opacity: 0.8;
+      opacity: 0.85;
+    }
+
+    @media (max-width: 768px) {
+      main.rewards-main {
+        margin: 110px 1rem 2.5rem;
+        padding: 2rem 1.4rem 2.25rem;
+        border-radius: 20px;
+      }
+
+      .rewards-header {
+        text-align: center;
+      }
+
+      .rewards-header p {
+        margin: 0 auto;
+      }
+
+      .rewards-balance {
+        margin-bottom: 1.8rem;
+      }
     }
   </style>
 </head>
@@ -246,7 +378,7 @@
     <section class="rewards-grid">
       <!-- PEN -->
       <article class="reward-card" data-reward-key="pen" data-cost="2">
-        <img src="https://images.pexels.com/photos/261748/pexels-photo-261748.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Pen">
+        <img src="https://t3.ftcdn.net/jpg/15/98/44/20/360_F_1598442037_kRXWPSXvrbkJp6IwQb8tKJwSfImS7iNg.jpg" alt="Pen">
         <h2>Library Pen</h2>
         <p class="reward-cost">Cost: 2 points</p>
         <p class="reward-note">Simple black ballpen for everyday notes.</p>
@@ -255,7 +387,7 @@
 
       <!-- CORRECTION TAPE -->
       <article class="reward-card" data-reward-key="tape" data-cost="4">
-        <img src="https://images.pexels.com/photos/209137/pexels-photo-209137.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Correction tape">
+        <img src="https://www.shutterstock.com/image-photo/blue-correction-tape-isolated-on-600nw-2439768105.jpg" alt="Correction tape">
         <h2>Correction Tape</h2>
         <p class="reward-cost">Cost: 4 points</p>
         <p class="reward-note">Perfect for fixing written mistakes cleanly.</p>
