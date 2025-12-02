@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter – ChapterFlow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+
+  <style>
+    body.chapter-page {
+      margin: 0;
+      font-family: "Merriweather", serif;
+      background-color: #f7f3e9;
+      color: #3c2b1a;
+    }
+
+    .chapter-banner {
+      background-color: #c9b184;
+      height: 180px;
+      width: 100%;
+    }
+
+    .chapter-layout {
+      max-width: 880px;
+      margin: 0 auto 64px;
+      padding: 0 16px 48px;
+      position: relative;
+      top: -110px;
+    }
+
+    .chapter-card {
+      background-color: #ffffff;
+      border-radius: 26px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.13);
+      padding: 26px 30px 32px;
+    }
+
+    .chapter-series-name {
+      margin: 0 0 6px;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .chapter-title-text {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+      line-height: 1.3;
+    }
+
+    .chapter-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: rgba(0, 0, 0, 0.6);
+      margin-bottom: 18px;
+      gap: 8px;
+    }
+
+    .chapter-meta-row span {
+      white-space: nowrap;
+    }
+
+    .chapter-body {
+      margin-top: 4px;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: rgba(0, 0, 0, 0.85);
+      white-space: pre-wrap;
+    }
+
+    .chapter-empty-message {
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .chapter-page .back-btn {
+      position: relative;
+      z-index: 5;
+      margin: 16px 0 0 16px;
+    }
+
+    .chapter-not-found {
+      max-width: 760px;
+      margin: -70px auto 40px;
+      padding: 16px;
+      text-align: center;
+      font-size: 0.95rem;
+      color: rgba(120, 60, 60, 0.85);
+    }
+
+    @media (max-width: 768px) {
+      .chapter-layout {
+        top: -90px;
+      }
+    }
+  </style>
+</head>
+<body class="chapter-page">
+  <a href="javascript:void(0)" id="chapter-back-btn" class="back-btn">← Back</a>
+
+  <div class="chapter-banner"></div>
+
+  <main>
+    <section class="chapter-layout">
+      <article class="chapter-card">
+        <p id="chapter-series-name" class="chapter-series-name">Story Title</p>
+        <h1 id="chapter-title" class="chapter-title-text">Chapter title</h1>
+
+        <div class="chapter-meta-row">
+          <span id="chapter-author"></span>
+          <span id="chapter-meta-right"></span>
+        </div>
+
+        <div id="chapter-body" class="chapter-body">
+          This is where the chapter text will appear.
+        </div>
+
+        <p id="chapter-empty" class="chapter-empty-message" style="display:none;">
+          This chapter doesn’t have any content yet. Once you wire the upload page to save chapters,
+          the full text will be shown here.
+        </p>
+      </article>
+    </section>
+
+    <div id="chapter-not-found" class="chapter-not-found" style="display:none;">
+      We couldn’t find this chapter. It may have been removed or not yet created on this device.
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const SERIES_KEY   = 'chapterflow:series';
+      const CHAPTERS_KEY = 'chapterflow:chapters';
+
+      function getSeriesList() {
+        try {
+          const raw = localStorage.getItem(SERIES_KEY);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function getChaptersList() {
+        try {
+          const raw = localStorage.getItem(CHAPTERS_KEY);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+
+      const params     = new URLSearchParams(window.location.search);
+      const seriesId   = params.get('seriesId');
+      const chapterId  = params.get('chapterId');
+
+      const backBtn       = document.getElementById('chapter-back-btn');
+      const seriesNameEl  = document.getElementById('chapter-series-name');
+      const titleEl       = document.getElementById('chapter-title');
+      const authorEl      = document.getElementById('chapter-author');
+      const metaRightEl   = document.getElementById('chapter-meta-right');
+      const bodyEl        = document.getElementById('chapter-body');
+      const emptyEl       = document.getElementById('chapter-empty');
+      const notFoundEl    = document.getElementById('chapter-not-found');
+
+      // Back button: go to story page if seriesId exists, otherwise back to profile
+      backBtn.addEventListener('click', () => {
+        if (seriesId) {
+          const url = `story.html?seriesId=${encodeURIComponent(seriesId)}`;
+          window.location.href = url;
+        } else {
+          window.location.href = '../Slide nav buttons/edit-profile.html';
+        }
+      });
+
+      if (!chapterId) {
+        notFoundEl.style.display = 'block';
+        return;
+      }
+
+      const seriesList   = getSeriesList();
+      const chaptersList = getChaptersList();
+
+      const series  = seriesList.find(s => String(s.id) === String(seriesId));
+      const chapter = chaptersList.find(c => String(c.id) === String(chapterId));
+
+      if (!chapter) {
+        notFoundEl.style.display = 'block';
+        return;
+      }
+
+      if (series) {
+        seriesNameEl.textContent = series.title || 'Untitled story';
+        if (series.ownerName) {
+          authorEl.textContent = 'By ' + series.ownerName;
+        }
+      } else {
+        seriesNameEl.textContent = 'Chapter';
+      }
+
+      titleEl.textContent = chapter.title || 'Untitled chapter';
+
+      if (chapter.createdAt) {
+        const dt = new Date(chapter.createdAt);
+        metaRightEl.textContent = dt.toLocaleDateString();
+      }
+
+      if (chapter.bodyHtml) {
+        bodyEl.innerHTML = chapter.bodyHtml;
+      } else if (chapter.bodyText) {
+        bodyEl.textContent = chapter.bodyText;
+      } else {
+        emptyEl.style.display = 'block';
+      }
+    })();
+  </script>
+</body>
+</html>

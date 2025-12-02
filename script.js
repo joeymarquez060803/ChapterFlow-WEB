@@ -2,12 +2,24 @@ document.addEventListener('DOMContentLoaded', function () {
   // -------------------------------
   // Page flags + anti-flash (FOUC) helpers
   // -------------------------------
-  const isChapterFlowPage = window.location.href.toLowerCase().includes('chapterflow.html');
-  const isEditProfilePage = window.location.href.toLowerCase().includes('edit-profile.html');
+const isChapterFlowPage = window.location.href.toLowerCase().includes('chapterflow.html');
+const isEditProfilePage = window.location.href.toLowerCase().includes('edit-profile.html');
+const editProfileSection = isEditProfilePage ? document.querySelector('.profile-section') : null;
+// ⬆️ we NO LONGER change visibility/opacity here
 
+   const profileStoriesSection   = isEditProfilePage ? document.querySelector('.profile-stories') : null;
+  const profileStoriesContainer = isEditProfilePage ? document.getElementById('profile-stories-container') : null;
+  const profileStoriesEmptyMsg  = isEditProfilePage ? document.querySelector('.profile-stories-empty') : null;
+
+  if (profileStoriesContainer) {
+    profileStoriesContainer.addEventListener('click', handleProfileStoriesClick);
+  }
+  
   const header = document.querySelector('header');
   const navLinksContainer = document.querySelector('.nav-links');
-    // Home hero buttons (only exist on ChapterFlow.html)
+  
+  
+  // Home hero buttons (only exist on ChapterFlow.html)
   const exploreBtn = document.querySelector('.explore-btn');
   const homeHubBtn = document.querySelector('.reading-hub-btn');
   // Is this the Reading Hub page?
@@ -17,21 +29,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const readingHubSection   = document.querySelector('.reading-hub');
   const readingHubLockedMsg = document.querySelector('.locked-message');
 
-
   // Prevent nav flicker/layout shift on ChapterFlow.html:
   // hide the entire .nav-links container during auth loading.
   if (isChapterFlowPage) {
     if (header) header.style.display = 'block';
     if (navLinksContainer) navLinksContainer.style.display = 'none';
-  }
-
-  // Prevent edit-profile flash of placeholder avatar/name/email:
-  // hide the whole profile section until we populate real data AND the image finishes loading.
-  const editProfileSection = isEditProfilePage ? document.querySelector('.profile-section') : null;
-  if (editProfileSection) {
-    editProfileSection.style.visibility = 'hidden';
-    editProfileSection.style.opacity = '0';
-    editProfileSection.style.transition = 'opacity 120ms ease';
   }
 
   function revealEditProfileSectionWhenReady() {
@@ -230,6 +232,100 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // -------------------------------
+  // Profile stories list on edit-profile (local-only, from upload.js)
+  // -------------------------------
+  const SERIES_KEY_PROFILE = 'chapterflow:series';
+
+  function loadSeriesForProfile() {
+    try {
+      const raw = localStorage.getItem(SERIES_KEY_PROFILE);
+      if (!raw) return [];
+      const data = JSON.parse(raw);
+      if (!Array.isArray(data)) return [];
+      return data;
+    } catch (e) {
+      console.warn('Failed to parse stored series list:', e);
+      return [];
+    }
+  }
+
+function renderProfileStoriesForUser(user) {
+  if (!isEditProfilePage) return;
+
+  const container = document.getElementById('profile-stories');
+  if (!container) return;
+
+  const emptyMsg = container.querySelector('.profile-stories-empty');
+
+  // Remove any old cards
+  container.querySelectorAll('.profile-story-card').forEach((card) => card.remove());
+
+  const seriesList = loadSeriesForProfile();
+
+  // No stories yet
+  if (!seriesList.length) {
+    if (emptyMsg) emptyMsg.style.display = 'block';
+    return;
+  }
+  if (emptyMsg) emptyMsg.style.display = 'none';
+
+  // B = oldest at top, newest at bottom (we keep array order)
+  seriesList.forEach((series) => {
+    const card = document.createElement('article');
+    card.className = 'profile-story-card';
+
+    // --- COVER AREA ---
+    const coverBox = document.createElement('div');
+    coverBox.className = 'profile-story-cover';
+
+    const coverUrl = series.coverFileId
+      ? getProfileImageUrl(series.coverFileId)   // reuse same helper as profile pic
+      : null;
+
+    if (coverUrl) {
+      const img = document.createElement('img');
+      img.src = coverUrl;
+      img.alt = series.title || 'Series cover';
+      coverBox.appendChild(img);
+    } else {
+      // fallback text if no cover was uploaded
+      const placeholder = document.createElement('div');
+      placeholder.className = 'profile-story-cover-inner';
+      placeholder.textContent = series.coverName || 'No cover';
+      coverBox.appendChild(placeholder);
+    }
+
+    // --- RIGHT SIDE CONTENT ---
+    const content = document.createElement('div');
+    content.className = 'profile-story-content';
+
+    const titleBtn = document.createElement('button');
+    titleBtn.type = 'button';
+    titleBtn.className = 'profile-story-title';
+    titleBtn.textContent = series.title || 'Untitled story';
+
+    // clicking the big title → go to that story’s chapter list page
+    titleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = `../story.html?seriesId=${encodeURIComponent(series.id)}`;
+    });
+
+    const desc = document.createElement('p');
+    desc.className = 'profile-story-description';
+    desc.textContent = series.description || 'No description yet.';
+
+    content.appendChild(titleBtn);
+    content.appendChild(desc);
+
+    card.appendChild(coverBox);
+    card.appendChild(content);
+
+    container.appendChild(card);
+  });
+}
+
+
+  // -------------------------------
   // Profile Picture Upload Functionality  (UPDATED)
   // -------------------------------
   const profilePic = document.getElementById('profile-pic');
@@ -335,11 +431,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // (rest of your script.js unchanged: modal, auth, etc.)
-  // ... (everything from "Log in & Sign up modal" down to checkAuthState())
-  // KEEP all that code exactly as in your current file
-  // (I didn't delete or modify any of those parts)
-  
   // ----- existing code continues here -----
   const modal = document.getElementById('authModal');
   const modalTitle = document.getElementById('modalTitle');
@@ -407,10 +498,16 @@ document.addEventListener('DOMContentLoaded', function () {
     togglePassword.addEventListener('mouseleave', () => (passwordInput.type = 'password'));
   }
 
+    // Keep track of the logged-in user locally AND on window so other files (upload.js)
+  // can know who the owner of a story is.
   let currentUser = null;
+  window.chapterFlowCurrentUser = null;
 
   async function checkAuthState() {
     if (!account) {
+      currentUser = null;
+      window.chapterFlowCurrentUser = null;
+
       updateUIForLoggedOutUser();
       document.body.classList.remove('loading');
       if (isChapterFlowPage && navLinksContainer) navLinksContainer.style.display = '';
@@ -419,9 +516,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     try {
       currentUser = await account.get();
+      window.chapterFlowCurrentUser = currentUser;   // <--- expose globally
+
       await updateUIForLoggedInUser(currentUser);
     } catch (error) {
       currentUser = null;
+      window.chapterFlowCurrentUser = null;
+
       updateUIForLoggedOutUser();
     }
 
@@ -429,7 +530,255 @@ document.addEventListener('DOMContentLoaded', function () {
     if (isChapterFlowPage && navLinksContainer) navLinksContainer.style.display = '';
   }
 
-    async function updateUIForLoggedInUser(user) {
+
+  // ===============================
+  // PROFILE STORIES / SERIES (edit-profile.html)
+  // ===============================
+
+  // LocalStorage key used by upload.js
+  const SERIES_STORAGE_KEY = 'chapterflow:series';
+
+  function getSeriesFromStorage() {
+    try {
+      const raw = localStorage.getItem(SERIES_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.warn('Failed to read series from storage', e);
+      return [];
+    }
+  }
+
+  function saveSeriesToStorage(list) {
+    try {
+      localStorage.setItem(SERIES_STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.warn('Failed to save series to storage', e);
+    }
+  }
+
+    function inferCoverFileId(series) {
+    if (series.coverFileId) return series.coverFileId;
+
+    const name = (series.coverName || '').trim();
+    // If coverName is a long ID with no dot, treat it as an Appwrite fileId
+    if (name && !name.includes('.') && name.length > 20) {
+      return name;
+    }
+    return null;
+  }
+
+
+  function renderProfileStories() {
+    if (!profileStoriesContainer) return;
+
+    const allSeries = getSeriesFromStorage();
+    profileStoriesContainer.innerHTML = '';
+
+    // If there is literally nothing in storage, show the empty message and stop.
+    if (!allSeries.length) {
+      if (profileStoriesEmptyMsg) {
+        profileStoriesEmptyMsg.style.display = 'block';
+      }
+      return;
+    }
+
+    const userId =
+      currentUser && currentUser.$id ? String(currentUser.$id) : null;
+
+    // --- MIGRATION: attach ownerId to old stories that don't have it yet ---
+    // The FIRST logged-in user who visits this page on this browser
+    // will "claim" any ownerless stories.
+        let changed = false;
+    if (userId && allSeries.length) {
+      allSeries.forEach((s) => {
+        // assign ownerId for old stories
+        if (!s.ownerId) {
+          s.ownerId = userId;
+          changed = true;
+        }
+        // also upgrade stories where coverName was actually the fileId
+        if (!s.coverFileId) {
+          const inferred = inferCoverFileId(s);
+          if (inferred) {
+            s.coverFileId = inferred;
+            changed = true;
+          }
+        }
+      });
+      if (changed) {
+        saveSeriesToStorage(allSeries);
+      }
+    }
+
+    // Only show stories that belong to the current account
+    const seriesList = userId
+      ? allSeries.filter((s) => String(s.ownerId) === userId)
+      : allSeries;
+
+    if (!seriesList.length) {
+      if (profileStoriesEmptyMsg) {
+        profileStoriesEmptyMsg.style.display = 'block';
+      }
+      return;
+    }
+
+    if (profileStoriesEmptyMsg) {
+      profileStoriesEmptyMsg.style.display = 'none';
+    }
+
+    seriesList.forEach((series) => {
+      const title = (series.title || '').trim() || 'Untitled story';
+      const desc  = (series.description || '').trim() || 'No description yet.';
+
+            const card = document.createElement('article');
+      card.className = 'profile-story-card';
+      card.dataset.seriesId = series.id;
+
+            const cover = document.createElement('div');
+      cover.className = 'profile-story-cover';
+
+      // Try coverFileId first, then fall back to coverName if it looks like an ID
+      const fileId = inferCoverFileId(series);
+      const coverUrl = fileId ? getProfileImageUrl(fileId) : null;
+
+      if (coverUrl) {
+        const img = document.createElement('img');
+        img.src = coverUrl;
+        img.alt = series.title || 'Series cover';
+        cover.appendChild(img);
+      } else {
+        // No usable file id → gray box with text (current behavior)
+        const placeholder = document.createElement('div');
+        placeholder.className = 'profile-story-cover-inner';
+        placeholder.textContent = series.coverName || 'COVER';
+        cover.appendChild(placeholder);
+      }
+
+
+
+      // Right side: title + description
+      const content = document.createElement('div');
+      content.className = 'profile-story-content';
+
+      const titleBtn = document.createElement('button');
+      titleBtn.type = 'button';
+      titleBtn.className = 'profile-story-title-btn';
+      titleBtn.dataset.seriesId = series.id;
+      titleBtn.textContent = title;
+      // later you’ll hook this up to your “chapters list” page
+
+            // When you click the story title, go to story.html for this series
+      titleBtn.addEventListener('click', () => {
+        // edit-profile.html is in "Slide nav buttons"
+        // story.html is in "Chapter - Story"
+        const base = '../Chapter - Story/story.html';
+        const url  = `${base}?seriesId=${encodeURIComponent(series.id)}`;
+        window.location.href = url;
+      });
+
+
+
+      const descP = document.createElement('p');
+      descP.className = 'profile-story-description';
+      descP.textContent = desc;
+
+      content.appendChild(titleBtn);
+      content.appendChild(descP);
+
+      // 3-dot menu (delete)
+      const menu = document.createElement('div');
+      menu.className = 'profile-story-menu';
+
+      const menuBtn = document.createElement('button');
+      menuBtn.type = 'button';
+      menuBtn.className = 'story-menu-btn';
+      menuBtn.setAttribute('aria-haspopup', 'true');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      // styled as three horizontal dots in CSS
+      menuBtn.textContent = '⋮';
+
+      const dropdown = document.createElement('div');
+      dropdown.className = 'story-menu-dropdown';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'story-delete-btn';
+      deleteBtn.dataset.seriesId = series.id;
+      deleteBtn.textContent = 'Delete story';
+
+      dropdown.appendChild(deleteBtn);
+      menu.appendChild(menuBtn);
+      menu.appendChild(dropdown);
+
+      card.appendChild(cover);
+      card.appendChild(content);
+      card.appendChild(menu);
+
+      profileStoriesContainer.appendChild(card);
+    });
+  }
+
+
+  function handleProfileStoriesClick(evt) {
+    if (!profileStoriesContainer) return;
+
+    const menuBtn   = evt.target.closest('.story-menu-btn');
+    const deleteBtn = evt.target.closest('.story-delete-btn');
+
+    // Toggle menu open/close
+    if (menuBtn) {
+      const card = menuBtn.closest('.profile-story-card');
+      if (!card) return;
+      const menu = card.querySelector('.profile-story-menu');
+      if (!menu) return;
+
+      const isOpen = menu.classList.contains('open');
+
+      // close all menus first
+      const allMenus = profileStoriesContainer.querySelectorAll('.profile-story-menu.open');
+      allMenus.forEach(m => m.classList.remove('open'));
+
+      if (!isOpen) {
+        menu.classList.add('open');
+      }
+      return;
+    }
+
+    // Delete story
+    if (deleteBtn) {
+      const card = deleteBtn.closest('.profile-story-card');
+      if (!card) return;
+      const seriesId = card.dataset.seriesId;
+      if (!seriesId) return;
+
+      const sure = window.confirm('Delete this story/series? This cannot be undone.');
+      if (!sure) {
+        // Just close the menu
+        const menu = card.querySelector('.profile-story-menu');
+        if (menu) menu.classList.remove('open');
+        return;
+      }
+
+      const list = getSeriesFromStorage();
+      const filtered = list.filter(s => String(s.id) !== String(seriesId));
+      saveSeriesToStorage(filtered);
+      renderProfileStories();
+      return;
+    }
+
+    // Clicked somewhere else inside the container → close any open menus
+    const openMenus = profileStoriesContainer.querySelectorAll('.profile-story-menu.open');
+    openMenus.forEach(menu => {
+      if (!menu.contains(evt.target)) {
+        menu.classList.remove('open');
+      }
+    });
+  }
+
+
+  async function updateUIForLoggedInUser(user) {
     // Hide "Log in / Sign up" in navbar
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach((link) => {
@@ -450,44 +799,42 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       // Remove any old profile widget first
-      // Remove any old profile widget first
-const existingProfile = slideNav.querySelector('.profile-container');
-if (existingProfile) existingProfile.remove();
+      const existingProfile = slideNav.querySelector('.profile-container');
+      if (existingProfile) existingProfile.remove();
 
-// Also remove any old action buttons block (.slide-nav-buttons)
-const existingActions = slideNav.querySelector('.slide-nav-buttons');
-if (existingActions) existingActions.remove();
+      // Also remove any old action buttons block (.slide-nav-buttons)
+      const existingActions = slideNav.querySelector('.slide-nav-buttons');
+      if (existingActions) existingActions.remove();
 
-// Build logged-in profile block (ONLY profile pic + username + Profile button)
-const profileContainer = document.createElement('div');
-profileContainer.className = 'profile-container';
-profileContainer.innerHTML = `
-  <img src="${DEFAULT_AVATAR_SMALL}" alt="Profile Picture" class="profile-pic">
-  <p class="username">${user.name || user.email.split('@')[0]}</p>
-  <button class="edit-profile-btn">Profile</button>
-`;
-slideNav.appendChild(profileContainer);
+      // Build logged-in profile block (ONLY profile pic + username + Profile button)
+      const profileContainer = document.createElement('div');
+      profileContainer.className = 'profile-container';
+      profileContainer.innerHTML = `
+        <img src="${DEFAULT_AVATAR_SMALL}" alt="Profile Picture" class="profile-pic">
+        <p class="username">${user.name || user.email.split('@')[0]}</p>
+        <button class="edit-profile-btn">Profile</button>
+      `;
+      slideNav.appendChild(profileContainer);
 
-// Build a completely separate block for Create / History / Points & Rewards / Log out
-const actionsContainer = document.createElement('div');
-actionsContainer.className = 'slide-nav-buttons';
-actionsContainer.innerHTML = `
-  <button class="slide-nav-btn">Create</button>
-  <button class="slide-nav-btn">History</button>
-  <button class="slide-nav-btn">Points & Rewards</button>
-  <button class="slide-nav-btn logout-btn">Log out</button>
-`;
-slideNav.appendChild(actionsContainer);
+      // Build a completely separate block for Create / History / Points & Rewards / Log out
+      const actionsContainer = document.createElement('div');
+      actionsContainer.className = 'slide-nav-buttons';
+      actionsContainer.innerHTML = `
+        <button class="slide-nav-btn">Create</button>
+        <button class="slide-nav-btn">History</button>
+        <button class="slide-nav-btn">Points & Rewards</button>
+        <button class="slide-nav-btn logout-btn">Log out</button>
+      `;
+      slideNav.appendChild(actionsContainer);
 
-await applyProfilePictureToUI(user);
+      await applyProfilePictureToUI(user);
 
-const editProfileBtn = profileContainer.querySelector('.edit-profile-btn');
-const slideButtons   = actionsContainer.querySelectorAll('.slide-nav-btn');
-const createBtn      = slideButtons[0];
-const historyBtn     = slideButtons[1];
-const pointsBtn      = slideButtons[2];
-const logoutBtn      = actionsContainer.querySelector('.logout-btn');
-
+      const editProfileBtn = profileContainer.querySelector('.edit-profile-btn');
+      const slideButtons   = actionsContainer.querySelectorAll('.slide-nav-btn');
+      const createBtn      = slideButtons[0];
+      const historyBtn     = slideButtons[1];
+      const pointsBtn      = slideButtons[2];
+      const logoutBtn      = actionsContainer.querySelector('.logout-btn');
 
       if (editProfileBtn) {
         editProfileBtn.addEventListener('click', (e) => {
@@ -496,12 +843,12 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
         });
       }
 
-     if (createBtn) {
-  createBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = '../Slide nav buttons/Create/upload.html';
-  });
-}
+      if (createBtn) {
+        createBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = '../Slide nav buttons/Create/upload.html';
+        });
+      }
 
       if (historyBtn) {
         historyBtn.addEventListener('click', (e) => {
@@ -543,6 +890,7 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
     }
 
     // ----- Edit profile page extra UI -----
+        // ----- Edit profile page extra UI -----
     if (isEditProfilePage) {
       const userName  = document.getElementById('user-name');
       const userEmail = document.getElementById('user-email');
@@ -552,8 +900,26 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
 
       await applyProfilePictureToUI(user);
       setupEditableUsername(user);
+
+      // NEW: render the series/stories under the card
+      renderProfileStories();
+
       revealEditProfileSectionWhenReady();
     }
+
+      // ----- Edit-profile "Create" button → upload page -----
+  if (isEditProfilePage) {
+    const profileCreateBtn = document.querySelector('.points-create-btn');
+    if (profileCreateBtn && !profileCreateBtn.dataset.bound) {
+      profileCreateBtn.dataset.bound = '1';
+      profileCreateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // edit-profile.html is in "Slide nav buttons", upload.html is in "Slide nav buttons/Create"
+        window.location.href = './Create/upload.html';
+      });
+    }
+  }
+
   }
 
   function updateUIForLoggedOutUser() {
@@ -568,18 +934,17 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
 
     // Slide nav: remove profile, show "Please log in first"
     if (slideNav) {
-  const profileContainer = slideNav.querySelector('.profile-container');
-  if (profileContainer) profileContainer.remove();
+      const profileContainer = slideNav.querySelector('.profile-container');
+      if (profileContainer) profileContainer.remove();
 
-  const actionsContainer = slideNav.querySelector('.slide-nav-buttons');
-  if (actionsContainer) actionsContainer.remove();
+      const actionsContainer = slideNav.querySelector('.slide-nav-buttons');
+      if (actionsContainer) actionsContainer.remove();
 
-  const loginBtn  = slideNav.querySelector('.login-btn');
-  const loginText = slideNav.querySelector('p');
-  if (loginBtn)  loginBtn.style.display = 'block';
-  if (loginText) loginText.style.display = 'block';
-}
-
+      const loginBtn  = slideNav.querySelector('.login-btn');
+      const loginText = slideNav.querySelector('p');
+      if (loginBtn)  loginBtn.style.display = 'block';
+      if (loginText) loginText.style.display = 'block';
+    }
 
     // HOME PAGE: show Explore, hide Reading Hub button
     if (isChapterFlowPage) {
@@ -593,7 +958,6 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
       if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'block';
     }
   }
-
 
   if (submitBtn) {
     submitBtn.addEventListener('click', async function () {
@@ -626,7 +990,7 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
     });
   }
 
-   // ===========================
+  // ===========================
   // READING BUBBLE (chapter pages only)
   // ===========================
   (function setupReadingBubble() {
@@ -840,7 +1204,5 @@ const logoutBtn      = actionsContainer.querySelector('.logout-btn');
     }, 1000);
   })();
 
-
   checkAuthState();
 });
-

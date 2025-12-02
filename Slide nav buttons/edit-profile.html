@@ -19,9 +19,8 @@
         <!-- Back button -->
         <a href="../ChapterFlow.html" class="back-btn">← Back</a>
 
+        <!-- PROFILE CARD -->
         <div class="profile-section" aria-busy="true">
-
-
             <!-- AVATAR WITH HOVER OVERLAY -->
             <div class="avatar-wrapper" id="avatar-wrapper">
                 <img
@@ -31,8 +30,10 @@
                 >
                 <div class="avatar-overlay">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M9 4.5L7.5 6H5A2 2 0 003 8v8a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-2.5L15 4.5H9z"
-                              fill="currentColor" />
+                        <path
+                            d="M9 4.5L7.5 6H5A2 2 0 003 8v8a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-2.5L15 4.5H9z"
+                            fill="currentColor"
+                        />
                         <circle cx="12" cy="12" r="3.5" fill="#ffffff" />
                     </svg>
                     <span>Upload</span>
@@ -45,10 +46,14 @@
                     <h2 id="user-name">User Name</h2>
                     <button id="edit-name-btn" class="edit-name-btn" type="button" aria-label="Edit username">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M3 17.25V21h3.75L19.81 7.94l-3.75-3.75L3 17.25Z"
-                                  stroke="currentColor" stroke-width="1.6" />
-                            <path d="M14.06 4.19l3.75 3.75"
-                                  stroke="currentColor" stroke-width="1.6" />
+                            <path
+                                d="M3 17.25V21h3.75L19.81 7.94l-3.75-3.75L3 17.25Z"
+                                stroke="currentColor" stroke-width="1.6"
+                            />
+                            <path
+                                d="M14.06 4.19l3.75 3.75"
+                                stroke="currentColor" stroke-width="1.6"
+                            />
                         </svg>
                     </button>
                 </div>
@@ -68,8 +73,16 @@
                 </div>
             </div>
         </div>
+
+        <!-- STORIES / SERIES UNDER THE CARD -->
+        <section class="profile-stories">
+            <h3 class="profile-stories-heading">Your stories / series</h3>
+            <p class="profile-stories-empty">You haven’t published any stories yet.</p>
+            <div id="profile-stories-container"></div>
+        </section>
     </div>
 
+    <!-- Hidden file input for avatar -->
     <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
 </body>
 </html>

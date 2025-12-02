@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Story – ChapterFlow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+
+  <style>
+    body.story-page {
+      margin: 0;
+      font-family: "Merriweather", serif;
+      background-color: #f7f3e9;
+      color: #3c2b1a;
+    }
+
+    .story-banner {
+      background-color: #c9b184;
+      height: 210px;
+      width: 100%;
+    }
+
+    .story-layout {
+      max-width: 980px;
+      margin: 0 auto 64px;
+      padding: 0 16px 48px;
+      position: relative;
+      top: -120px;
+    }
+
+    .story-card {
+      background-color: #ffffff;
+      border-radius: 26px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.13);
+      padding: 26px 32px;
+      display: grid;
+      grid-template-columns: minmax(160px, 220px) 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .story-cover-box {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      border-radius: 18px;
+      background: #e4ddcf;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      color: rgba(0, 0, 0, 0.5);
+      text-align: center;
+      padding: 8px;
+    }
+
+    .story-cover-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .story-meta h1 {
+      margin: 0 0 6px;
+      font-size: 1.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .story-meta .story-tagline {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(0, 0, 0, 0.55);
+    }
+
+    .story-meta p.story-description {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: rgba(0, 0, 0, 0.75);
+    }
+
+    .story-meta .story-author {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .story-main-section {
+      max-width: 980px;
+      margin: -70px auto 72px;
+      padding: 0 16px 48px;
+    }
+
+    .chapters-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .chapters-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .chapters-header p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .chapter-list {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chapter-card {
+      background-color: #ffffff;
+      border-radius: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.07);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    .chapter-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+    }
+
+    .chapter-card-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .chapter-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .chapter-sub {
+      font-size: 0.85rem;
+      color: rgba(0, 0, 0, 0.65);
+    }
+
+    .chapter-meta {
+      font-size: 0.8rem;
+      color: rgba(0, 0, 0, 0.5);
+      text-align: right;
+      min-width: 120px;
+      margin-left: 16px;
+    }
+
+    .chapter-empty {
+      text-align: center;
+      font-size: 0.9rem;
+      color: rgba(0, 0, 0, 0.6);
+      margin-top: 10px;
+    }
+
+    .story-not-found {
+      max-width: 780px;
+      margin: -60px auto 40px;
+      padding: 16px;
+      text-align: center;
+      font-size: 0.95rem;
+      color: rgba(120, 60, 60, 0.85);
+    }
+
+    .story-page .back-btn {
+      position: relative;
+      z-index: 5;
+      margin: 16px 0 0 16px;
+    }
+
+    @media (max-width: 768px) {
+      .story-layout {
+        top: -100px;
+      }
+      .story-card {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="story-page">
+  <a href="../Slide nav buttons/edit-profile.html" class="back-btn">← Back</a>
+
+  <div class="story-banner"></div>
+
+  <main>
+    <section class="story-layout">
+      <article class="story-card">
+        <div class="story-cover-box">
+          <span id="story-cover-placeholder">COVER</span>
+          <img id="story-cover-image" src="" alt="">
+        </div>
+        <div class="story-meta">
+          <p class="story-tagline">Series</p>
+          <h1 id="story-title">Story Title</h1>
+          <p class="story-description" id="story-description">
+            Description of the story will appear here.
+          </p>
+          <p class="story-author" id="story-author"></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="story-main-section">
+      <div class="chapters-header">
+        <h2>Chapters</h2>
+        <p>This is where all chapters for this series will appear.</p>
+      </div>
+
+      <div id="chapter-list" class="chapter-list"></div>
+      <p id="chapter-empty" class="chapter-empty">No chapters uploaded yet.</p>
+
+      <div id="story-not-found" class="story-not-found" style="display:none;">
+        We couldn’t find this story. It may have been deleted or not yet created.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const PROJECT_ID = '69230def0009866e3192';
+      const ENDPOINT   = 'https://nyc.cloud.appwrite.io/v1';
+      const BUCKET_ID  = '69230e950007fef02b5b';
+      const DATABASE_ID            = '69252c2f001121c41ace';
+      const STORIES_COLLECTION_ID  = 'stories';
+      const CHAPTERS_COLLECTION_ID = 'chapters';
+
+      if (typeof Appwrite === 'undefined') {
+        console.error('Appwrite SDK not loaded');
+        return;
+      }
+
+      const client = new Appwrite.Client()
+        .setEndpoint(ENDPOINT)
+        .setProject(PROJECT_ID);
+
+      const databases = new Appwrite.Databases(client);
+
+      // Build a public view URL for an image in the bucket
+      function getImageUrl(fileId) {
+        if (!fileId) return null;
+        return (
+          ENDPOINT +
+          '/storage/buckets/' + BUCKET_ID +
+          '/files/' + encodeURIComponent(fileId) +
+          '/view?project=' + encodeURIComponent(PROJECT_ID)
+        );
+      }
+
+      const params    = new URLSearchParams(window.location.search);
+      const seriesId  = params.get('seriesId');
+
+      const titleEl       = document.getElementById('story-title');
+      const descEl        = document.getElementById('story-description');
+      const authorEl      = document.getElementById('story-author');
+      const coverHolder   = document.getElementById('story-cover-placeholder');
+      const coverImg      = document.getElementById('story-cover-image');
+      const chapterListEl = document.getElementById('chapter-list');
+      const chapterEmpty  = document.getElementById('chapter-empty');
+      const storyNotFound = document.getElementById('story-not-found');
+
+      async function loadStoryAndChapters() {
+        if (!seriesId) {
+          storyNotFound.style.display = 'block';
+          return;
+        }
+
+        try {
+          const storyDoc = await databases.getDocument(
+            DATABASE_ID,
+            STORIES_COLLECTION_ID,
+            seriesId
+          );
+
+          titleEl.textContent = storyDoc.title || 'Untitled story';
+          descEl.textContent  = storyDoc.description || 'No description yet.';
+          // ownerName doesn't exist in schema anymore, so just leave author blank
+          authorEl.textContent = '';
+
+          // 🔴 Use coverImageId (the column in your Stories table)
+          const coverUrl = getImageUrl(storyDoc.coverImageId);
+          if (coverUrl) {
+            coverImg.src = coverUrl;
+            coverImg.style.display = 'block';
+            coverHolder.style.display = 'none';
+          } else {
+            coverImg.style.display = 'none';
+            coverHolder.style.display = 'block';
+            coverHolder.textContent = 'COVER';
+          }
+        } catch (err) {
+          console.error('Failed to load story', err);
+          storyNotFound.style.display = 'block';
+          return;
+        }
+
+        // Chapters for this story
+        try {
+          const res = await databases.listDocuments(
+            DATABASE_ID,
+            CHAPTERS_COLLECTION_ID,
+            [Appwrite.Query.equal('storyId', seriesId)]
+          );
+
+          const chapters = res.documents.sort(
+            (a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0)
+          );
+
+          if (!chapters.length) {
+            chapterEmpty.style.display = 'block';
+            return;
+          }
+
+          chapterEmpty.style.display = 'none';
+
+          chapters.forEach(doc => {
+            const card = document.createElement('article');
+            card.className = 'chapter-card';
+
+            const main = document.createElement('div');
+            main.className = 'chapter-card-main';
+
+            const title = document.createElement('div');
+            title.className = 'chapter-title';
+            const num = doc.chapterNumber != null ? doc.chapterNumber : '';
+            title.textContent = (num ? 'Chapter ' + num + ' — ' : '') +
+              (doc.chapterTitle || 'Untitled chapter');
+
+            const sub = document.createElement('div');
+            sub.className = 'chapter-sub';
+            sub.textContent = '';
+
+            main.appendChild(title);
+            if (sub.textContent) main.appendChild(sub);
+
+            const meta = document.createElement('div');
+            meta.className = 'chapter-meta';
+            meta.textContent = doc.createdAt
+              ? new Date(doc.createdAt).toLocaleDateString()
+              : (doc.$createdAt ? new Date(doc.$createdAt).toLocaleDateString() : '');
+
+            card.appendChild(main);
+            card.appendChild(meta);
+
+            card.addEventListener('click', () => {
+              const url = `chapter.html?seriesId=${encodeURIComponent(seriesId)}&chapterId=${encodeURIComponent(doc.$id)}`;
+              window.location.href = url;
+            });
+
+            chapterListEl.appendChild(card);
+          });
+        } catch (err) {
+          console.error('Failed to load chapters', err);
+          chapterEmpty.style.display = 'block';
+        }
+      }
+
+      loadStoryAndChapters();
+    })();
+  </script>
+</body>
+</html>
