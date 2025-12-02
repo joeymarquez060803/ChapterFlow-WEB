@@ -98,9 +98,11 @@
       border: none;
       cursor: pointer;
       font-weight: 600;
+      /* style this to match your brand if you want */
     }
 
-    /* Simple modal (you can style nicer later) */
+    /* Simple modal */
+
     .reward-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -166,12 +168,15 @@
       font-weight: 600;
     }
 
-    .modal-exchange-btn {
-      /* style this in your CSS to match your brand */
-    }
-
     .modal-cancel-btn {
       background: #eee;
+    }
+
+    .modal-error {
+      color: #c0392b;
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+      min-height: 1em;
     }
 
     .exchange-result {
@@ -240,8 +245,7 @@
 
     <section class="rewards-grid">
       <!-- PEN -->
-      <article class="reward-card" data-reward-key="PEN" data-cost="2">
-        <!-- Replace src with your own pen image if you want -->
+      <article class="reward-card" data-reward-key="pen" data-cost="2">
         <img src="https://images.pexels.com/photos/261748/pexels-photo-261748.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Pen">
         <h2>Library Pen</h2>
         <p class="reward-cost">Cost: 2 points</p>
@@ -250,8 +254,7 @@
       </article>
 
       <!-- CORRECTION TAPE -->
-      <article class="reward-card" data-reward-key="CORR" data-cost="4">
-        <!-- Replace src with your own correction tape image if you want -->
+      <article class="reward-card" data-reward-key="tape" data-cost="4">
         <img src="https://images.pexels.com/photos/209137/pexels-photo-209137.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Correction tape">
         <h2>Correction Tape</h2>
         <p class="reward-cost">Cost: 4 points</p>
@@ -269,6 +272,8 @@
       <p>This reward costs <span id="modal-reward-cost">0</span> points.</p>
       <p>Are you sure you want to exchange your points for this item?</p>
 
+      <p id="modal-error" class="modal-error"></p>
+
       <div class="modal-actions">
         <button class="modal-cancel-btn" type="button">Cancel</button>
         <button class="modal-exchange-btn" type="button" id="modal-exchange-btn">Exchange</button>
@@ -284,203 +289,243 @@
   </div>
 
   <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // ---------- Appwrite setup (separate from script.js) ----------
-  const client = new Appwrite.Client()
-    .setEndpoint('https://nyc.cloud.appwrite.io/v1')
-    .setProject('69230def0009866e3192');
+    document.addEventListener('DOMContentLoaded', () => {
+      // ---------- Appwrite setup ----------
+      const client = new Appwrite.Client()
+        .setEndpoint('https://nyc.cloud.appwrite.io/v1')
+        .setProject('69230def0009866e3192');
 
-  const account = new Appwrite.Account(client);
+      const account = new Appwrite.Account(client);
 
-  let currentUser = null;
-  let currentPoints = 0;
-  let selectedReward = null;
+      let currentUser = null;
+      let currentPoints = 0;
+      let selectedReward = null;
 
-  // ---------- DOM refs ----------
-  const currentPointsDisplay = document.getElementById('currentPointsDisplay');
-  const exchangeButtons      = document.querySelectorAll('.exchange-btn');
+      // ---------- DOM refs ----------
+      const currentPointsDisplay = document.getElementById('rewards-current-points');
+      const exchangeButtons      = document.querySelectorAll('.reward-exchange-btn');
 
-  const modal        = document.getElementById('redeemModal');
-  const backdrop     = document.getElementById('redeemBackdrop');
-  const modalRewardName = document.getElementById('modalRewardName');
-  const modalCost    = document.getElementById('modalCost');
-  const modalError   = document.getElementById('modalError');
-  const confirmBtn   = document.getElementById('confirmExchangeBtn');
-  const closeBtn     = document.getElementById('closeRedeemModal');
-  const codeSection  = document.getElementById('codeSection');
-  const rewardCodeEl = document.getElementById('rewardCode');
+      const backdrop        = document.getElementById('reward-modal-backdrop');
+      const modal           = document.getElementById('reward-modal');
+      const modalRewardName = document.getElementById('modal-reward-name');
+      const modalRewardCost = document.getElementById('modal-reward-cost');
+      const modalError      = document.getElementById('modal-error');
+      const modalCloseBtn   = document.querySelector('.reward-modal-close');
+      const modalCancelBtn  = document.querySelector('.modal-cancel-btn');
+      const modalExchangeBtn = document.getElementById('modal-exchange-btn');
 
-  // ---------- Helpers ----------
-  async function refreshPoints() {
-    if (!account || !currentUser) return;
+      const resultSection   = document.getElementById('exchange-result');
+      const rewardCodeEl    = document.getElementById('reward-code');
 
-    try {
-      const prefs = await account.getPrefs();
-      const raw   = prefs.readingPoints;
-      const n     = Number(raw);
-
-      currentPoints = Number.isFinite(n) && n > 0 ? n : 0;
-
-      if (currentPointsDisplay) {
-        currentPointsDisplay.textContent = currentPoints;
-      }
-
-      // also keep navbar badge in sync if it exists
-      const navBadge = document.querySelector('.nav-points-display');
-      if (navBadge) {
-        navBadge.textContent = `Points: ${currentPoints}`;
-      }
-    } catch (err) {
-      console.warn('Failed to refresh points', err);
-      currentPoints = 0;
-      if (currentPointsDisplay) currentPointsDisplay.textContent = '0';
-    }
-  }
-
-  function openModal() {
-    if (!modal || !backdrop) return;
-    modal.classList.add('open');
-    backdrop.classList.add('open');
-  }
-
-  function closeModal() {
-    if (!modal || !backdrop) return;
-    modal.classList.remove('open');
-    backdrop.classList.remove('open');
-    modalError.textContent = '';
-    codeSection.style.display = 'none';
-    rewardCodeEl.textContent = '';
-    confirmBtn.disabled = false;
-  }
-
-  function generateCode(key) {
-    const base = (key || 'cf')
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g, '')
-      .slice(0, 3) || 'CFX';
-
-    const ts   = Date.now().toString(36).toUpperCase();
-    const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
-
-    return `CF-${base}-${ts}-${rand}`;
-  }
-
-  // ---------- Close modal events ----------
-  if (closeBtn)   closeBtn.addEventListener('click', closeModal);
-  if (backdrop)   backdrop.addEventListener('click', closeModal);
-
-  // ---------- Confirm Exchange (actual deduction + code) ----------
-  if (confirmBtn) {
-    confirmBtn.addEventListener('click', async () => {
-      if (!selectedReward) return;
-
-      const cost = selectedReward.cost;
-      modalError.textContent = '';
-
-      if (!currentUser) {
-        modalError.textContent = 'Please log in first.';
-        return;
-      }
-
-      // 🔒 IMPORTANT PART:
-      // Block when 0 points OR not enough for this reward
-      if (!Number.isFinite(currentPoints) || currentPoints <= 0 || currentPoints < cost) {
-        modalError.textContent = 'Insufficient points for this reward.';
-        return;
-      }
-
-      try {
-        confirmBtn.disabled = true;
-
-        const newTotal = currentPoints - cost;
-
-        // Update points in Appwrite prefs
-        await account.updatePrefs({
-          readingPoints: newTotal
-        });
-
-        currentPoints = newTotal;
-
-        // Update page display
-        if (currentPointsDisplay) currentPointsDisplay.textContent = currentPoints;
-
-        // Update navbar badge if present
+      // ---------- Helpers ----------
+      function updateDisplays() {
+        if (currentPointsDisplay) {
+          currentPointsDisplay.textContent = currentPoints;
+        }
         const navBadge = document.querySelector('.nav-points-display');
-        if (navBadge) navBadge.textContent = `Points: ${currentPoints}`;
-
-        // Generate one-time code
-        const code = generateCode(selectedReward.key);
-        rewardCodeEl.textContent = code;
-        codeSection.style.display = 'block';
-      } catch (err) {
-        console.error('Error updating points', err);
-        modalError.textContent = 'Something went wrong. Please try again.';
-      } finally {
-        confirmBtn.disabled = false;
-      }
-    });
-  }
-
-  // ---------- When you click "Exchange" on a reward ----------
-  exchangeButtons.forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      modalError.textContent = '';
-      codeSection.style.display = 'none';
-      rewardCodeEl.textContent = '';
-
-      const key  = btn.dataset.key;          // e.g. "pen" or "tape"
-      const cost = Number(btn.dataset.cost) || 0;
-
-      const niceName =
-        key === 'pen'  ? 'Library Pen' :
-        key === 'tape' ? 'Correction Tape' :
-        key;
-
-      selectedReward = { key, cost };
-
-      modalRewardName.textContent = niceName;
-      modalCost.textContent = `Cost: ${cost} point${cost === 1 ? '' : 's'}`;
-
-      try {
-        currentUser = await account.get();
-      } catch {
-        currentUser = null;
-      }
-
-      if (!currentUser) {
-        modalError.textContent = 'Please log in to exchange points.';
-      } else {
-        await refreshPoints();
-
-        if (currentPoints <= 0) {
-          // No points at all
-          modalError.textContent = 'You have 0 points. Read chapters to earn points before exchanging.';
-        } else if (currentPoints < cost) {
-          // Not enough for this specific reward
-          modalError.textContent = `You only have ${currentPoints} point(s). You need ${cost}.`;
+        if (navBadge) {
+          navBadge.textContent = `Points: ${currentPoints}`;
         }
       }
 
-      openModal();
+      async function refreshPoints() {
+        if (!currentUser) {
+          currentPoints = 0;
+          updateDisplays();
+          return;
+        }
+
+        try {
+          const prefs = await account.getPrefs();
+          const raw = prefs.readingPoints;
+          const n = Number(raw);
+
+          currentPoints = Number.isFinite(n) && n > 0 ? n : 0;
+        } catch (err) {
+          console.warn('Failed to refresh points', err);
+          currentPoints = 0;
+        }
+
+        updateDisplays();
+      }
+
+      function openModal() {
+        if (!backdrop) return;
+        backdrop.classList.add('active');
+      }
+
+      function closeModal() {
+        if (!backdrop) return;
+        backdrop.classList.remove('active');
+        if (modalError) modalError.textContent = '';
+        if (resultSection) resultSection.style.display = 'none';
+        if (rewardCodeEl) rewardCodeEl.textContent = '';
+        if (modalExchangeBtn) modalExchangeBtn.disabled = false;
+      }
+
+      function generateCode(key) {
+        const base = (key || 'cf')
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, '')
+          .slice(0, 3) || 'CFX';
+
+        const ts   = Date.now().toString(36).toUpperCase();
+        const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+
+        return `CF-${base}-${ts}-${rand}`;
+      }
+
+      // ---------- Dev cheat: add points via console ----------
+      // In console you can run: cfAddPoints(999)
+      window.cfAddPoints = async function(amount) {
+        try {
+          if (!currentUser) {
+            currentUser = await account.get();
+          }
+        } catch {
+          console.error('No logged-in user; cannot add points.');
+          return;
+        }
+
+        const prefs = await account.getPrefs();
+        const current = Number(prefs.readingPoints || 0);
+        const add = Number(amount) || 0;
+        const next = current + add;
+
+        await account.updatePrefs({
+          ...prefs,
+          readingPoints: next
+        });
+
+        currentPoints = next;
+        updateDisplays();
+        console.log(`Dev cheat: added ${add} point(s). Now you have ${next}.`);
+      };
+
+      // ---------- Close modal events ----------
+      if (modalCloseBtn)  modalCloseBtn.addEventListener('click', closeModal);
+      if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+      if (backdrop) {
+        backdrop.addEventListener('click', (e) => {
+          if (e.target === backdrop) closeModal();
+        });
+      }
+
+      // ---------- Confirm Exchange (actual deduction + code) ----------
+      if (modalExchangeBtn) {
+        modalExchangeBtn.addEventListener('click', async () => {
+          if (!selectedReward || !currentUser) return;
+
+          const cost = selectedReward.cost;
+          if (modalError) modalError.textContent = '';
+
+          // Final safety check
+          if (!Number.isFinite(currentPoints) || currentPoints <= 0 || currentPoints < cost) {
+            if (modalError) modalError.textContent = 'Insufficient points for this reward.';
+            return;
+          }
+
+          try {
+            modalExchangeBtn.disabled = true;
+
+            const prefs = await account.getPrefs();
+            const newTotal = currentPoints - cost;
+
+            await account.updatePrefs({
+              ...prefs,
+              readingPoints: newTotal
+            });
+
+            currentPoints = newTotal;
+            updateDisplays();
+
+            // Generate and show code
+            const code = generateCode(selectedReward.key);
+            if (rewardCodeEl) rewardCodeEl.textContent = code;
+            if (resultSection) resultSection.style.display = 'block';
+          } catch (err) {
+            console.error('Error updating points', err);
+            if (modalError) modalError.textContent = 'Something went wrong. Please try again.';
+          } finally {
+            modalExchangeBtn.disabled = false;
+          }
+        });
+      }
+
+      // ---------- When you click "Exchange" on a reward ----------
+      exchangeButtons.forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!modal || !backdrop) return;
+
+          if (modalError) modalError.textContent = '';
+          if (resultSection) resultSection.style.display = 'none';
+          if (rewardCodeEl) rewardCodeEl.textContent = '';
+
+          const card = btn.closest('.reward-card');
+          const key  = card ? (card.dataset.rewardKey || '').toLowerCase() : '';
+          const cost = card ? Number(card.dataset.cost || '0') : 0;
+
+          selectedReward = { key, cost };
+
+          if (modalRewardName) {
+            const niceName =
+              key === 'pen'  ? 'Library Pen' :
+              key === 'tape' ? 'Correction Tape' :
+              'Reward';
+            modalRewardName.textContent = niceName;
+          }
+
+          if (modalRewardCost) {
+            modalRewardCost.textContent = cost;
+          }
+
+          // Get user and points
+          try {
+            currentUser = await account.get();
+          } catch {
+            currentUser = null;
+          }
+
+          if (!currentUser) {
+            if (modalError) modalError.textContent = 'Please log in to exchange points.';
+            if (modalExchangeBtn) modalExchangeBtn.disabled = true;
+          } else {
+            await refreshPoints();
+
+            if (currentPoints <= 0) {
+              if (modalError) modalError.textContent =
+                'You have 0 points. Read chapters to earn points before exchanging.';
+              if (modalExchangeBtn) modalExchangeBtn.disabled = true;
+            } else if (currentPoints < cost) {
+              if (modalError) modalError.textContent =
+                `You only have ${currentPoints} point(s). You need ${cost}.`;
+              if (modalExchangeBtn) modalExchangeBtn.disabled = true;
+            } else {
+              if (modalExchangeBtn) modalExchangeBtn.disabled = false;
+            }
+          }
+
+          openModal();
+        });
+      });
+
+      // ---------- Initial load: get user + points ----------
+      (async function init() {
+        try {
+          currentUser = await account.get();
+        } catch {
+          currentUser = null;
+        }
+
+        if (currentUser) {
+          await refreshPoints();
+        } else {
+          currentPoints = 0;
+          updateDisplays();
+        }
+      })();
     });
-  });
-
-  // ---------- Initial load: get user + points ----------
-  (async function init() {
-    try {
-      currentUser = await account.get();
-    } catch {
-      currentUser = null;
-    }
-
-    if (currentUser) {
-      await refreshPoints();
-    } else if (currentPointsDisplay) {
-      currentPointsDisplay.textContent = '0';
-    }
-  })();
-});
-</script>
+  </script>
 
 </body>
 </html>
