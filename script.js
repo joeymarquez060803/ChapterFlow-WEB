@@ -1286,4 +1286,4 @@ async function publishChapter() {
     refreshSeriesListUI();
     loadDraft();
   });
-})();
+})()
