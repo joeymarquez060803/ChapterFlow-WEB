@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Points & Rewards - ChapterFlow</title>
+
+  <!-- Fonts & main styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../Style.css">
+
+  <!-- Appwrite SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+
+  <!-- Main shared script (navbar, auth, etc.) -->
+  <script src="../script.js" defer></script>
+
+  <style>
+    /* --- ChapterFlow-ish palette (local to this page) --- */
+    :root {
+      --cf-khaki-light: #f6efe2;
+      --cf-khaki: #e3cfaa;
+      --cf-khaki-deep: #d0b586;
+      --cf-brown: #5b4636;
+      --cf-brown-soft: #6e5540;
+      --cf-ink: #2f2720;
+    }
+
+    main.rewards-main {
+      max-width: 1000px;
+      margin: 130px auto 3.5rem;
+      padding: 2.5rem 2.25rem 2.75rem;
+      font-family: "Merriweather", serif;
+      background: var(--cf-khaki-light);
+      border-radius: 26px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* subtle top band */
+    main.rewards-main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      top: 0;
+      height: 54%;
+      background: linear-gradient(
+        135deg,
+        var(--cf-khaki-deep),
+        var(--cf-khaki-light)
+      );
+      opacity: 0.75;
+      z-index: -1;
+    }
+
+    .rewards-header {
+      text-align: left;
+      margin-bottom: 1.75rem;
+    }
+
+    .rewards-header h1 {
+      margin-bottom: 0.35rem;
+      font-size: 2.1rem;
+      color: var(--cf-ink);
+      letter-spacing: 0.03em;
+    }
+
+    .rewards-header p {
+      font-size: 0.95rem;
+      color: rgba(32, 24, 18, 0.8);
+      max-width: 520px;
+    }
+
+    .rewards-balance {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      font-weight: 600;
+      color: var(--cf-brown);
+      margin-bottom: 2.1rem;
+    }
+
+    .rewards-balance span {
+      font-weight: 700;
+      padding: 0.15rem 0.7rem;
+      border-radius: 999px;
+      background: var(--cf-khaki);
+      color: var(--cf-ink);
+      min-width: 3ch;
+      text-align: center;
+    }
+
+    .rewards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .reward-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 18px;
+      padding: 1.3rem 1.3rem 1.2rem;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border: 1px solid rgba(126, 96, 68, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reward-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      top: 0;
+      height: 40%;
+      background: radial-gradient(circle at top left,
+        rgba(219, 188, 135, 0.35),
+        transparent 60%);
+      z-index: -1;
+    }
+
+    .reward-card img {
+      width: 135px;
+      height: 135px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin-bottom: 0.85rem;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .reward-card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.15rem;
+      color: var(--cf-ink);
+    }
+
+    .reward-cost {
+      font-size: 0.9rem;
+      color: var(--cf-brown-soft);
+      margin-bottom: 0.25rem;
+    }
+
+    .reward-note {
+      font-size: 0.78rem;
+      color: rgba(40, 30, 22, 0.8);
+      margin-bottom: 0.9rem;
+    }
+
+    .reward-exchange-btn {
+      padding: 0.5rem 1.5rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      background: var(--cf-brown);
+      color: #fdf9f1;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+      transition:
+        background 0.15s ease,
+        transform 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+
+    .reward-exchange-btn:hover {
+      background: #443326;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+    }
+
+    .reward-exchange-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    /* --- Modal --- */
+
+    .reward-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .reward-modal-backdrop.active {
+      display: flex;
+    }
+
+    .reward-modal {
+      background: #fffaf2;
+      border-radius: 20px;
+      max-width: 430px;
+      width: 90%;
+      padding: 1.6rem 1.4rem 1.35rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      text-align: left;
+      font-family: "Merriweather", serif;
+      border-top: 5px solid var(--cf-khaki-deep);
+    }
+
+    .reward-modal-close {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.75rem;
+      border: none;
+      background: transparent;
+      font-size: 1.35rem;
+      cursor: pointer;
+      line-height: 1;
+      color: var(--cf-brown-soft);
+    }
+
+    .reward-modal h2 {
+      margin-top: 0;
+      margin-bottom: 0.35rem;
+      font-size: 1.3rem;
+      color: var(--cf-ink);
+    }
+
+    .reward-modal p {
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      color: rgba(32, 24, 18, 0.9);
+    }
+
+    .reward-modal .modal-actions {
+      margin-top: 1.1rem;
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-end;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .reward-modal button {
+      padding: 0.45rem 1.1rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+
+    .modal-cancel-btn {
+      background: #eee5d8;
+      color: var(--cf-brown-soft);
+    }
+
+    .modal-cancel-btn:hover {
+      background: #e0d2bf;
+    }
+
+    .modal-exchange-btn {
+      background: var(--cf-brown);
+      color: #fdf9f1;
+      box-shadow: 0 7px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-exchange-btn:hover:not(:disabled) {
+      background: #443326;
+    }
+
+    .modal-exchange-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .modal-error {
+      color: #c0392b;
+      font-size: 0.8rem;
+      margin-top: 0.15rem;
+      min-height: 1em;
+    }
+
+    .exchange-result {
+      margin-top: 0.9rem;
+      padding: 0.7rem 0.8rem;
+      border-radius: 10px;
+      background: #f6efe2;
+      font-size: 0.9rem;
+      border: 1px dashed var(--cf-khaki-deep);
+    }
+
+    .exchange-code {
+      font-family: monospace;
+      font-size: 0.98rem;
+      background: #fff;
+      padding: 0.35rem 0.6rem;
+      border-radius: 8px;
+      display: inline-block;
+      margin: 0.25rem 0 0.4rem;
+      letter-spacing: 0.06em;
+      color: var(--cf-brown);
+    }
+
+    .small-note {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    @media (max-width: 768px) {
+      main.rewards-main {
+        margin: 110px 1rem 2.5rem;
+        padding: 2rem 1.4rem 2.25rem;
+        border-radius: 20px;
+      }
+
+      .rewards-header {
+        text-align: center;
+      }
+
+      .rewards-header p {
+        margin: 0 auto;
+      }
+
+      .rewards-balance {
+        margin-bottom: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="loading">
+
+  <!-- HEADER / NAVBAR (same structure your script.js expects) -->
+  <header>
+    <nav class="navbar">
+      <button class="hamburger" aria-label="Open menu">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </button>
+
+      <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+      <h2><a href="../ChapterFlow.html">ChapterFlow</a></h2>
+
+      <div class="nav-links">
+        <a href="../ChapterFlow.html" class="nav-link nav-main-link">Home</a>
+        <a href="../about.html" class="nav-link nav-main-link">About</a>
+        <a href="#" class="nav-link nav-auth-link nav-login-link">Log in</a>
+        <a href="#" class="nav-link nav-auth-link nav-signup-cta">Sign up</a>
+      </div>
+    </nav>
+
+    <div class="slide-nav">
+      <button class="close-btn"><</button>
+      <p class="slide-message">Please log in first</p>
+      <button class="login-btn">Log in</button>
+    </div>
+    <div class="backdrop"></div>
+  </header>
+
+  <main class="rewards-main">
+    <div class="rewards-header">
+      <h1>Points & Rewards</h1>
+      <p>Exchange your reading points for small rewards. Codes are one-time use — show them to the library staff.</p>
+    </div>
+
+    <section class="rewards-balance">
+      Current points: <span id="rewards-current-points">--</span>
+    </section>
+
+    <section class="rewards-grid">
+      <!-- PEN -->
+      <article class="reward-card" data-reward-key="pen" data-cost="2">
+        <img src="https://t3.ftcdn.net/jpg/15/98/44/20/360_F_1598442037_kRXWPSXvrbkJp6IwQb8tKJwSfImS7iNg.jpg" alt="Pen">
+        <h2>Library Pen</h2>
+        <p class="reward-cost">Cost: 2 points</p>
+        <p class="reward-note">Simple black ballpen for everyday notes.</p>
+        <button class="reward-exchange-btn">Exchange</button>
+      </article>
+
+      <!-- CORRECTION TAPE -->
+      <article class="reward-card" data-reward-key="tape" data-cost="4">
+        <img src="https://www.shutterstock.com/image-photo/blue-correction-tape-isolated-on-600nw-2439768105.jpg" alt="Correction tape">
+        <h2>Correction Tape</h2>
+        <p class="reward-cost">Cost: 4 points</p>
+        <p class="reward-note">Perfect for fixing written mistakes cleanly.</p>
+        <button class="reward-exchange-btn">Exchange</button>
+      </article>
+    </section>
+  </main>
+
+  <!-- MODAL -->
+  <div class="reward-modal-backdrop" id="reward-modal-backdrop">
+    <div class="reward-modal" id="reward-modal">
+      <button class="reward-modal-close" aria-label="Close">&times;</button>
+      <h2 id="modal-reward-name">Exchange Reward</h2>
+      <p>This reward costs <span id="modal-reward-cost">0</span> points.</p>
+      <p>Are you sure you want to exchange your points for this item?</p>
+
+      <p id="modal-error" class="modal-error"></p>
+
+      <div class="modal-actions">
+        <button class="modal-cancel-btn" type="button">Cancel</button>
+        <button class="modal-exchange-btn" type="button" id="modal-exchange-btn">Exchange</button>
+      </div>
+
+      <div class="exchange-result" id="exchange-result" style="display: none;">
+        <p>Exchange successful!</p>
+        <p>Your code:</p>
+        <div class="exchange-code" id="reward-code"></div>
+        <p class="small-note">Show this code to the library.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ---------- Appwrite setup ----------
+      const client = new Appwrite.Client()
+        .setEndpoint('https://nyc.cloud.appwrite.io/v1')
+        .setProject('69230def0009866e3192');
+
+      const account = new Appwrite.Account(client);
+
+      let currentUser = null;
+      let currentPoints = 0;
+      let selectedReward = null;
+
+      // ---------- DOM refs ----------
+      const currentPointsDisplay = document.getElementById('rewards-current-points');
+      const exchangeButtons      = document.querySelectorAll('.reward-exchange-btn');
+
+      const backdrop        = document.getElementById('reward-modal-backdrop');
+      const modal           = document.getElementById('reward-modal');
+      const modalRewardName = document.getElementById('modal-reward-name');
+      const modalRewardCost = document.getElementById('modal-reward-cost');
+      const modalError      = document.getElementById('modal-error');
+      const modalCloseBtn   = document.querySelector('.reward-modal-close');
+      const modalCancelBtn  = document.querySelector('.modal-cancel-btn');
+      const modalExchangeBtn = document.getElementById('modal-exchange-btn');
+
+      const resultSection   = document.getElementById('exchange-result');
+      const rewardCodeEl    = document.getElementById('reward-code');
+
+      // ---------- Helpers ----------
+      function updateDisplays() {
+        if (currentPointsDisplay) {
+          currentPointsDisplay.textContent = currentPoints;
+        }
+        const navBadge = document.querySelector('.nav-points-display');
+        if (navBadge) {
+          navBadge.textContent = `Points: ${currentPoints}`;
+        }
+      }
+
+      async function refreshPoints() {
+        if (!currentUser) {
+          currentPoints = 0;
+          updateDisplays();
+          return;
+        }
+
+        try {
+          const prefs = await account.getPrefs();
+          const raw = prefs.readingPoints;
+          const n = Number(raw);
+
+          currentPoints = Number.isFinite(n) && n > 0 ? n : 0;
+        } catch (err) {
+          console.warn('Failed to refresh points', err);
+          currentPoints = 0;
+        }
+
+        updateDisplays();
+      }
+
+      function openModal() {
+        if (!backdrop) return;
+        backdrop.classList.add('active');
+      }
+
+      function closeModal() {
+        if (!backdrop) return;
+        backdrop.classList.remove('active');
+        if (modalError) modalError.textContent = '';
+        if (resultSection) resultSection.style.display = 'none';
+        if (rewardCodeEl) rewardCodeEl.textContent = '';
+        if (modalExchangeBtn) modalExchangeBtn.disabled = false;
+      }
+
+      function generateCode(key) {
+        const base = (key || 'cf')
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, '')
+          .slice(0, 3) || 'CFX';
+
+        const ts   = Date.now().toString(36).toUpperCase();
+        const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+
+        return `CF-${base}-${ts}-${rand}`;
+      }
+
+      // ---------- Dev cheat: add points via console ----------
+      // In console you can run: cfAddPoints(999)
+      window.cfAddPoints = async function(amount) {
+        try {
+          if (!currentUser) {
+            currentUser = await account.get();
+          }
+        } catch {
+          console.error('No logged-in user; cannot add points.');
+          return;
+        }
+
+        const prefs = await account.getPrefs();
+        const current = Number(prefs.readingPoints || 0);
+        const add = Number(amount) || 0;
+        const next = current + add;
+
+        await account.updatePrefs({
+          ...prefs,
+          readingPoints: next
+        });
+
+        currentPoints = next;
+        updateDisplays();
+        console.log(`Dev cheat: added ${add} point(s). Now you have ${next}.`);
+      };
+
+      // ---------- Close modal events ----------
+      if (modalCloseBtn)  modalCloseBtn.addEventListener('click', closeModal);
+      if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+      if (backdrop) {
+        backdrop.addEventListener('click', (e) => {
+          if (e.target === backdrop) closeModal();
+        });
+      }
+
+      // ---------- Confirm Exchange (actual deduction + code) ----------
+      if (modalExchangeBtn) {
+        modalExchangeBtn.addEventListener('click', async () => {
+          if (!selectedReward || !currentUser) return;
+
+          const cost = selectedReward.cost;
+          if (modalError) modalError.textContent = '';
+
+          // Final safety check
+          if (!Number.isFinite(currentPoints) || currentPoints <= 0 || currentPoints < cost) {
+            if (modalError) modalError.textContent = 'Insufficient points for this reward.';
+            return;
+          }
+
+          try {
+            modalExchangeBtn.disabled = true;
+
+            const prefs = await account.getPrefs();
+            const newTotal = currentPoints - cost;
+
+            await account.updatePrefs({
+              ...prefs,
+              readingPoints: newTotal
+            });
+
+            currentPoints = newTotal;
+            updateDisplays();
+
+            // Generate and show code
+            const code = generateCode(selectedReward.key);
+            if (rewardCodeEl) rewardCodeEl.textContent = code;
+            if (resultSection) resultSection.style.display = 'block';
+          } catch (err) {
+            console.error('Error updating points', err);
+            if (modalError) modalError.textContent = 'Something went wrong. Please try again.';
+          } finally {
+            modalExchangeBtn.disabled = false;
+          }
+        });
+      }
+
+      // ---------- When you click "Exchange" on a reward ----------
+      exchangeButtons.forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!modal || !backdrop) return;
+
+          if (modalError) modalError.textContent = '';
+          if (resultSection) resultSection.style.display = 'none';
+          if (rewardCodeEl) rewardCodeEl.textContent = '';
+
+          const card = btn.closest('.reward-card');
+          const key  = card ? (card.dataset.rewardKey || '').toLowerCase() : '';
+          const cost = card ? Number(card.dataset.cost || '0') : 0;
+
+          selectedReward = { key, cost };
+
+          if (modalRewardName) {
+            const niceName =
+              key === 'pen'  ? 'Library Pen' :
+              key === 'tape' ? 'Correction Tape' :
+              'Reward';
+            modalRewardName.textContent = niceName;
+          }
+
+          if (modalRewardCost) {
+            modalRewardCost.textContent = cost;
+          }
+
+          // Get user and points
+          try {
+            currentUser = await account.get();
+          } catch {
+            currentUser = null;
+          }
+
+          if (!currentUser) {
+            if (modalError) modalError.textContent = 'Please log in to exchange points.';
+            if (modalExchangeBtn) modalExchangeBtn.disabled = true;
+          } else {
+            await refreshPoints();
+
+            if (currentPoints <= 0) {
+              if (modalError) modalError.textContent =
+                'You have 0 points. Read chapters to earn points before exchanging.';
+              if (modalExchangeBtn) modalExchangeBtn.disabled = true;
+            } else if (currentPoints < cost) {
+              if (modalError) modalError.textContent =
+                `You only have ${currentPoints} point(s). You need ${cost}.`;
+              if (modalExchangeBtn) modalExchangeBtn.disabled = true;
+            } else {
+              if (modalExchangeBtn) modalExchangeBtn.disabled = false;
+            }
+          }
+
+          openModal();
+        });
+      });
+
+      // ---------- Initial load: get user + points ----------
+      (async function init() {
+        try {
+          currentUser = await account.get();
+        } catch {
+          currentUser = null;
+        }
+
+        if (currentUser) {
+          await refreshPoints();
+        } else {
+          currentPoints = 0;
+          updateDisplays();
+        }
+      })();
+    });
+  </script>
+
+</body>
+</html>

@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - ChapterFlow</title>
+
+    <!-- Same font vibe as the rest of the site -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Your main styles (navbar, etc.) -->
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -11,77 +16,77 @@
 
     <a href="ChapterFlow.html" class="back-btn">← Back</a>
 
-    <h1>About ChapterFlow</h1>
+    <main class="about-wrapper">
+        <section class="about-card">
+            <h1>About ChapterFlow</h1>
 
-    <p>
-    ChapterFlow began with one simple belief — <strong>reading doesn't have to be boring.</strong>  
-    Many students grow up thinking books are tiring, dull, or something you're forced to do  
-    for grades. We want to change that. We want reading to feel exciting, rewarding, and  
-    something you actually look forward to.
-</p>
+            <p>
+                ChapterFlow started as a simple idea from our group: we wanted reading to feel
+                less like a school requirement and more like something you’d actually enjoy in
+                your free time. A lot of us grew up thinking that books are “for grades only”,
+                and we wanted to break that feeling even just a little.
+            </p>
 
-<br>
+            <br>
 
-<p>
-    Our platform is built to make reading feel like a journey — not an obligation.  
-    Every story can transport you to a world that doesn’t exist inside the classroom,  
-    whether it’s a quiet romance, an intense mystery, or a fantasy beyond reality.  
-    When you read, you’re not just passing time — <strong>you’re sharpening your mind,  
-    improving comprehension, building vocabulary, and letting your imagination breathe.</strong>
-</p>
+            <p>
+                The platform is designed to make reading feel like a small journey each time you open it.
+                You can jump into different stories and series—whether it’s romance, mystery, fantasy,
+                or anything in between. While you’re reading, you’re not just passing time;
+                <strong>you’re improving your comprehension, building vocabulary, and letting your mind relax
+                from all the academic stress.</strong>
+            </p>
 
-<br>
+            <br>
 
-<p>
-    That’s why ChapterFlow includes a reward system — because growth should be recognized.  
-    The more you read, the more you unlock. It turns progress into something visible,  
-    interactive, and fun. Reading shouldn’t only be beneficial — it should feel satisfying.
-</p>
+            <p>
+                We also added a simple reward system because we believe effort should be recognized.
+                The more you read, the more points you earn. In the future, these points can be used
+                for different rewards or features. It’s our way of making progress feel a little more
+                visible and a little more fun.
+            </p>
 
-<br>
+            <br>
 
-<p>
-    And behind this platform is not a corporation — but four college students fueled  
-    by creativity, caffeine, deadlines, and a big dream. We built ChapterFlow for  
-    people like us — students who love stories, curious minds searching for new ones,  
-    and writers hoping to see their work appreciated.
-</p>
+            <p>
+                Behind ChapterFlow are four college students trying to balance deadlines, projects,
+                and life in general. This isn’t a big company project—just something we built
+                with code, caffeine, late nights, and a shared love for stories. We made this
+                platform for students like us: people who enjoy reading, people who want to start,
+                and writers who want a place to share their work.
+            </p>
 
-<br>
+            <br>
 
-<p>
-    Whether you're here to write, read, publish, or discover something new,  
-    <strong>ChapterFlow is your space</strong> — made by students, made for students,  
-    and made to prove that reading can be powerful, emotional, and incredibly fun.
-</p>
+            <p>
+                So whether you’re here to read, write, publish, or just look for something new to
+                escape into between classes, <strong>ChapterFlow is your space</strong>—created by students,
+                for students, and meant to prove that reading can be simple, meaningful, and actually fun.
+            </p>
+        </section>
 
+        <!-- Slideshow -->
+        <div class="slideshow-container">
 
-    <br><br>
+            <!-- Slides -->
+            <div class="slides fade">
+                <img src="https://upload.wikimedia.org/wikipedia/en/4/4b/My_Bloody_Valentine_-_Loveless.png" alt="Image 1">
+            </div>
 
-   
+            <div class="slides fade">
+                <img src="https://img.freepik.com/free-photo/attractive-young-woman-working-laptop-early-morning_169016-24935.jpg?semt=ais_hybrid&w=740&q=80" alt="Image 2">
+            </div>
 
-    <div class="slideshow-container">
+            <div class="slides fade">
+                <img src="https://media.istockphoto.com/id/543042274/photo/books-in-second-hand-bookshop.jpg?s=612x612&w=0&k=20&c=3XYYWrdQ3JrXa5Web1O0WCUEvMGp0LRKzYL3S1143lI=" alt="Image 3">
+            </div>
 
-        <!-- Slides -->
-        <div class="slides fade">
-            <img src="https://upload.wikimedia.org/wikipedia/en/4/4b/My_Bloody_Valentine_-_Loveless.png" alt="Image 1">
+            <!-- Arrows -->
+            <a class="prev" onclick="plusSlides(-1)">❮</a>
+            <a class="next" onclick="plusSlides(1)">❯</a>
+
         </div>
-
-        <div class="slides fade">
-            <img src="https://img.freepik.com/free-photo/attractive-young-woman-working-laptop-early-morning_169016-24935.jpg?semt=ais_hybrid&w=740&q=80" alt="Image 2">
-        </div>
-
-        <div class="slides fade">
-            <img src="https://media.istockphoto.com/id/543042274/photo/books-in-second-hand-bookshop.jpg?s=612x612&w=0&k=20&c=3XYYWrdQ3JrXa5Web1O0WCUEvMGp0LRKzYL3S1143lI=" alt="Image 3">
-        </div>
-
-        <!-- Arrows -->
-        <a class="prev" onclick="plusSlides(-1)">❮</a>
-        <a class="next" onclick="plusSlides(1)">❯</a>
-
-    </div>
-
-    <br>
+    </main>
 
     <!-- JS for slideshow -->
     <script>
@@ -89,97 +94,122 @@
         showSlides();
 
         function showSlides() {
-    let slides = document.getElementsByClassName("slides");
+            let slides = document.getElementsByClassName("slides");
 
-    for (let i = 0; i < slides.length; i++) {
-        slides[i].style.display = "none";
-    }
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
 
-    slideIndex++;
-    if (slideIndex > slides.length) {
-        slideIndex = 1;
-    }
+            slideIndex++;
+            if (slideIndex > slides.length) {
+                slideIndex = 1;
+            }
 
-    slides[slideIndex - 1].style.display = "block";
-    setTimeout(showSlides, 5000); // or your chosen speed
-}
-
+            slides[slideIndex - 1].style.display = "block";
+            setTimeout(showSlides, 5000); // autoplay speed
+        }
 
         function plusSlides(n) {
-    let slides = document.getElementsByClassName("slides");
-    slideIndex += n;
+            let slides = document.getElementsByClassName("slides");
+            slideIndex += n;
 
-    if (slideIndex > slides.length) {
-        slideIndex = 1;
-    }
-    if (slideIndex < 1) {
-        slideIndex = slides.length;
-    }
+            if (slideIndex > slides.length) {
+                slideIndex = 1;
+            }
+            if (slideIndex < 1) {
+                slideIndex = slides.length;
+            }
 
-    showSpecificSlide(slideIndex);
-}
+            showSpecificSlide(slideIndex);
+        }
 
-function showSpecificSlide(n) {
-    let slides = document.getElementsByClassName("slides");
+        function showSpecificSlide(n) {
+            let slides = document.getElementsByClassName("slides");
 
-    for (let i = 0; i < slides.length; i++) {
-        slides[i].style.display = "none";
-    }
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
 
-    slides[n - 1].style.display = "block";
-}
-
+            slides[n - 1].style.display = "block";
+        }
     </script>
 
-   
+    <!-- Page-specific styling to match ChapterFlow vibe -->
     <style>
         body {
+            margin: 0;
+            padding: 0;
             font-family: 'Merriweather', serif;
+            background-color: #f4e7c4; /* soft khaki */
+            color: #333;
+        }
+
+        .about-wrapper {
+            min-height: 100vh;
+            padding: 80px 16px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .about-card {
+            max-width: 900px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 18px;
+            padding: 40px 28px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
             text-align: center;
-            padding: 60px 20px;
-        }
-
-        .back-btn {
-            display: inline-block;
-            padding: 8px 16px;
-            margin-bottom: 30px;
-            font-size: 18px;
-            text-decoration: none;
-            color: black;
-            border: 1px solid black;
-            border-radius: 8px;
-            background-color: rgb(240, 240, 240);
-        }
-
-        .back-btn:hover {
-            background-color: lightgray;
         }
 
         h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: 40px;
+            margin-bottom: 16px;
         }
 
         p {
-            max-width: 750px;
+            max-width: 780px;
             margin: 0 auto;
-            font-size: 20px;
-            line-height: 1.6;
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-block;
+            padding: 8px 16px;
+            font-size: 16px;
+            text-decoration: none;
+            color: #333;
+            border: 1px solid #333;
+            border-radius: 999px;
+            background-color: #f4e7c4;
+            backdrop-filter: blur(6px);
+        }
+
+        .back-btn:hover {
+            background-color: #e1d3aa;
         }
 
         /* =============== SLIDESHOW CSS =============== */
 
         .slideshow-container {
             position: relative;
-            max-width: 800px;
-            margin: auto;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto 24px;
         }
 
         .slides img {
             width: 100%;
-            height: 400px;
+            height: 380px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
         }
 
         .slides {
@@ -191,25 +221,27 @@ function showSpecificSlide(n) {
             cursor: pointer;
             position: absolute;
             top: 50%;
-            padding: 16px;
-            margin-top: -22px;
+            padding: 12px 16px;
+            transform: translateY(-50%);
             color: white;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             transition: 0.3s;
             user-select: none;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .prev {
-            left: 0;
+            left: 12px;
         }
 
         .next {
-            right: 0;
+            right: 12px;
         }
 
         .prev:hover, .next:hover {
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
         }
 
         .fade {
@@ -219,6 +251,24 @@ function showSpecificSlide(n) {
         @keyframes fadeEffect {
             from { opacity: .4 }
             to { opacity: 1 }
+        }
+
+        @media (max-width: 600px) {
+            .about-card {
+                padding: 28px 20px;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            .slides img {
+                height: 260px;
+            }
         }
     </style>
 

@@ -13,8 +13,181 @@
 
   <!-- Your main script -->
   <script src="script.js" defer></script>
+
+  <style>
+    /* ===== Reading Hub page-specific styling (ChapterFlow vibe) ===== */
+
+    :root {
+      --cf-khaki-light: #f6efe2;
+      --cf-khaki: #c8b38a;
+      --cf-khaki-deep: #d0b586;
+      --cf-ink: #2f2720;
+    }
+
+    /* Make sure hub is visible on this dedicated page
+       (overrides .reading-hub { display:none } from style.css) */
+    body.reading-hub-page .reading-hub {
+      display: block;
+    }
+
+    body.reading-hub-page main.reading-hub-main {
+      max-width: 1100px;
+      margin: 130px auto 4rem;
+      padding: 2.5rem 2.3rem 3rem;
+      background: var(--cf-khaki-light);
+      border-radius: 26px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+      font-family: "Merriweather", serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* soft khaki band at the top of the card */
+    body.reading-hub-page main.reading-hub-main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      top: 0;
+      height: 50%;
+      background: linear-gradient(
+        135deg,
+        var(--cf-khaki-deep),
+        var(--cf-khaki-light)
+      );
+      opacity: 0.75;
+      z-index: -1;
+    }
+
+    .reading-hub-title {
+      margin: 0 0 0.4rem;
+      text-align: left;
+      font-size: 2.1rem;
+      color: var(--cf-ink);
+      letter-spacing: 0.03em;
+    }
+
+    .reading-hub-sub {
+      margin: 0 0 2.1rem;
+      max-width: 640px;
+      font-size: 0.98rem;
+      color: rgba(32, 24, 18, 0.85);
+      line-height: 1.8;
+    }
+
+    /* section headings inside the card */
+    .reading-hub .section-title {
+      margin-top: 2.1rem;
+      margin-bottom: 0.35rem;
+      font-size: 1.25rem;
+      color: var(--cf-ink);
+    }
+
+    .reading-hub .section-desc {
+      max-width: 780px;
+      font-size: 0.96rem;
+      color: rgba(32, 24, 18, 0.85);
+      line-height: 1.85;
+      margin-bottom: 1.6rem;
+    }
+
+    /* tweak the grid and cards slightly to fit the khaki card */
+    .reading-hub .stories-grid {
+      margin-top: 0.4rem;
+      gap: 1.8rem;
+    }
+
+    .reading-hub .story-card {
+      background-color: rgba(255, 255, 255, 0.96);
+      border-radius: 18px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(126, 96, 68, 0.12);
+      overflow: hidden;
+    }
+
+    .reading-hub .story-card img {
+      height: 230px;
+    }
+
+    .reading-hub .story-card-body {
+      padding: 1.05rem 1.15rem 1.35rem;
+    }
+
+    .reading-hub .story-card-body h3 {
+      font-size: 1.02rem;
+    }
+
+    .reading-hub .story-card-body .genre {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .reading-hub .story-card-body .author {
+      font-size: 0.85rem;
+      color: #333;
+    }
+
+    .reading-hub .story-card-body .read-btn {
+      padding: 0.45rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid black;
+      background-color: silver;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+
+    .reading-hub .story-card-body .read-btn:hover {
+      background-color: lightgray;
+      color: white;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    }
+
+    /* section divider between student works & campus books */
+    .reading-hub .campus-grid {
+      margin-top: 1.6rem;
+    }
+
+    @media (max-width: 768px) {
+      body.reading-hub-page main.reading-hub-main {
+        margin: 110px 1rem 3rem;
+        padding: 2.1rem 1.4rem 2.6rem;
+        border-radius: 20px;
+      }
+
+      .reading-hub-title {
+        text-align: center;
+      }
+
+      .reading-hub-sub {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+/* Inner boxes for each section (Created by Students / Available on Campus) */
+.hub-section-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 20px;
+  padding: 1.6rem 1.5rem 1.9rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+  border: 1px solid rgba(126, 96, 68, 0.12);
+  margin-bottom: 1.8rem;
+}
+
+/* Remove big top margin inside cards so titles hug the box nicely */
+.hub-section-card .section-title {
+  margin-top: 0;
+}
+
+
+  </style>
 </head>
-<body class="loading">
+<body class="loading reading-hub-page">
   <header>
     <nav class="navbar">
       <button class="hamburger" aria-label="Open menu">
@@ -42,17 +215,22 @@
     <div class="backdrop"></div>
   </header>
 
-  <main>
-  <h1 style="text-align:center; margin-top:110px;">Reading Hub</h1>
+  <main class="reading-hub-main">
+    <h1 class="reading-hub-title">Reading Hub</h1>
+    <p class="reading-hub-sub">
+      A dedicated space inside ChapterFlow where you can explore campus-created works and
+      sample titles available in school — a taste of how the full reading experience feels.
+    </p>
 
-  <!-- shown only when logged out (your JS can toggle this) -->
-  <p class="locked-message" style="text-align:center; max-width:700px; margin:0 auto 2rem; display:none;">
-    Please log in to access the Reading Hub.
-  </p>
+    <!-- shown only when logged out (your JS can toggle this) -->
+    <p class="locked-message" style="text-align:center; max-width:700px; margin:0 auto 2rem; display:none;">
+      Please log in to access the Reading Hub.
+    </p>
 
-  <section class="reading-hub">
+    <section class="reading-hub">
 
-    <!-- 🔹 Created by Students (top section, you can add real user works later) -->
+  <!-- Created by Students (box 1) -->
+  <div class="hub-section-card">
     <h2 class="section-title">Created by Students</h2>
     <p class="section-desc">
       A space for campus writers to share their own stories, poems, and light novels.
@@ -60,24 +238,13 @@
     </p>
 
     <div class="stories-grid">
-      <!-- You can add real student-created cards here later -->
-      <!-- Example placeholder card (optional, you can delete this): -->
-      <!--
-      <article class="story-card">
-        <span class="tag student">Student Work</span>
-        <img src="https://via.placeholder.com/300x400" alt="Student Story Cover">
-        <div class="story-card-body">
-          <h3>Untitled Draft</h3>
-          <p class="genre">Campus Life / Slice of Life</p>
-          <p class="author">Student Writer</p>
-          <button class="read-btn" disabled>Coming Soon</button>
-        </div>
-      </article>
-      -->
+      <!-- student-created cards can be injected here later -->
     </div>
+  </div>
 
-    <!-- 🔹 Available on Campus (your 3 books go here) -->
-    <h2 class="section-title" style="margin-top:2.5rem;">Available on Campus</h2>
+  <!-- Available on Campus (box 2) -->
+  <div class="hub-section-card">
+    <h2 class="section-title">Available on Campus</h2>
     <p class="section-desc">
       Curated titles that you can explore anytime inside campus — sample novels,
       light novels, and poetry collections to showcase how ChapterFlow works as a reading platform.
@@ -107,25 +274,10 @@
           <button class="read-btn" onclick="location.href='books/story-dreamybull.html'">Read</button>
         </div>
       </article>
-
-      <!-- Book 3 -->
-      <article class="story-card">
-        <span class="tag poetry">Poetry</span>
-        <img src="covers/sample3.jpg" alt="Petals and Paper">
-        <div class="story-card-body">
-          <h3>Petals and Paper</h3>
-          <p class="genre">Spoken Word / Emotional</p>
-          <p class="author">User: Welnis3759</p>
-          <button class="read-btn" onclick="location.href='books/story-petals.html'">Read</button>
-        </div>
-      </article>
     </div>
-  </section>
-</main>
+  </div>
+</section>
 
-
-  
-
- 
+  </main>
 </body>
 </html>

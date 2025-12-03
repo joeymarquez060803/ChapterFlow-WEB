@@ -1,69 +1,160 @@
-(function () {
-  const editorEl = document.getElementById('chapter-body');
-  const chapterTitleEl = document.getElementById('chapter-title');
-  const statsEl = document.getElementById('editor-stats');
-  const toolbarButtons = document.querySelectorAll('.editor-btn');
-  const saveDraftBtn = document.getElementById('save-draft-btn');
-  const publishBtn = document.getElementById('publish-btn');
-  const fontSizeSelect = document.getElementById('font-size-select');
+document.addEventListener('DOMContentLoaded', function () {
+  // -------------------------------
+  // Page flags + anti-flash (FOUC) helpers
+  // -------------------------------
+  const isChapterFlowPage = window.location.href.toLowerCase().includes('chapterflow.html');
+  const isEditProfilePage = window.location.href.toLowerCase().includes('edit-profile.html');
 
-  const insertImageBtn = document.getElementById('insert-image-btn');
-  const insertImageInput = document.getElementById('insert-image-input');
+  // Profile stories section (edit-profile.html)
+  const profileStoriesSection   = isEditProfilePage ? document.querySelector('.profile-stories') : null;
+  const profileStoriesContainer = isEditProfilePage ? document.getElementById('profile-stories-container') : null;
+  const profileStoriesEmptyMsg  = isEditProfilePage ? document.querySelector('.profile-stories-empty') : null;
 
-  // Back button (top-left of card)
-  const backBtn = document.getElementById('upload-back-btn');
-
-  // Series elements
-  const seriesSelectBtn = document.getElementById('series-select-btn');
-  const seriesStatusEl = document.getElementById('series-status');
-  const seriesDropdown = document.getElementById('series-dropdown');
-  const seriesListContainer = document.getElementById('series-list');
-  const seriesCreateNewBtn = document.getElementById('series-create-new-btn');
-  const seriesPanel = document.getElementById('series-panel');
-  const seriesStepLabel = document.getElementById('series-step-label');
-  const seriesTitleStep = document.getElementById('series-title-step');
-  const seriesDescriptionStep = document.getElementById('series-description-step');
-  const seriesCoverStep = document.getElementById('series-cover-step');
-  const seriesTitleInput = document.getElementById('series-title-input');
-  const seriesDescriptionInput = document.getElementById('series-description-input');
-  const seriesCoverInput = document.getElementById('series-cover-input');
-  const seriesCoverBtn = document.getElementById('series-cover-btn');
-  const seriesCoverName = document.getElementById('series-cover-name');
-  const seriesBackButtons = document.querySelectorAll('.series-back-btn');
-  const seriesSaveButtons = document.querySelectorAll('.series-save-btn');
-  const seriesCancelButtons = document.querySelectorAll('.series-cancel-btn');
-
-  const DRAFT_KEY = 'chapterflow:draft';
-  const SERIES_KEY = 'chapterflow:series';
-
-  // ---- Appwrite config (same project/bucket as profile pictures) ----
-  const PROJECT_ID = '69230def0009866e3192';
-  const ENDPOINT   = 'https://nyc.cloud.appwrite.io/v1';
-  const BUCKET_ID  = '69230e950007fef02b5b'; // same bucket as profile pictures
-
-  // Database & collection IDs provided by you
-  const DATABASE_ID            = '69252c2f001121c41ace';
-  const STORIES_COLLECTION_ID  = 'stories';
-  const CHAPTERS_COLLECTION_ID = 'chapters';
-
-  let client    = null;
-  let storage   = null;
-  let account   = null;
-  let databases = null;
-
-  if (typeof Appwrite !== 'undefined') {
-    client = new Appwrite.Client()
-      .setEndpoint(ENDPOINT)
-      .setProject(PROJECT_ID);
-
-    storage   = new Appwrite.Storage(client);
-    account   = new Appwrite.Account(client);
-    databases = new Appwrite.Databases(client);
-  } else {
-    console.error('Appwrite SDK not loaded on upload page.');
+  if (profileStoriesContainer) {
+    profileStoriesContainer.addEventListener('click', handleProfileStoriesClick);
   }
 
-  async function getLoggedInUserForUpload() {
+  const header = document.querySelector('header');
+  const navLinksContainer = document.querySelector('.nav-links');
+
+  // Home hero buttons (only exist on ChapterFlow.html)
+  const exploreBtn = document.querySelector('.explore-btn');
+  const homeHubBtn = document.querySelector('.reading-hub-btn');
+
+  // Is this the Reading Hub page?
+  const isReadingHubPage = window.location.href.toLowerCase().includes('readinghub.html');
+
+  // Elements that only exist (or mainly exist) on readinghub.html
+  const readingHubSection   = document.querySelector('.reading-hub');
+  const readingHubLockedMsg = document.querySelector('.locked-message');
+
+  // Prevent nav flicker/layout shift on ChapterFlow.html:
+  // hide the entire .nav-links container during auth loading.
+  if (isChapterFlowPage) {
+    if (header) header.style.display = 'block';
+    if (navLinksContainer) navLinksContainer.style.display = 'none';
+  }
+
+  // Prevent edit-profile flash of placeholder avatar/name/email:
+  // hide the whole profile section until we populate real data AND the image finishes loading.
+  const editProfileSection = isEditProfilePage ? document.querySelector('.profile-section') : null;
+  if (editProfileSection) {
+    editProfileSection.style.visibility = 'hidden';
+    editProfileSection.style.opacity = '0';
+    editProfileSection.style.transition = 'opacity 120ms ease';
+  }
+
+  function revealEditProfileSectionWhenReady() {
+    if (!editProfileSection) return;
+
+    const img = document.getElementById('profile-pic');
+    const show = () => {
+      editProfileSection.style.visibility = 'visible';
+      editProfileSection.style.opacity = '1';
+    };
+
+    if (!img) return show();
+    if (img.complete) return show();
+
+    img.addEventListener('load', show, { once: true });
+    img.addEventListener('error', show, { once: true });
+  }
+
+  // Initialize Appwrite Client and Account (conditionally, without blocking UI)
+  let client, account;
+  if (typeof Appwrite !== 'undefined') {
+    client = new Appwrite.Client()
+      .setEndpoint('https://nyc.cloud.appwrite.io/v1')
+      .setProject('69230def0009866e3192');
+    account = new Appwrite.Account(client);
+  } else {
+    console.error('Appwrite SDK not loaded. Auth and uploads may not work.');
+  }
+
+  // ===========================
+  // REAL POINTS stored in Appwrite prefs
+  // ===========================
+  const POINTS_PREF_KEY = 'readingPoints';
+
+  // Show points ONLY in the top navbar
+  function updateHeaderPoints(points) {
+    const navContainer = document.querySelector('.nav-links');
+    if (!navContainer) return;
+
+    let badge = navContainer.querySelector('.nav-points-display');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'nav-points-display';
+      navContainer.appendChild(badge);
+    }
+    badge.textContent = `Points: ${points}`;
+  }
+
+  // OPTIONAL: If you ever want to show points on profile page
+  function updateProfilePoints(points) {
+    const span = document.getElementById('profile-points-value');
+    if (span) {
+      span.textContent = points;
+    }
+  }
+
+  // Read points from Appwrite account prefs
+  async function getUserPoints(user) {
+    if (!account || !user) return 0;
+    try {
+      const prefs = await account.getPrefs();
+      const raw = prefs?.[POINTS_PREF_KEY];
+      const n = Number(raw);
+      if (!Number.isFinite(n) || n < 0) return 0;
+      return Math.floor(n);
+    } catch (e) {
+      console.warn('Failed to load points prefs:', e);
+      return 0;
+    }
+  }
+
+  // Save points to Appwrite prefs + refresh navbar/profile UI
+  async function setUserPoints(user, points) {
+    if (!account || !user) return;
+    const safePoints = Math.max(0, Math.floor(Number(points) || 0));
+
+    try {
+      await account.updatePrefs({ [POINTS_PREF_KEY]: safePoints });
+    } catch (e) {
+      console.warn('Failed to save points prefs:', e);
+    }
+
+    updateHeaderPoints(safePoints);
+    updateProfilePoints(safePoints);
+  }
+
+  // Helpers you can call anywhere
+  async function addUserPoints(user, delta) {
+    const current = await getUserPoints(user);
+    return setUserPoints(user, current + (Number(delta) || 0));
+  }
+
+  async function subtractUserPoints(user, delta) {
+    const current = await getUserPoints(user);
+    return setUserPoints(user, current - (Number(delta) || 0));
+  }
+
+  // -------------------------------
+  // Profile picture persistence (per-account)
+  // -------------------------------
+  const BUCKET_ID = '69230e950007fef02b5b';
+  const PROFILE_PREF_KEY = 'profilePicFileId';
+  const DEFAULT_AVATAR_SMALL = 'https://via.placeholder.com/50x50/cccccc/000000?text=U';
+  const DEFAULT_AVATAR_LARGE = 'https://via.placeholder.com/200x200/cccccc/000000?text=U';
+
+  const storage = client ? new Appwrite.Storage(client) : null;
+
+  const PROJECT_ID = client?.config?.project || '69230def0009866e3192';
+  const ENDPOINT = (client?.config?.endpoint || 'https://nyc.cloud.appwrite.io/v1').replace(/\/$/, '');
+
+  const perUserKey = (userId) => `${PROFILE_PREF_KEY}:${userId}`;
+
+  async function getLoggedInUserSafe() {
     if (!account) return null;
     try {
       return await account.get();
@@ -72,929 +163,198 @@
     }
   }
 
-  // For font-size dropdown hack
-  const FONT_DUMMY_VALUE = '__font_dummy__';
-  let lastFontSizeValue = '18'; // default base size you want
-
-  // This should match the min-height in upload.css (.editor-content)
-  const DEFAULT_EDITOR_MIN_HEIGHT = 600;
-
-  let seriesList = [];
-  let currentSeries = null;
-  let seriesStep = 0;
-  let seriesDraft = { title: '', description: '', coverName: '', coverFileId: null };
-  let uploadCurrentUser = null; // Appwrite user on this page
-
-  // For draggable/resizable images
-  let centerLineV = null;
-  let centerLineH = null;
-  let activeImage = null;
-  let isDragging = false;
-  let isResizing = false;
-  let dragOffsetX = 0;
-  let dragOffsetY = 0;
-  let startWidth = 0;
-  let startHeight = 0;
-  let startX = 0;
-  let startY = 0;
-
-  // Context menu for images
-  let imageMenu = null;
-  let menuTarget = null;
-
-  /* ---- Navigation: go back to homepage ---- */
-  function goHome() {
-    // Adjust path if your folder structure changes
-    window.location.href = '../../ChapterFlow.html';
-  }
-
-  /* ---- Utilities ---- */
-  function getPlainText() {
-    if (!editorEl) return '';
-    return (editorEl.innerText || '').replace(/\u200B/g, '');
-  }
-
-  function updateStats() {
-    const text = getPlainText().trim();
-    const wordCount = text ? text.split(/\s+/).length : 0;
-    const charCount = text.length;
-    if (statsEl) {
-      statsEl.textContent = wordCount + ' words · ' + charCount + ' characters';
+  async function getProfileFileIdSafe(user) {
+    if (!account || !user) return null;
+    try {
+      const prefs = await account.getPrefs();
+      return prefs?.[PROFILE_PREF_KEY] || null;
+    } catch {
+      return null;
     }
   }
 
-  // Base font size (applies to entire editor)
-  function applyFontSize(size) {
-    if (!editorEl || !size) return;
+  async function setProfileFileIdSafe(user, fileId) {
+    if (!account || !user || !fileId) return;
 
-    // Remove all inline font-size styles inside editor
-    const styledNodes = editorEl.querySelectorAll('[style*="font-size"]');
-    styledNodes.forEach(node => {
-      node.style.fontSize = '';
-      if (!node.getAttribute('style')) {
-        node.removeAttribute('style');
-      }
-    });
+    try {
+      await account.updatePrefs({ [PROFILE_PREF_KEY]: fileId });
+    } catch (e) {
+      console.warn('Failed to update prefs:', e);
+    }
 
-    editorEl.style.fontSize = size + 'px';
+    try {
+      localStorage.setItem(perUserKey(user.$id), fileId);
+    } catch {}
   }
 
-  // Apply font size to selection if there is a selection inside editor;
-  // otherwise apply to the whole editor.
-  function applyFontSizeToSelectionOrAll(size) {
-    if (!editorEl || !size) return;
+  function getProfileImageUrl(fileId) {
+    if (!fileId) return null;
+    return `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${fileId}/view?project=${encodeURIComponent(PROJECT_ID)}`;
+  }
 
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0) {
-      const range = sel.getRangeAt(0);
-      const isInEditor = editorEl.contains(range.commonAncestorContainer);
+  async function applyProfilePictureToUI(user) {
+    if (!user) return;
 
-      if (!range.collapsed && isInEditor) {
-        const span = document.createElement('span');
-        span.style.fontSize = size + 'px';
-
+    const fileId =
+      (await getProfileFileIdSafe(user)) ||
+      (() => {
         try {
-          range.surroundContents(span);
-        } catch (err) {
-          const contents = range.extractContents();
-          span.appendChild(contents);
-          range.insertNode(span);
+          return localStorage.getItem(perUserKey(user.$id));
+        } catch {
+          return null;
+        }
+      })();
+
+    const src = fileId ? getProfileImageUrl(fileId) : null;
+
+    const big = document.getElementById('profile-pic');
+    if (big) big.src = (src || DEFAULT_AVATAR_LARGE);
+
+    const small = document.querySelector('.profile-container .profile-pic');
+    if (small) small.src = (src || DEFAULT_AVATAR_SMALL);
+  }
+
+  // -------------------------------
+  // Editable username (edit-profile.html)
+  // -------------------------------
+  function setupEditableUsername(user) {
+    if (!isEditProfilePage || !account || !user) return;
+
+    const nameDisplay = document.getElementById('user-name');
+    const emailDisplay = document.getElementById('user-email');
+
+    const wrapper = document.getElementById('name-display-wrapper');
+    const editBtn = document.getElementById('edit-name-btn');
+
+    const editor = document.getElementById('name-editor');
+    const nameInput = document.getElementById('name-input');
+    const saveBtn = document.getElementById('save-name-btn');
+    const cancelBtn = document.getElementById('cancel-name-btn');
+
+    if (!nameDisplay || !wrapper || !editBtn || !editor || !nameInput || !saveBtn || !cancelBtn) {
+      return;
+    }
+
+    const getCurrentName = () =>
+      (user.name || (user.email ? user.email.split('@')[0] : '')).trim();
+
+    nameDisplay.textContent = getCurrentName();
+    if (emailDisplay && user.email) emailDisplay.textContent = user.email;
+
+    const openEditor = () => {
+      wrapper.style.display = 'none';
+      editor.classList.add('is-open');
+      nameInput.value = getCurrentName();
+      nameInput.focus();
+      nameInput.select();
+    };
+
+    const closeEditor = () => {
+      editor.classList.remove('is-open');
+      wrapper.style.display = '';
+    };
+
+    if (!editBtn.dataset.bound) {
+      editBtn.dataset.bound = '1';
+      editBtn.addEventListener('click', openEditor);
+    }
+
+    if (!cancelBtn.dataset.bound) {
+      cancelBtn.dataset.bound = '1';
+      cancelBtn.addEventListener('click', closeEditor);
+    }
+
+    if (!saveBtn.dataset.bound) {
+      saveBtn.dataset.bound = '1';
+      saveBtn.addEventListener('click', async () => {
+        const newName = (nameInput.value || '').trim();
+
+        if (!newName) {
+          alert('Name cannot be empty.');
+          nameInput.focus();
+          return;
         }
 
-        // put cursor after the styled span
-        sel.removeAllRanges();
-        const newRange = document.createRange();
-        newRange.selectNodeContents(span);
-        newRange.collapse(false);
-        sel.addRange(newRange);
+        if (newName.length > 40) {
+          alert('Name is too long (max 40 characters).');
+          nameInput.focus();
+          return;
+        }
 
-        recalcEditorHeight();
-        return;
-      }
-    }
+        saveBtn.disabled = true;
+        cancelBtn.disabled = true;
 
-    // No selection / outside editor → treat as "change all text"
-    applyFontSize(size);
-    recalcEditorHeight();
-  }
+        try {
+          await account.updateName(newName);
 
-  function ensureEditableParagraph() {
-    if (!editorEl) return;
-    const text = getPlainText().trim();
-    const hasParagraph = editorEl.querySelector('p');
-    if (!text && !hasParagraph) {
-      const p = document.createElement('p');
-      p.innerHTML = '<br>';
-      editorEl.appendChild(p);
-    }
-  }
+          const fresh = await account.get();
+          user.name = fresh.name;
 
-  /* ---- Editor height management ---- */
-  function recalcEditorHeight() {
-    if (!editorEl) return;
+          nameDisplay.textContent = fresh.name || newName;
 
-    editorEl.style.minHeight = DEFAULT_EDITOR_MIN_HEIGHT + 'px';
-    const contentHeight = editorEl.scrollHeight;
-    const needed = Math.max(DEFAULT_EDITOR_MIN_HEIGHT, contentHeight);
-    editorEl.style.minHeight = needed + 'px';
-  }
+          const slideUsername = document.querySelector('.profile-container .username');
+          if (slideUsername) slideUsername.textContent = fresh.name || newName;
 
-  function expandEditorForImage() {
-    recalcEditorHeight();
-  }
-
-  /* ---- Center guide lines ---- */
-  function ensureCenterLines() {
-    if (!editorEl) return;
-    if (!centerLineV) {
-      centerLineV = document.createElement('div');
-      centerLineV.className = 'editor-center-line-vertical';
-      editorEl.appendChild(centerLineV);
-    }
-    if (!centerLineH) {
-      centerLineH = document.createElement('div');
-      centerLineH.className = 'editor-center-line-horizontal';
-      editorEl.appendChild(centerLineH);
+          closeEditor();
+        } catch (err) {
+          console.error('Failed to update name:', err);
+          alert('Failed to save name. Check console for details.');
+        } finally {
+          saveBtn.disabled = false;
+          cancelBtn.disabled = false;
+        }
+      });
     }
   }
 
-  function updateCenterGuides(wrapper) {
-    if (!editorEl || !wrapper) return;
-    ensureCenterLines();
+  // -------------------------------
+  // Profile Picture Upload Functionality  (UPDATED)
+  // -------------------------------
+  const profilePic = document.getElementById('profile-pic');
+  const profilePicUpload = document.getElementById('profile-pic-upload');
+  const avatarWrapper = document.getElementById('avatar-wrapper');
 
-    const contRect = editorEl.getBoundingClientRect();
-    const imgRect = wrapper.getBoundingClientRect();
+  if (profilePicUpload && client && (profilePic || avatarWrapper)) {
+    const clickable = avatarWrapper || profilePic;
 
-    const contCenterX = contRect.left + contRect.width / 2;
-    const contCenterY = contRect.top + contRect.height / 2;
-    const imgCenterX = imgRect.left + imgRect.width / 2;
-    const imgCenterY = imgRect.top + imgRect.height / 2;
-
-    const threshold = 10;
-
-    if (centerLineV) {
-      if (Math.abs(imgCenterX - contCenterX) <= threshold) {
-        centerLineV.classList.add('active');
-      } else {
-        centerLineV.classList.remove('active');
-      }
-    }
-
-    if (centerLineH) {
-      if (Math.abs(imgCenterY - contCenterY) <= threshold) {
-        centerLineH.classList.add('active');
-      } else {
-        centerLineH.classList.remove('active');
-      }
-    }
-  }
-
-  function clearCenterGuides() {
-    if (centerLineV) centerLineV.classList.remove('active');
-    if (centerLineH) centerLineH.classList.remove('active');
-  }
-
-  /* ---- Auto-scroll while dragging ---- */
-  function autoScrollViewport(e) {
-    const edgeZone = 60; // px from top/bottom to start scrolling
-    const step = 25;     // scroll step
-
-    if (e.clientY > window.innerHeight - edgeZone) {
-      window.scrollBy(0, step);
-    } else if (e.clientY < edgeZone) {
-      window.scrollBy(0, -step);
-    }
-  }
-
-  /* ---- Context menu for deleting images ---- */
-  function createImageMenu() {
-    if (imageMenu) return;
-    imageMenu = document.createElement('div');
-    imageMenu.className = 'editor-image-menu hidden';
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = 'Delete image';
-    btn.addEventListener('click', () => {
-      if (menuTarget && menuTarget.parentNode) {
-        menuTarget.parentNode.removeChild(menuTarget);
-        menuTarget = null;
-        updateStats();
-        recalcEditorHeight();
-      }
-      hideImageMenu();
-    });
-    imageMenu.appendChild(btn);
-    document.body.appendChild(imageMenu);
-  }
-
-  function showImageMenu(x, y, wrapper) {
-    createImageMenu();
-    menuTarget = wrapper;
-    imageMenu.style.left = x + 'px';
-    imageMenu.style.top = y + 'px';
-    imageMenu.classList.remove('hidden');
-  }
-
-  function hideImageMenu() {
-    if (!imageMenu) return;
-    imageMenu.classList.add('hidden');
-    menuTarget = null;
-  }
-
-  document.addEventListener('click', (e) => {
-    if (!imageMenu || imageMenu.classList.contains('hidden')) return;
-    if (imageMenu.contains(e.target)) return;
-    hideImageMenu();
-  });
-
-  window.addEventListener('scroll', hideImageMenu);
-
-  /* ---- Draggable & resizable images ---- */
-  function onImageDragMove(e) {
-    if (!isDragging || !activeImage || !editorEl) return;
-
-    autoScrollViewport(e);
-
-    const contRect = editorEl.getBoundingClientRect();
-    const imgRect = activeImage.getBoundingClientRect();
-
-    let newLeft = e.clientX - contRect.left - dragOffsetX;
-    let newTop = e.clientY - contRect.top - dragOffsetY;
-
-    const maxLeft = contRect.width - imgRect.width;
-    newLeft = Math.max(0, Math.min(newLeft, maxLeft));
-    newTop = Math.max(0, newTop); // allow dragging below; height will expand
-
-    // Snap to center if close
-    const snapThreshold = 10;
-    const contCenterX = contRect.width / 2;
-    const contCenterY = contRect.height / 2;
-    const imgWidth = imgRect.width;
-    const imgHeight = imgRect.height;
-
-    const tentativeCenterX = newLeft + imgWidth / 2;
-    const tentativeCenterY = newTop + imgHeight / 2;
-
-    if (Math.abs(tentativeCenterX - contCenterX) <= snapThreshold) {
-      newLeft = contCenterX - imgWidth / 2;
-    }
-    if (Math.abs(tentativeCenterY - contCenterY) <= snapThreshold) {
-      newTop = contCenterY - imgHeight / 2;
-    }
-
-    activeImage.style.left = newLeft + 'px';
-    activeImage.style.top = newTop + 'px';
-
-    expandEditorForImage();
-    updateCenterGuides(activeImage);
-  }
-
-  function onImageDragEnd() {
-    if (!isDragging) return;
-    isDragging = false;
-    if (activeImage) {
-      activeImage.classList.remove('is-dragging');
-    }
-    clearCenterGuides();
-    recalcEditorHeight();
-    document.removeEventListener('mousemove', onImageDragMove);
-    document.removeEventListener('mouseup', onImageDragEnd);
-  }
-
-  function onImageResizeMove(e) {
-    if (!isResizing || !activeImage) return;
-    const img = activeImage.querySelector('img');
-    if (!img) return;
-
-    const dx = e.clientX - startX;
-    let newWidth = startWidth + dx;
-    if (newWidth < 40) newWidth = 40;
-    const scale = newWidth / startWidth;
-    const newHeight = startHeight * scale;
-
-    img.style.width = newWidth + 'px';
-    img.style.height = newHeight + 'px';
-
-    expandEditorForImage();
-    updateCenterGuides(activeImage);
-  }
-
-  function onImageResizeEnd() {
-    if (!isResizing) return;
-    isResizing = false;
-    if (activeImage) {
-      activeImage.classList.remove('is-resizing');
-    }
-    clearCenterGuides();
-    recalcEditorHeight();
-    document.removeEventListener('mousemove', onImageResizeMove);
-    document.removeEventListener('mouseup', onImageResizeEnd);
-  }
-
-  function makeImageInteractive(wrapper) {
-    if (!editorEl || !wrapper) return;
-    const handle = wrapper.querySelector('.editor-image-resize');
-    const img = wrapper.querySelector('img');
-
-    // Drag
-    wrapper.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return; // only left click
-      if (e.target === handle) return;
+    clickable.addEventListener('click', (e) => {
       e.preventDefault();
-      isDragging = true;
-      activeImage = wrapper;
-      wrapper.classList.add('is-dragging');
-
-      const rect = wrapper.getBoundingClientRect();
-      dragOffsetX = e.clientX - rect.left;
-      dragOffsetY = e.clientY - rect.top;
-
-      document.addEventListener('mousemove', onImageDragMove);
-      document.addEventListener('mouseup', onImageDragEnd);
+      profilePicUpload.click();   // single, central place to open dialog
     });
 
-    // Resize
-    if (handle) {
-      handle.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
-        e.stopPropagation();
-        e.preventDefault();
-        isResizing = true;
-        activeImage = wrapper;
-        wrapper.classList.add('is-resizing');
-
-        const rect = wrapper.getBoundingClientRect();
-        startWidth = rect.width;
-        startHeight = rect.height;
-        startX = e.clientX;
-        startY = e.clientY;
-
-        document.addEventListener('mousemove', onImageResizeMove);
-        document.addEventListener('mouseup', onImageResizeEnd);
+    if (profilePic) {
+      profilePic.addEventListener('error', () => {
+        console.error('Profile image failed to load. src =', profilePic.src);
       });
     }
 
-    // Right-click → delete menu
-    function showMenu(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      showImageMenu(e.clientX, e.clientY, wrapper);
-    }
-
-    wrapper.addEventListener('contextmenu', showMenu);
-    if (img) {
-      img.addEventListener('contextmenu', showMenu);
-    }
-  }
-
-  function addImageToEditor(src) {
-    if (!editorEl || !src) return;
-    ensureCenterLines();
-    ensureEditableParagraph();
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'editor-image';
-    wrapper.setAttribute('contenteditable', 'false');
-
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = '';
-
-    const handle = document.createElement('div');
-    handle.className = 'editor-image-resize';
-
-    wrapper.appendChild(img);
-    wrapper.appendChild(handle);
-    editorEl.appendChild(wrapper);
-
-    const contRectInitial = editorEl.getBoundingClientRect();
-    const initialWidth = Math.min(contRectInitial.width * 0.4, 400);
-    img.style.width = initialWidth + 'px';
-    img.style.height = 'auto';
-
-    // Place image near where the user is currently looking
-    requestAnimationFrame(() => {
-      const contRect = editorEl.getBoundingClientRect();
-      const rect = wrapper.getBoundingClientRect();
-
-      const left = (contRect.width - rect.width) / 2;
-      wrapper.style.left = Math.max(0, left) + 'px';
-
-      const editorTopDoc = contRect.top + window.scrollY;
-      const visibleTopInsideEditor = window.scrollY - editorTopDoc;
-      let topInside = visibleTopInsideEditor + 80;
-      if (topInside < 40) topInside = 40;
-      wrapper.style.top = topInside + 'px';
-
-      expandEditorForImage();
-    });
-
-    makeImageInteractive(wrapper);
-  }
-
-  function initExistingImages() {
-    if (!editorEl) return;
-    ensureCenterLines();
-    const wrappers = editorEl.querySelectorAll('.editor-image');
-    wrappers.forEach((w) => makeImageInteractive(w));
-  }
-
-  /* ---- Series persistence ---- */
-async function loadSeries() {
-  // Start fresh
-  seriesList = [];
-
-  // 1) Load whatever is in localStorage (old saved series)
-  try {
-    const raw = localStorage.getItem(SERIES_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        seriesList = parsed;
-      }
-    }
-  } catch (e) {
-    console.warn('Failed to read local series from storage', e);
-  }
-
-  // If Appwrite DB is not available, just keep the local list
-  if (!databases) return;
-
-  // 2) Try to determine the current user so we can filter stories
-  let user = uploadCurrentUser;
-  if (!user) {
-    try {
-      user = await getLoggedInUserForUpload();
-    } catch (e) {
-      console.warn('Failed to fetch user for series loading', e);
-    }
-  }
-  if (!user || !user.$id) {
-    // We don't know who the user is → don't touch the existing list
-    return;
-  }
-
-  // 3) Load this user's stories from Appwrite and MERGE with local list
-  try {
-    const res = await databases.listDocuments(
-      DATABASE_ID,
-      STORIES_COLLECTION_ID,
-      [Appwrite.Query.equal('ownerId', user.$id)]
-    );
-
-    const fromDb = res.documents.map(doc => ({
-      id: doc.$id,
-      title: doc.title,
-      description: doc.description || '',
-      coverName: doc.coverName || null,
-      coverFileId: doc.coverFileId || null,
-      ownerId: doc.ownerId || user.$id,
-      ownerName:
-        doc.ownerName ||
-        user.name ||
-        (user.email ? user.email.split('@')[0] : null)
-    }));
-
-    // Merge current seriesList (maybe from localStorage) with DB data by id
-    const byId = new Map();
-    seriesList.forEach(s => byId.set(s.id, s));
-    fromDb.forEach(s => byId.set(s.id, s));
-
-    seriesList = Array.from(byId.values());
-
-    // Save merged list back to localStorage so edit-profile.html sees it
-    saveSeries();
-  } catch (e) {
-    console.warn('Failed to load series from Appwrite; keeping local list.', e);
-  }
-}
-
-
-  function saveSeries() {
-    try {
-      localStorage.setItem(SERIES_KEY, JSON.stringify(seriesList));
-    } catch (e) {
-      console.warn('Failed to save series', e);
-    }
-  }
-
-function refreshSeriesListUI() {
-  if (!seriesListContainer) return;
-  seriesListContainer.innerHTML = '';
-
-  let visibleSeries = [];
-
-  if (uploadCurrentUser && uploadCurrentUser.$id) {
-    const uid = String(uploadCurrentUser.$id);
-
-    // 1) Stories clearly owned by this user
-    const owned = seriesList.filter(
-      s => s.ownerId && String(s.ownerId) === uid
-    );
-
-    if (owned.length) {
-      visibleSeries = owned;
-    } else {
-      // 2) Fallback: any stories that have no ownerId yet
-      //    (these are older stories created before we started saving ownerId)
-      visibleSeries = seriesList.filter(s => !s.ownerId);
-    }
-  } else {
-    // No user info → just show everything we have locally
-    visibleSeries = seriesList.slice();
-  }
-
-  if (!visibleSeries.length) {
-    const p = document.createElement('p');
-    p.className = 'series-empty';
-    p.textContent = 'No stories yet.';
-    seriesListContainer.appendChild(p);
-    return;
-  }
-
-  visibleSeries.forEach(series => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'series-item-btn';
-    btn.textContent = series.title;
-    btn.dataset.seriesId = series.id;
-    btn.addEventListener('click', () => {
-      currentSeries = series;
-      if (seriesStatusEl) {
-        seriesStatusEl.textContent = 'Selected: ' + series.title;
-      }
-      seriesDropdown.classList.add('hidden');
-      seriesPanel.classList.add('hidden');
-    });
-    seriesListContainer.appendChild(btn);
-  });
-}
-
-
-  /* ---- Series creation flow ---- */
-  function setSeriesStep(step) {
-    seriesStep = step;
-    seriesTitleStep.classList.add('hidden');
-    seriesDescriptionStep.classList.add('hidden');
-    seriesCoverStep.classList.add('hidden');
-    seriesStepLabel.textContent = '';
-
-    if (step === 1) {
-      seriesStepLabel.textContent = 'Step 1: Series title';
-      seriesTitleStep.classList.remove('hidden');
-      seriesTitleInput.value = seriesDraft.title || '';
-    } else if (step === 2) {
-      seriesStepLabel.textContent = 'Step 2: Description';
-      seriesDescriptionStep.classList.remove('hidden');
-      seriesDescriptionInput.value = seriesDraft.description || '';
-    } else if (step === 3) {
-      seriesStepLabel.textContent = 'Step 3: Series cover';
-      seriesCoverStep.classList.remove('hidden');
-      seriesCoverName.textContent = seriesDraft.coverName || 'No file chosen';
-    }
-  }
-
-  function startSeriesCreation() {
-    seriesDraft = { title: '', description: '', coverName: '', coverFileId: null };
-    seriesPanel.classList.remove('hidden');
-    setSeriesStep(1);
-  }
-
-async function finishSeriesCreation() {
-  if (!seriesDraft.title) {
-    alert('Please enter a series title first.');
-    setSeriesStep(1);
-    return;
-  }
-
-  // Your Stories collection requires coverImageId,
-  // so we must have uploaded a cover first.
-  if (!seriesDraft.coverFileId) {
-    alert('Please upload a cover image before saving your story/series.');
-    setSeriesStep(3);
-    return;
-  }
-
-  // Make sure we know who the owner is
-  let user = uploadCurrentUser;
-  if (!user) {
-    user = await getLoggedInUserForUpload();
-  }
-  if (!user) {
-    alert('You must be logged in to create a story.');
-    return;
-  }
-
-  const ownerId = String(user.$id);
-
-  if (!databases) {
-    alert('Appwrite is not ready yet. Please refresh the page.');
-    return;
-  }
-
-  let createdDoc = null;
-
-  try {
-    const permissions = [
-      Appwrite.Permission.read(Appwrite.Role.any()),
-      Appwrite.Permission.update(Appwrite.Role.user(ownerId)),
-      Appwrite.Permission.delete(Appwrite.Role.user(ownerId)),
-    ];
-
-    // 🔴 Only send fields that actually exist in the Stories schema
-    createdDoc = await databases.createDocument(
-      DATABASE_ID,
-      STORIES_COLLECTION_ID,
-      Appwrite.ID.unique(),
-      {
-        title:        seriesDraft.title,
-        description:  seriesDraft.description || '',
-        coverImageId: seriesDraft.coverFileId,          // required string
-        ownerId:      ownerId,                          // required string
-        createdAt:    new Date().toISOString()          // required datetime
-      },
-      permissions
-    );
-  } catch (err) {
-    console.error('Failed to create story in Appwrite:', err);
-    alert(
-      'Failed to create story in Appwrite: ' +
-      (err && err.message ? err.message : 'Check the console for details.')
-    );
-    return; // don't add locally if DB failed
-  }
-
-  // If we reach here, the story exists in the DB.
-  // Locally we can keep extra fields for the UI (coverName, etc.)
-  const newSeries = {
-    id:          createdDoc.$id,
-    title:       createdDoc.title,
-    description: createdDoc.description || '',
-    coverName:   seriesDraft.coverName || null,          // local only
-    coverFileId: createdDoc.coverImageId || seriesDraft.coverFileId || null,
-    ownerId:     createdDoc.ownerId || ownerId
-  };
-
-  seriesList.push(newSeries);
-  saveSeries();
-  refreshSeriesListUI();
-
-  currentSeries = newSeries;
-  if (seriesStatusEl) {
-    seriesStatusEl.textContent = 'Selected: ' + newSeries.title;
-  }
-
-  seriesPanel.classList.add('hidden');
-  seriesDropdown.classList.add('hidden');
-  seriesStep = 0;
-}
-
-  /* ---- Toolbar (bold/italic/underline/align) ---- */
-  toolbarButtons.forEach(btn => {
-    const role = btn.dataset.role;
-    btn.addEventListener('click', () => {
-      if (!editorEl) return;
-      editorEl.focus();
-
-      if (!role) return;
-      if (role === 'bold') {
-        document.execCommand('bold');
-      } else if (role === 'italic') {
-        document.execCommand('italic');
-      } else if (role === 'underline') {
-        document.execCommand('underline');
-      } else if (role === 'align-left') {
-        document.execCommand('justifyLeft');
-      } else if (role === 'align-center') {
-        document.execCommand('justifyCenter');
-      } else if (role === 'align-right') {
-        document.execCommand('justifyRight');
-      }
-
-      updateStats();
-      recalcEditorHeight();
-    });
-  });
-
-  /* ---- Backspace behavior like Word (centered line → backspace → left) ---- */
-  function getCurrentBlockElement() {
-    if (!editorEl) return null;
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return null;
-    let node = sel.anchorNode;
-    if (!editorEl.contains(node)) return null;
-    if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
-
-    while (node && node !== editorEl) {
-      const display = window.getComputedStyle(node).display;
-      if (
-        display === 'block' ||
-        display === 'list-item' ||
-        node.tagName === 'P' ||
-        node.tagName === 'DIV'
-      ) {
-        return node;
-      }
-      node = node.parentNode;
-    }
-    return editorEl;
-  }
-
-  function handleEditorChange() {
-    const text = getPlainText().trim();
-
-    // If all text is removed, reset font size to default 18
-    if (!text) {
-      const defaultSize = '18';
-      lastFontSizeValue = defaultSize;
-      if (fontSizeSelect) {
-        fontSizeSelect.value = defaultSize;
-      }
-      applyFontSize(defaultSize);
-    }
-
-    updateStats();
-    recalcEditorHeight();
-  }
-
-  if (editorEl) {
-    editorEl.addEventListener('input', handleEditorChange);
-    editorEl.addEventListener('keyup', handleEditorChange);
-    editorEl.addEventListener('change', handleEditorChange);
-    editorEl.addEventListener('focus', () => {
-      ensureEditableParagraph();
-      recalcEditorHeight();
-    });
-
-    // Backspace key special behavior when on an empty centered line
-    editorEl.addEventListener('keydown', (e) => {
-      if (e.key !== 'Backspace') return;
-
-      const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0) return;
-      const range = sel.getRangeAt(0);
-      if (!range.collapsed) return; // only when caret, not selection
-
-      const block = getCurrentBlockElement();
-      if (!block || block === editorEl) return;
-
-      // Text before caret inside this block
-      const beforeRange = range.cloneRange();
-      beforeRange.selectNodeContents(block);
-      beforeRange.setEnd(range.startContainer, range.startOffset);
-      const beforeText = beforeRange.toString().replace(/\u200B/g, '');
-
-      // Only when at start of block
-      if (beforeText.length > 0) return;
-
-      // Only when block is visually empty
-      const blockText = block.textContent.replace(/\u200B/g, '').trim();
-      if (blockText !== '') return;
-
-      const align = window.getComputedStyle(block).textAlign;
-      if (align === 'center' || align === 'right') {
-        // First Backspace → turn this empty line into left-aligned instead of merging
-        e.preventDefault();
-        block.style.textAlign = 'left';
-
-        const newRange = document.createRange();
-        newRange.selectNodeContents(block);
-        newRange.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(newRange);
-      }
-    });
-  }
-
-  /* ---- Font size select: "same size" works, no flicker ---- */
-  if (fontSizeSelect) {
-    // initial value (from dropdown or default 18)
-    lastFontSizeValue = fontSizeSelect.value || lastFontSizeValue;
-
-    const applyCurrentSize = () => {
-      applyFontSizeToSelectionOrAll(fontSizeSelect.value);
-      lastFontSizeValue = fontSizeSelect.value;
-    };
-
-    // Create a hidden dummy option so setting FONT_DUMMY_VALUE is valid
-    (function ensureDummyOption() {
-      const exists = Array.from(fontSizeSelect.options).some(
-        opt => opt.value === FONT_DUMMY_VALUE
-      );
-      if (!exists) {
-        const opt = document.createElement('option');
-        opt.value = FONT_DUMMY_VALUE;
-        opt.textContent = '';
-        opt.disabled = true;
-        opt.hidden = true;
-        fontSizeSelect.appendChild(opt);
-      }
-    })();
-
-    // Before dropdown opens, if there's a selection, temporarily set
-    // a dummy value so choosing the same size still fires "change"
-    fontSizeSelect.addEventListener('mousedown', () => {
-      const sel = window.getSelection();
-      if (!sel || !sel.rangeCount) return;
-      const range = sel.getRangeAt(0);
-      if (range.collapsed) return; // no highlighted text
-      if (!editorEl.contains(range.commonAncestorContainer)) return; // outside editor
-
-      fontSizeSelect.value = FONT_DUMMY_VALUE;
-    });
-
-    // Apply when user actually selects an option
-    fontSizeSelect.addEventListener('change', () => {
-      if (fontSizeSelect.value === FONT_DUMMY_VALUE) return;
-      applyCurrentSize();
-    });
-
-    // If they open the dropdown and then click away without choosing,
-    // restore the last real value.
-    fontSizeSelect.addEventListener('blur', () => {
-      if (fontSizeSelect.value === FONT_DUMMY_VALUE) {
-        fontSizeSelect.value = lastFontSizeValue;
-      }
-    });
-
-    // Initial base font size for the whole editor
-    applyFontSize(lastFontSizeValue);
-  }
-
-  /* ---- Insert image events ---- */
-  if (insertImageBtn && insertImageInput) {
-    insertImageBtn.addEventListener('click', () => {
-      insertImageInput.click();
-    });
-
-    insertImageInput.addEventListener('change', (e) => {
-      const file = e.target.files && e.target.files[0];
+    profilePicUpload.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
       if (!file) return;
-      const url = URL.createObjectURL(file);
-      addImageToEditor(url);
-      insertImageInput.value = '';
-    });
-  }
 
-  /* ---- Series UI events ---- */
-  if (seriesSelectBtn) {
-    seriesSelectBtn.addEventListener('click', () => {
-      if (seriesDropdown.classList.contains('hidden')) {
-        seriesDropdown.classList.remove('hidden');
-      } else {
-        seriesDropdown.classList.add('hidden');
-      }
-    });
-  }
+      profilePicUpload.value = '';
 
-  if (seriesCreateNewBtn) {
-    seriesCreateNewBtn.addEventListener('click', () => {
-      startSeriesCreation();
-    });
-  }
-
-  if (seriesCoverBtn && seriesCoverInput) {
-    seriesCoverBtn.addEventListener('click', () => {
-      seriesCoverInput.click();
-    });
-
-    seriesCoverInput.addEventListener('change', async () => {
-      const file = seriesCoverInput.files && seriesCoverInput.files[0];
-
-      if (!file) {
-        seriesDraft.coverName = '';
-        seriesDraft.coverFileId = null;
-        seriesCoverName.textContent = 'No file chosen';
-        return;
-      }
-
-      // Basic validation
       if (!file.type.startsWith('image/')) {
-        alert('Please select an image file for the cover.');
-        seriesCoverInput.value = '';
+        alert('Please select a valid image file.');
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        alert('Cover image must be less than 5MB.');
-        seriesCoverInput.value = '';
+        alert('File size must be less than 5MB.');
         return;
       }
-
-      if (!storage || !account) {
-        alert('Appwrite is not ready yet. Please refresh the page.');
-        return;
-      }
-
-      const user = await getLoggedInUserForUpload();
-      if (!user) {
-        alert('You are not logged in. Please log in again before uploading a cover.');
-        return;
-      }
-
-      // Show quick feedback
-      seriesCoverName.textContent = 'Uploading...';
 
       try {
+        if (!storage || !account) {
+          alert('Appwrite is not ready yet. Please refresh the page.');
+          return;
+        }
+
+        const user = await getLoggedInUserSafe();
+        if (!user) {
+          alert('You are not logged in. Please log in again.');
+          return;
+        }
+
         const permissions = [
           Appwrite.Permission.read(Appwrite.Role.any()),
           Appwrite.Permission.update(Appwrite.Role.user(user.$id)),
@@ -1008,282 +368,927 @@ async function finishSeriesCreation() {
           permissions
         );
 
-        // Save file info into the draft
-        seriesDraft.coverName   = file.name;
-        seriesDraft.coverFileId = response.$id;
+        const fileId = response.$id;
 
-        seriesCoverName.textContent = file.name;
-      } catch (err) {
-        console.error('Failed to upload series cover:', err);
-        alert('Failed to upload cover image. Please try again.');
-        seriesCoverName.textContent = 'No file chosen';
-        seriesDraft.coverName = '';
-        seriesDraft.coverFileId = null;
+        await setProfileFileIdSafe(user, fileId);
+
+        const src = getProfileImageUrl(fileId);
+        const bust = `&v=${Date.now()}`;
+        if (src && profilePic) profilePic.src = `${src}${bust}`;
+
+        const slideNavPic = document.querySelector('.profile-container .profile-pic');
+        if (slideNavPic && src) slideNavPic.src = `${src}${bust}`;
+
+        alert('Profile picture updated successfully!');
+      } catch (error) {
+        console.error('Upload error details:', error);
+        alert(
+          'Failed to upload profile picture: ' +
+            (error?.message || error) +
+            ' (Check console for more details)'
+        );
       }
     });
   }
 
-  seriesBackButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const step = btn.dataset.step;
-      if (step === 'description') {
-        setSeriesStep(1);
-      } else if (step === 'cover') {
-        setSeriesStep(2);
+  // -------------------------------
+  // Hamburger and Slide Nav
+  // -------------------------------
+  const hamburger = document.querySelector('.hamburger');
+  const slideNav = document.querySelector('.slide-nav');
+  const closeBtn = document.querySelector('.close-btn');
+  const backdrop = document.querySelector('.backdrop');
+
+  if (hamburger && slideNav && backdrop) {
+    hamburger.addEventListener('click', function () {
+      slideNav.classList.add('active');
+      backdrop.classList.add('active');
+    });
+  }
+
+  if (closeBtn && slideNav && backdrop) {
+    closeBtn.addEventListener('click', function () {
+      slideNav.classList.remove('active');
+      backdrop.classList.remove('active');
+    });
+  }
+
+  // ----- existing code continues here -----
+  const modal = document.getElementById('authModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const closeModal = document.querySelector('.modal .close');
+  const submitBtn = document.getElementById('submitBtn');
+
+  const slideLoginBtn = document.querySelector('.login-btn');
+  if (slideLoginBtn && slideNav && backdrop) {
+    slideLoginBtn.addEventListener('click', function () {
+      slideNav.classList.remove('active');
+      backdrop.classList.remove('active');
+      if (modal) {
+        modal.style.display = 'block';
+        modalTitle.textContent = 'Log in';
+        submitBtn.textContent = 'Log in';
+      }
+    });
+  }
+
+  const loginLinks = Array.from(document.querySelectorAll('.nav-links a')).filter(
+    (link) => link.textContent === 'Log in' || link.textContent === 'Sign up'
+  );
+
+  loginLinks.forEach((link) => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const usernameInput = document.getElementById('usernameInput');
+      const passwordInput = document.getElementById('passwordInput');
+      if (usernameInput) usernameInput.value = '';
+      if (passwordInput) passwordInput.value = '';
+      if (modal) {
+        modal.style.display = 'block';
+        modalTitle.textContent = link.textContent;
+        submitBtn.textContent = link.textContent === 'Log in' ? 'Log in' : 'Create Account';
       }
     });
   });
 
-  seriesSaveButtons.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const step = btn.dataset.step;
-      if (step === 'title') {
-        const title = (seriesTitleInput.value || '').trim();
-        if (!title) {
-          alert('Please enter a series title.');
-          return;
-        }
-        seriesDraft.title = title;
-        setSeriesStep(2);
-      } else if (step === 'description') {
-        seriesDraft.description = (seriesDescriptionInput.value || '').trim();
-        setSeriesStep(3);
-      } else if (step === 'cover') {
-        await finishSeriesCreation();
-      }
+  if (closeModal) {
+    closeModal.addEventListener('click', () => {
+      if (modal) modal.style.display = 'none';
+      const usernameInput = document.getElementById('usernameInput');
+      const passwordInput = document.getElementById('passwordInput');
+      if (usernameInput) usernameInput.value = '';
+      if (passwordInput) passwordInput.value = '';
     });
-  });
-
-  seriesSaveButtons.forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const step = btn.dataset.step;
-    if (step === 'title') {
-      const title = (seriesTitleInput.value || '').trim();
-      if (!title) {
-        alert('Please enter a series title.');
-        return;
-      }
-      seriesDraft.title = title;
-      setSeriesStep(2);
-    } else if (step === 'description') {
-      seriesDraft.description = (seriesDescriptionInput.value || '').trim();
-      setSeriesStep(3);
-    } else if (step === 'cover') {
-      await finishSeriesCreation();
-    }
-  });
-});
-
-
-  /* ---- Draft save/load ---- */
-  function loadDraft() {
-    try {
-      const raw = localStorage.getItem(DRAFT_KEY);
-      if (!raw) return;
-      const data = JSON.parse(raw);
-
-      if (data.chapterTitle && chapterTitleEl) {
-        chapterTitleEl.value = data.chapterTitle;
-      }
-      if (editorEl && data.body) {
-        editorEl.innerHTML = data.body;
-      }
-      if (data.fontSize && fontSizeSelect) {
-        fontSizeSelect.value = data.fontSize;
-        lastFontSizeValue = data.fontSize;
-        applyFontSize(data.fontSize);
-      }
-      if (data.seriesId && Array.isArray(seriesList)) {
-        const found = seriesList.find(s => s.id === data.seriesId);
-        if (found) {
-          currentSeries = found;
-          if (seriesStatusEl) {
-            seriesStatusEl.textContent = 'Selected: ' + found.title;
-          }
-        }
-      }
-
-      ensureEditableParagraph();
-      initExistingImages();
-      updateStats();
-      recalcEditorHeight();
-    } catch (e) {
-      console.warn('Failed to load draft', e);
-    }
   }
 
-  function saveDraft() {
-    const sizeToSave =
-      fontSizeSelect && fontSizeSelect.value !== FONT_DUMMY_VALUE
-        ? fontSizeSelect.value
-        : lastFontSizeValue;
-
-    const payload = {
-      chapterTitle: chapterTitleEl ? chapterTitleEl.value.trim() : '',
-      body: editorEl ? editorEl.innerHTML : '',
-      fontSize: sizeToSave,
-      seriesId: currentSeries ? currentSeries.id : null
-    };
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
-      alert('Draft saved locally on this browser.');
-      goHome(); // go back to homepage after saving
-    } catch (e) {
-      alert('Could not save draft (storage error).');
+  window.addEventListener('click', function (e) {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+      const usernameInput = document.getElementById('usernameInput');
+      const passwordInput = document.getElementById('passwordInput');
+      if (usernameInput) usernameInput.value = '';
+      if (passwordInput) passwordInput.value = '';
     }
+  });
+
+  const passwordInputEl = document.getElementById('passwordInput');
+  const togglePassword = document.getElementById('togglePassword');
+
+  if (togglePassword && passwordInputEl) {
+    togglePassword.addEventListener('mousedown', () => (passwordInputEl.type = 'text'));
+    togglePassword.addEventListener('mouseup', () => (passwordInputEl.type = 'password'));
+    togglePassword.addEventListener('mouseleave', () => (passwordInputEl.type = 'password'));
   }
 
-async function publishChapter() {
-  const chapterTitle = chapterTitleEl ? chapterTitleEl.value.trim() : '';
-  const bodyText     = getPlainText().trim();              // plain text (for empty check)
-  const bodyHtml     = editorEl ? editorEl.innerHTML : ''; // full HTML to save
+  let currentUser = null;
+  window.chapterFlowCurrentUser = null;
 
-  const hasTitle = !!chapterTitle;
-  const hasBody  = !!bodyText;
-
-  // -------------------------
-  // CASE A: Only story/series, NO chapter
-  // -------------------------
-  if (!hasTitle && !hasBody) {
-    // 1) If a story is already selected → just treat this as
-    //    "confirm story exists" and go home.
-    if (currentSeries) {
-      try {
-        localStorage.removeItem(DRAFT_KEY);
-      } catch (_) {}
-      alert('Story/series saved. You can add chapters later.');
-      goHome();
+  async function checkAuthState() {
+    if (!account) {
+      currentUser = null;
+      window.chapterFlowCurrentUser = null;
+      updateUIForLoggedOutUser();
+      document.body.classList.remove('loading');
+      if (isChapterFlowPage && navLinksContainer) navLinksContainer.style.display = '';
       return;
     }
 
-    // 2) No selected story, but there is data in the "Create New" panel
-    //    (seriesDraft.title) → finish creating that series and go home.
-    if (seriesDraft && seriesDraft.title) {
-      try {
-        await finishSeriesCreation();
-        try {
-          localStorage.removeItem(DRAFT_KEY);
-        } catch (_) {}
-        alert('Story/series created. You can add chapters later.');
-        goHome();
-        return;
-      } catch (err) {
-        console.error('Failed to finish series creation from Publish:', err);
-        alert('Could not finish creating the story/series. Please try again.');
-        return;
+    try {
+      currentUser = await account.get();
+      window.chapterFlowCurrentUser = currentUser;
+      await updateUIForLoggedInUser(currentUser);
+    } catch (error) {
+      currentUser = null;
+      window.chapterFlowCurrentUser = null;
+      updateUIForLoggedOutUser();
+    }
+
+    document.body.classList.remove('loading');
+    if (isChapterFlowPage && navLinksContainer) navLinksContainer.style.display = '';
+  }
+
+  // Generate a unique-ish code for each redemption
+  function generateRewardCode(user, rewardId) {
+    const userPart = (user.$id || '').slice(-4).toUpperCase();      // last 4 chars of user id
+    const timePart = Date.now().toString(36).toUpperCase();         // timestamp in base36
+    const randPart = Math.floor(Math.random() * 46656)              // 0..36^3-1
+      .toString(36)
+      .padStart(3, '0')
+      .toUpperCase();
+
+    // Example: PEN-AB12-LKJ3F-0X9
+    return `${rewardId}-${userPart}-${timePart}-${randPart}`;
+  }
+
+  // ===============================
+  // PROFILE STORIES / SERIES (edit-profile.html)
+  // ===============================
+
+  // LocalStorage key used by upload.js
+  const SERIES_STORAGE_KEY = 'chapterflow:series';
+
+  function getSeriesFromStorage() {
+    try {
+      const raw = localStorage.getItem(SERIES_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.warn('Failed to read series from storage', e);
+      return [];
+    }
+  }
+
+  function saveSeriesToStorage(list) {
+    try {
+      localStorage.setItem(SERIES_STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.warn('Failed to save series to storage', e);
+    }
+  }
+
+  function inferCoverFileId(series) {
+    if (series.coverFileId) return series.coverFileId;
+
+    const name = (series.coverName || '').trim();
+    // If coverName is a long ID with no dot, treat it as an Appwrite fileId
+    if (name && !name.includes('.') && name.length > 20) {
+      return name;
+    }
+    return null;
+  }
+
+  function renderProfileStories() {
+    if (!profileStoriesContainer) return;
+
+    const allSeries = getSeriesFromStorage();
+    profileStoriesContainer.innerHTML = '';
+
+    // If there is literally nothing in storage, show the empty message and stop.
+    if (!allSeries.length) {
+      if (profileStoriesEmptyMsg) {
+        profileStoriesEmptyMsg.style.display = 'block';
+      }
+      return;
+    }
+
+    const userId =
+      currentUser && currentUser.$id ? String(currentUser.$id) : null;
+
+    // --- MIGRATION: attach ownerId to old stories that don't have it yet ---
+    let changed = false;
+    if (userId && allSeries.length) {
+      allSeries.forEach((s) => {
+        // assign ownerId for old stories
+        if (!s.ownerId) {
+          s.ownerId = userId;
+          changed = true;
+        }
+        // also upgrade stories where coverName was actually the fileId
+        if (!s.coverFileId) {
+          const inferred = inferCoverFileId(s);
+          if (inferred) {
+            s.coverFileId = inferred;
+            changed = true;
+          }
+        }
+      });
+      if (changed) {
+        saveSeriesToStorage(allSeries);
       }
     }
 
-    // 3) No series selected AND no draft → user really hasn’t created anything yet.
-    alert('Please select or create a story/series first.');
-    startSeriesCreation();
-    return;
-  }
+    // Only show stories that belong to the current account
+    const seriesList = userId
+      ? allSeries.filter((s) => String(s.ownerId) === userId)
+      : allSeries;
 
-  // -------------------------
-  // CASE B: Trying to publish a chapter
-  // -------------------------
-
-  // We need BOTH title and content for a chapter
-  if (!hasTitle || !hasBody) {
-    alert('Please enter BOTH a chapter title and some content, or leave both empty if you only want to create a story/series.');
-    return;
-  }
-
-  // Now we definitely need a story to attach this chapter to
-  if (!currentSeries) {
-    alert('Please select or create a story/series first.');
-    startSeriesCreation();
-    return;
-  }
-
-  if (!databases) {
-    alert('Appwrite is not ready yet. Please refresh the page.');
-    return;
-  }
-
-  // Figure out the owner (current logged-in user)
-  let ownerId = null;
-  if (uploadCurrentUser && uploadCurrentUser.$id) {
-    ownerId = String(uploadCurrentUser.$id);
-  } else if (window.chapterFlowCurrentUser && window.chapterFlowCurrentUser.$id) {
-    ownerId = String(window.chapterFlowCurrentUser.$id);
-  }
-
-  if (!ownerId) {
-    alert('You are not logged in. Please log in again before publishing.');
-    return;
-  }
-
-  try {
-    // Determine next chapter number by counting existing chapters for this story
-    let nextNumber = 1;
-    try {
-      const list = await databases.listDocuments(
-        DATABASE_ID,
-        CHAPTERS_COLLECTION_ID,
-        [Appwrite.Query.equal('storyId', currentSeries.id)]
-      );
-      // Appwrite returns .total and .documents; use whichever is available
-      nextNumber = (list.total || list.documents.length || 0) + 1;
-    } catch (err) {
-      console.warn('Could not count existing chapters, defaulting to chapter 1', err);
+    if (!seriesList.length) {
+      if (profileStoriesEmptyMsg) {
+        profileStoriesEmptyMsg.style.display = 'block';
+      }
+      return;
     }
 
-    await databases.createDocument(
-  DATABASE_ID,
-  CHAPTERS_COLLECTION_ID,
-  Appwrite.ID.unique(),
-  {
-    storyId:       currentSeries.id,
-    chapterTitle:  chapterTitle,
-    content:       bodyHtml,
-    chapterNumber: nextNumber,
-    ownerId:       ownerId,
-    createdAt:     new Date().toISOString()   // 👈 required datetime column
-  }
-);
-
-
-    try {
-      localStorage.removeItem(DRAFT_KEY);
-    } catch (_) {}
-
-    alert('Chapter published successfully!');
-    goHome(); // redirect to homepage after publish
-  } catch (err) {
-    console.error('Failed to publish chapter:', err);
-    let msg = 'Failed to publish chapter. Please try again.';
-    if (err && err.message) {
-      msg = 'Failed to publish chapter: ' + err.message;
+    if (profileStoriesEmptyMsg) {
+      profileStoriesEmptyMsg.style.display = 'none';
     }
-    alert(msg);
+
+    seriesList.forEach((series) => {
+      const title = (series.title || '').trim() || 'Untitled story';
+      const desc  = (series.description || '').trim() || 'No description yet.';
+
+      const card = document.createElement('article');
+      card.className = 'profile-story-card';
+      card.dataset.seriesId = series.id;
+
+      const cover = document.createElement('div');
+      cover.className = 'profile-story-cover';
+
+      // Try coverFileId first, then fall back to coverName if it looks like an ID
+      const fileId = inferCoverFileId(series);
+      const coverUrl = fileId ? getProfileImageUrl(fileId) : null;
+
+      if (coverUrl) {
+        const img = document.createElement('img');
+        img.src = coverUrl;
+        img.alt = series.title || 'Series cover';
+        cover.appendChild(img);
+      } else {
+        // No usable file id → gray box with text
+        const placeholder = document.createElement('div');
+        placeholder.className = 'profile-story-cover-inner';
+        placeholder.textContent = series.coverName || 'COVER';
+        cover.appendChild(placeholder);
+      }
+
+      // Right side: title + description
+      const content = document.createElement('div');
+      content.className = 'profile-story-content';
+
+      const titleBtn = document.createElement('button');
+      titleBtn.type = 'button';
+      titleBtn.className = 'profile-story-title-btn';
+      titleBtn.dataset.seriesId = series.id;
+      titleBtn.textContent = title;
+
+      // When you click the story title, go to story.html for this series
+      titleBtn.addEventListener('click', () => {
+        // edit-profile.html is in "Slide nav buttons"
+        // story.html is in "Chapter - Story"
+        const base = '../Chapter - Story/story.html';
+        const url  = `${base}?seriesId=${encodeURIComponent(series.id)}`;
+        window.location.href = url;
+      });
+
+      const descP = document.createElement('p');
+      descP.className = 'profile-story-description';
+      descP.textContent = desc;
+
+      content.appendChild(titleBtn);
+      content.appendChild(descP);
+
+      // 3-dot menu (delete)
+      const menu = document.createElement('div');
+      menu.className = 'profile-story-menu';
+
+      const menuBtn = document.createElement('button');
+      menuBtn.type = 'button';
+      menuBtn.className = 'story-menu-btn';
+      menuBtn.setAttribute('aria-haspopup', 'true');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.textContent = '⋮';
+
+      const dropdown = document.createElement('div');
+      dropdown.className = 'story-menu-dropdown';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'story-delete-btn';
+      deleteBtn.dataset.seriesId = series.id;
+      deleteBtn.textContent = 'Delete story';
+
+      dropdown.appendChild(deleteBtn);
+      menu.appendChild(menuBtn);
+      menu.appendChild(dropdown);
+
+      card.appendChild(cover);
+      card.appendChild(content);
+      card.appendChild(menu);
+
+      profileStoriesContainer.appendChild(card);
+    });
   }
-}
 
+  function handleProfileStoriesClick(evt) {
+    if (!profileStoriesContainer) return;
 
+    const menuBtn   = evt.target.closest('.story-menu-btn');
+    const deleteBtn = evt.target.closest('.story-delete-btn');
 
-  if (saveDraftBtn) {
-    saveDraftBtn.addEventListener('click', saveDraft);
+    // Toggle menu open/close
+    if (menuBtn) {
+      const card = menuBtn.closest('.profile-story-card');
+      if (!card) return;
+      const menu = card.querySelector('.profile-story-menu');
+      if (!menu) return;
+
+      const isOpen = menu.classList.contains('open');
+
+      // close all menus first
+      const allMenus = profileStoriesContainer.querySelectorAll('.profile-story-menu.open');
+      allMenus.forEach(m => m.classList.remove('open'));
+
+      if (!isOpen) {
+        menu.classList.add('open');
+      }
+      return;
+    }
+
+    // Delete story
+    if (deleteBtn) {
+      const card = deleteBtn.closest('.profile-story-card');
+      if (!card) return;
+      const seriesId = card.dataset.seriesId;
+      if (!seriesId) return;
+
+      const sure = window.confirm('Delete this story/series? This cannot be undone.');
+      if (!sure) {
+        const menu = card.querySelector('.profile-story-menu');
+        if (menu) menu.classList.remove('open');
+        return;
+      }
+
+      const list = getSeriesFromStorage();
+      const filtered = list.filter(s => String(s.id) !== String(seriesId));
+      saveSeriesToStorage(filtered);
+      renderProfileStories();
+      return;
+    }
+
+    // Clicked somewhere else inside the container → close any open menus
+    const openMenus = profileStoriesContainer.querySelectorAll('.profile-story-menu.open');
+    openMenus.forEach(menu => {
+      if (!menu.contains(evt.target)) {
+        menu.classList.remove('open');
+      }
+    });
   }
-  if (publishBtn) {
-    publishBtn.addEventListener('click', publishChapter);
+
+  // ===========================
+  // UI for logged in / logged out
+  // ===========================
+  async function updateUIForLoggedInUser(user) {
+    // Hide "Log in / Sign up" in navbar
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach((link) => {
+      const text = (link.textContent || '').trim();
+      if (text === 'Log in' || text === 'Sign up') {
+        link.style.display = 'none';
+      }
+    });
+
+    // Points for this user
+    const userPoints = await getUserPoints(user);
+    updateHeaderPoints(userPoints);    // NAVBAR ONLY
+    updateProfilePoints(userPoints);   // OPTIONAL (profile page)
+
+    // ----- Slide nav (left hamburger menu) -----
+    if (slideNav) {
+      const loginBtn = slideNav.querySelector('.login-btn');
+      const loginText = slideNav.querySelector('p');
+
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (loginText && loginText.textContent === 'Please log in first') {
+        loginText.style.display = 'none';
+      }
+
+      // Remove any old profile widget first
+      const existingProfile = slideNav.querySelector('.profile-container');
+      if (existingProfile) existingProfile.remove();
+
+      // Also remove any old action buttons block (.slide-nav-buttons)
+      const existingActions = slideNav.querySelector('.slide-nav-buttons');
+      if (existingActions) existingActions.remove();
+
+      // Build logged-in profile block (ONLY profile pic + username + Profile button)
+      const profileContainer = document.createElement('div');
+      profileContainer.className = 'profile-container';
+      profileContainer.innerHTML = `
+  <img src="${DEFAULT_AVATAR_SMALL}" alt="Profile Picture" class="profile-pic">
+  <p class="username">${user.name || user.email.split('@')[0]}</p>
+  <button class="edit-profile-btn">Profile</button>
+`;
+      slideNav.appendChild(profileContainer);
+
+      // Build a completely separate block for Create / History / Points & Rewards / Log out
+      const actionsContainer = document.createElement('div');
+      actionsContainer.className = 'slide-nav-buttons';
+      actionsContainer.innerHTML = `
+  <button class="slide-nav-btn">Create</button>
+  <button class="slide-nav-btn">History</button>
+  <button class="slide-nav-btn">Points & Rewards</button>
+  <button class="slide-nav-btn logout-btn">Log out</button>
+`;
+      slideNav.appendChild(actionsContainer);
+
+      await applyProfilePictureToUI(user);
+
+      const editProfileBtn = profileContainer.querySelector('.edit-profile-btn');
+      const slideButtons   = actionsContainer.querySelectorAll('.slide-nav-btn');
+      const createBtn      = slideButtons[0];
+      const historyBtn     = slideButtons[1];
+      const pointsBtn      = slideButtons[2];
+      const logoutBtn      = actionsContainer.querySelector('.logout-btn');
+
+      if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = '../Slide nav buttons/edit-profile.html';
+        });
+      }
+
+      if (createBtn) {
+        createBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          // upload.html is in "Slide nav buttons/Create"
+          window.location.href = '../Slide nav buttons/Create/upload.html';
+        });
+      }
+
+      if (historyBtn) {
+        historyBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = '../Slide nav buttons/history.html';
+        });
+      }
+
+      if (pointsBtn) {
+        pointsBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = '../Slide nav buttons/points-rewards.html';
+        });
+      }
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+          try {
+            await account.deleteSession('current');
+            alert('Logged out successfully!');
+            window.location.href = '../ChapterFlow.html';
+          } catch (error) {
+            alert('Error logging out: ' + error.message);
+          }
+        });
+      }
+    }
+
+    // ----- HOME PAGE: swap Explore ↔ Reading Hub button -----
+    if (isChapterFlowPage) {
+      if (exploreBtn)  exploreBtn.style.display = 'none';
+      if (homeHubBtn)  homeHubBtn.style.display = 'inline-block';
+    }
+
+    // ----- READING HUB PAGE: show cards, hide lock message -----
+    if (isReadingHubPage) {
+      if (readingHubSection)  readingHubSection.style.display = 'block';
+      if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'none';
+    }
+
+    // ----- Edit profile page extra UI -----
+    if (isEditProfilePage) {
+      const userName  = document.getElementById('user-name');
+      const userEmail = document.getElementById('user-email');
+
+      if (userName)  userName.textContent  = (user.name || user.email.split('@')[0]);
+      if (userEmail) userEmail.textContent = user.email;
+
+      await applyProfilePictureToUI(user);
+      setupEditableUsername(user);
+
+      // Render the series/stories under the profile card
+      renderProfileStories();
+
+      revealEditProfileSectionWhenReady();
+
+      // Edit-profile "Create" button → upload page
+      const profileCreateBtn = document.querySelector('.points-create-btn');
+      if (profileCreateBtn && !profileCreateBtn.dataset.bound) {
+        profileCreateBtn.dataset.bound = '1';
+        profileCreateBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          // edit-profile.html is in "Slide nav buttons", upload.html is in "Slide nav buttons/Create"
+          window.location.href = './Create/upload.html';
+        });
+      }
+    }
   }
 
-  if (backBtn) {
-    backBtn.addEventListener('click', goHome);
+  function updateUIForLoggedOutUser() {
+    // Show "Log in / Sign up" again
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach((link) => {
+      const text = (link.textContent || '').trim();
+      if (text === 'Log in' || text === 'Sign up') {
+        link.style.display = 'inline';
+      }
+    });
+
+    // Remove header points badge when logged out
+    const navContainer = document.querySelector('.nav-links');
+    if (navContainer) {
+      const badge = navContainer.querySelector('.nav-points-display');
+      if (badge) badge.remove();
+    }
+
+    // Clear profile stories list on edit-profile page
+    if (profileStoriesContainer) {
+      profileStoriesContainer.innerHTML = '';
+    }
+    if (profileStoriesEmptyMsg) {
+      profileStoriesEmptyMsg.style.display = 'block';
+    }
+
+    // Slide nav: remove profile, show "Please log in first"
+    if (slideNav) {
+      const profileContainer = slideNav.querySelector('.profile-container');
+      if (profileContainer) profileContainer.remove();
+
+      const actionsContainer = slideNav.querySelector('.slide-nav-buttons');
+      if (actionsContainer) actionsContainer.remove();
+
+      const loginBtn  = slideNav.querySelector('.login-btn');
+      const loginText = slideNav.querySelector('p');
+      if (loginBtn)  loginBtn.style.display = 'block';
+      if (loginText) loginText.style.display = 'block';
+    }
+
+    // HOME PAGE: show Explore, hide Reading Hub button
+    if (isChapterFlowPage) {
+      if (exploreBtn)  exploreBtn.style.display = 'inline-block';
+      if (homeHubBtn)  homeHubBtn.style.display = 'none';
+    }
+
+    // READING HUB PAGE: hide cards, show "Please log in" message
+    if (isReadingHubPage) {
+      if (readingHubSection)   readingHubSection.style.display = 'none';
+      if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'block';
+    }
   }
 
-  // ---- Initialisation ----
-  ensureEditableParagraph();
-  updateStats();
-  recalcEditorHeight();
+  if (submitBtn) {
+    submitBtn.addEventListener('click', async function () {
+      if (!account) {
+        alert('Appwrite not loaded. Cannot authenticate.');
+        return;
+      }
+      const email = document.getElementById('usernameInput').value;
+      const password = document.getElementById('passwordInput').value;
 
-  // Get logged-in user, then load their stories from Appwrite, THEN load draft
-  getLoggedInUserForUpload().then(async (user) => {
-    uploadCurrentUser = user;
-    await loadSeries();
-    refreshSeriesListUI();
-    loadDraft();
-  });
-})()
+      if (!email || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      try {
+        if (modalTitle.textContent === 'Log in') {
+          await account.createEmailPasswordSession(email, password);
+          if (modal) modal.style.display = 'none';
+          alert('Logged in successfully!');
+          checkAuthState();
+        } else {
+          await account.create(Appwrite.ID.unique(), email, password);
+          if (modal) modal.style.display = 'none';
+          alert('Account created successfully! Please log in.');
+        }
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  }
+
+  // ===========================
+  // READING BUBBLE (chapter pages only, REAL points)
+  // ===========================
+  (function setupReadingBubble() {
+    // only on chapter-reading pages (no header/book-info)
+    const isReaderPage = document.querySelector('main.reader-page');
+    const hasMeta = document.querySelector('.reader-meta'); // book info page has this
+    const isChapterView = isReaderPage && !hasMeta;
+
+    if (!isChapterView) return;
+    if (typeof account === 'undefined' || !account) return;
+
+    // --- identify the book so all its chapters share progress ---
+    const pathname = window.location.pathname;
+    const filename = pathname.split('/').pop() || '';
+    const baseName = filename.replace(/\.html$/i, '');
+    const bookId = baseName.replace(/-ch\d+$/i, '');
+    const STORAGE_KEY = `cf_progress:${bookId || 'default'}`;
+
+    const INACTIVITY_LIMIT_MS = 60000;  // 60s no activity = pause
+    const POINT_INTERVAL_SEC = 300;     // 5 min per 1 point
+
+    let secondsRead = 0;
+    let pointsAwarded = 0; // how many 5-min chunks already converted to points
+
+    // --- load local progress (so time continues across chapters) ---
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (typeof data.secondsRead === 'number' && data.secondsRead >= 0) {
+          secondsRead = data.secondsRead;
+        }
+        if (typeof data.pointsAwarded === 'number' && data.pointsAwarded >= 0) {
+          pointsAwarded = data.pointsAwarded;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load reading progress', e);
+    }
+
+    function saveProgress() {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ secondsRead, pointsAwarded })
+        );
+      } catch (e) {
+        console.warn('Failed to save reading progress', e);
+      }
+    }
+
+    // --- bubble DOM ---
+    const bubble = document.createElement('div');
+    bubble.className = 'reading-bubble panel-left';
+
+    bubble.innerHTML = `
+    <div class="reading-bubble-main" title="Reading assistant">⏱</div>
+    <div class="reading-bubble-panel">
+      <p class="rb-time">Reading time: 0:00</p>
+      <p class="rb-next">Next point in: 5:00</p>
+      <button type="button" class="rb-prev-btn" style="display:none;">Previous chapter</button>
+      <button type="button" class="rb-next-btn">Next chapter</button>
+    </div>
+  `;
+
+    document.body.appendChild(bubble);
+
+    const mainBtn   = bubble.querySelector('.reading-bubble-main');
+    const panel     = bubble.querySelector('.reading-bubble-panel');
+    const timeLabel = bubble.querySelector('.rb-time');
+    const nextLabel = bubble.querySelector('.rb-next');
+    const prevBtn   = bubble.querySelector('.rb-prev-btn');
+    const nextBtn   = bubble.querySelector('.rb-next-btn');
+
+    // --- decide which side the panel opens on (left/right) ---
+    function updatePanelSide() {
+      const rect = bubble.getBoundingClientRect();
+      const threshold = 160;
+
+      if (rect.left < threshold) {
+        bubble.classList.add('panel-right');
+        bubble.classList.remove('panel-left');
+      } else {
+        bubble.classList.add('panel-left');
+        bubble.classList.remove('panel-right');
+      }
+    }
+
+    updatePanelSide();
+
+    mainBtn.addEventListener('click', () => {
+      bubble.classList.toggle('open');
+    });
+
+    // --- prev / next chapter wiring (adjust filenames to your own) ---
+    const path = window.location.pathname;
+    const isCh1 = path.includes('story-king-ch1');
+    const isCh2 = path.includes('story-king-ch2');
+    const isCh3 = path.includes('story-king-ch3');
+
+    if (isCh1) {
+      prevBtn.style.display = 'none';
+      nextBtn.textContent = 'Next chapter';
+      nextBtn.addEventListener('click', () => {
+        window.location.href = 'story-king-ch2.html';
+      });
+    } else if (isCh2) {
+      prevBtn.style.display = 'inline-block';
+      prevBtn.textContent = 'Previous chapter';
+      nextBtn.textContent = 'Next chapter';
+      prevBtn.addEventListener('click', () => {
+        window.location.href = 'story-king-ch1.html';
+      });
+      nextBtn.addEventListener('click', () => {
+        window.location.href = 'story-king-ch3.html';
+      });
+    } else if (isCh3) {
+      prevBtn.style.display = 'inline-block';
+      prevBtn.textContent = 'Previous chapter';
+      nextBtn.textContent = 'Back to book';
+      prevBtn.addEventListener('click', () => {
+        window.location.href = 'story-king-ch2.html';
+      });
+      nextBtn.addEventListener('click', () => {
+        window.location.href = 'story-king.html';
+      });
+    } else {
+      prevBtn.style.display = 'none';
+      nextBtn.style.display = 'none';
+    }
+
+    // --- draggable behaviour ---
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    function startDrag(clientX, clientY) {
+      isDragging = true;
+      const rect = bubble.getBoundingClientRect();
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+      mainBtn.style.cursor = 'grabbing';
+      bubble.style.left = rect.left + 'px';
+      bubble.style.top  = rect.top + 'px';
+      bubble.style.right = 'auto';
+      bubble.style.bottom = 'auto';
+    }
+
+    function moveDrag(clientX, clientY) {
+      if (!isDragging) return;
+      const x = clientX - offsetX;
+      const y = clientY - offsetY;
+      bubble.style.left = x + 'px';
+      bubble.style.top  = y + 'px';
+    }
+
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+      mainBtn.style.cursor = 'grab';
+      updatePanelSide();
+    }
+
+    mainBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      startDrag(e.clientX, e.clientY);
+    });
+    window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+    window.addEventListener('mouseup', endDrag);
+
+    mainBtn.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startDrag(t.clientX, t.clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      moveDrag(t.clientX, t.clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchend', endDrag);
+    window.addEventListener('resize', updatePanelSide);
+
+    // --- reading timer + REAL points ---
+    let lastActivity = Date.now();
+
+    function recordActivity() {
+      lastActivity = Date.now();
+    }
+
+    ['mousemove', 'keydown', 'scroll', 'touchstart'].forEach((evt) => {
+      document.addEventListener(evt, recordActivity, { passive: true });
+    });
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function updateLabels() {
+      timeLabel.textContent = `Reading time: ${formatTime(secondsRead)}`;
+      const thresholds = Math.floor(secondsRead / POINT_INTERVAL_SEC);
+      const nextThresholdSec = (thresholds + 1) * POINT_INTERVAL_SEC;
+      const remaining = nextThresholdSec - secondsRead;
+      nextLabel.textContent = `Next point in: ${formatTime(remaining)}`;
+    }
+
+    updateLabels();
+
+    setInterval(() => {
+      const now = Date.now();
+      const inactiveFor = now - lastActivity;
+      if (inactiveFor < INACTIVITY_LIMIT_MS) {
+        secondsRead += 1;
+
+        const thresholds = Math.floor(secondsRead / POINT_INTERVAL_SEC);
+
+        if (thresholds > pointsAwarded) {
+          const delta = thresholds - pointsAwarded;
+          pointsAwarded = thresholds;
+          saveProgress();
+
+          // Add REAL POINTS into Appwrite prefs
+          (async () => {
+            const userNow = await getLoggedInUserSafe();
+            if (userNow) {
+              await addUserPoints(userNow, delta);
+            }
+          })();
+        } else {
+          saveProgress();
+        }
+
+        updateLabels();
+      }
+    }, 1000);
+  })();
+
+  // ===========================
+  // POINTS & REWARDS PAGE (redeem items)
+  // ===========================
+  async function setupRewardsPage() {
+    const isPointsPage = window.location.href.toLowerCase().includes('points-rewards.html');
+    if (!isPointsPage) return;
+    if (!account) return;
+
+    const user = await getLoggedInUserSafe();
+    if (!user) {
+      alert('Please log in to redeem rewards.');
+      return;
+    }
+
+    const buttons = document.querySelectorAll('.reward-redeem');
+    buttons.forEach((btn) => {
+      const cost = parseInt(btn.dataset.cost, 10) || 0;
+      const rewardId = btn.dataset.rewardId || 'REWARD';
+
+      btn.addEventListener('click', async () => {
+        const currentUser = await getLoggedInUserSafe();
+        if (!currentUser) {
+          alert('Please log in to redeem rewards.');
+          return;
+        }
+
+        const currentPoints = await getUserPoints(currentUser);
+        if (currentPoints < cost) {
+          alert(`You need ${cost} points, but you only have ${currentPoints}.`);
+          return;
+        }
+
+        const ok = confirm(`Redeem this reward for ${cost} points?`);
+        if (!ok) return;
+
+        // Subtract points
+        const newBalance = currentPoints - cost;
+        await setUserPoints(currentUser, newBalance);
+
+        // Generate code
+        const code = generateRewardCode(currentUser, rewardId);
+
+        // Show code in alert
+        alert(
+          `Success! You redeemed this reward.\n\n` +
+          `Your new balance: ${newBalance} points.\n\n` +
+          `Your code: ${code}\n` +
+          `Show this code to us.`
+        );
+
+        // Also show the code in the card on the page
+        const card = btn.closest('.reward-card');
+        if (card) {
+          const msg = card.querySelector('.reward-code-message');
+          if (msg) {
+            msg.textContent = `Your code: ${code} — show this code to us.`;
+          }
+        }
+      });
+    });
+  }
+
+  checkAuthState();
+  setupRewardsPage();
+});
