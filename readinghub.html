@@ -30,32 +30,12 @@
       display: block;
     }
 
+    /* Main layout: NO giant card, just centered content */
     body.reading-hub-page main.reading-hub-main {
       max-width: 1100px;
-      margin: 130px auto 4rem;
-      padding: 2.5rem 2.3rem 3rem;
-      background: var(--cf-khaki-light);
-      border-radius: 26px;
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+      margin: 120px auto 4rem;
+      padding: 0 1.5rem 3rem;
       font-family: "Merriweather", serif;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* soft khaki band at the top of the card */
-    body.reading-hub-page main.reading-hub-main::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      top: 0;
-      height: 50%;
-      background: linear-gradient(
-        135deg,
-        var(--cf-khaki-deep),
-        var(--cf-khaki-light)
-      );
-      opacity: 0.75;
-      z-index: -1;
     }
 
     .reading-hub-title {
@@ -74,26 +54,43 @@
       line-height: 1.8;
     }
 
-    /* section headings inside the card */
-    .reading-hub .section-title {
-      margin-top: 2.1rem;
+    /* Inner boxes for each section (Created by Students / Available on Campus) */
+    .hub-section-card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 20px;
+      padding: 1.6rem 1.5rem 1.9rem;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(126, 96, 68, 0.12);
+      margin-bottom: 1.8rem;
+    }
+
+    /* Specific: Created by Students box should not shrink when empty */
+    .students-section-card {
+      min-height: 260px; /* keeps it roughly same height as when it has cards */
+    }
+
+    .hub-section-card .section-title {
+      margin-top: 0;
       margin-bottom: 0.35rem;
       font-size: 1.25rem;
       color: var(--cf-ink);
     }
 
-    .reading-hub .section-desc {
+    .hub-section-card .section-desc {
       max-width: 780px;
       font-size: 0.96rem;
       color: rgba(32, 24, 18, 0.85);
       line-height: 1.85;
-      margin-bottom: 1.6rem;
+      margin-bottom: 1.2rem;
     }
 
-    /* tweak the grid and cards slightly to fit the khaki card */
-    .reading-hub .stories-grid {
-      margin-top: 0.4rem;
+    /* Created by Students: custom grid so 1 card doesn't stretch full width */
+    .reading-hub .students-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 260px));
+      justify-content: flex-start;
       gap: 1.8rem;
+      min-height: 180px; /* space reserved even when empty */
     }
 
     .reading-hub .story-card {
@@ -106,6 +103,7 @@
 
     .reading-hub .story-card img {
       height: 230px;
+      object-fit: cover;
     }
 
     .reading-hub .story-card-body {
@@ -146,16 +144,111 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
     }
 
-    /* section divider between student works & campus books */
-    .reading-hub .campus-grid {
-      margin-top: 1.6rem;
+    /* Empty state line for Created by Students */
+    .students-empty-placeholder {
+      grid-column: 1 / -1;
+      align-self: center;
+      justify-self: center;
+      text-align: center;
+      max-width: 460px;
+      font-size: 0.95rem;
+      font-style: italic;
+      color: rgba(32, 24, 18, 0.75);
+      padding: 1.2rem 1rem;
+      border-radius: 14px;
+      background: #f6efe2;
+      border: 1px dashed #d0b586;
+    }
+
+    .students-empty-placeholder span {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: 0.8rem;
+      font-style: normal;
+      opacity: 0.8;
+    }
+
+    /* Header row with arrows for "Available on Campus" */
+    .hub-section-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hub-section-header-row .section-title {
+      margin-bottom: 0.15rem;
+    }
+
+    .hub-section-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .campus-slider-arrow {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.5);
+      background: #f0f0f0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition:
+        background-color 0.15s ease,
+        transform 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+
+    .campus-slider-arrow:hover {
+      background-color: #dcdcdc;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    }
+
+    .campus-slider-arrow:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* Slider area for Available on Campus */
+    .campus-track-wrapper {
+      position: relative;
+      overflow-x: auto;
+      overflow-y: visible;
+      scroll-behavior: smooth;
+      padding-bottom: 0.35rem;
+      margin: 0 -0.25rem;
+    }
+
+    .campus-track-wrapper::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .campus-track-wrapper::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 999px;
+    }
+
+    .campus-track {
+      display: inline-flex;
+      gap: 1.3rem;
+      padding: 0.25rem 0.25rem 0.1rem;
+    }
+
+    .campus-track .story-card {
+      min-width: 230px;
+      max-width: 260px;
     }
 
     @media (max-width: 768px) {
       body.reading-hub-page main.reading-hub-main {
         margin: 110px 1rem 3rem;
-        padding: 2.1rem 1.4rem 2.6rem;
-        border-radius: 20px;
+        padding: 0 0.5rem 2.5rem;
       }
 
       .reading-hub-title {
@@ -167,24 +260,11 @@
         margin-left: auto;
         margin-right: auto;
       }
+
+      .hub-section-card {
+        padding: 1.4rem 1.1rem 1.7rem;
+      }
     }
-
-/* Inner boxes for each section (Created by Students / Available on Campus) */
-.hub-section-card {
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 20px;
-  padding: 1.6rem 1.5rem 1.9rem;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
-  border: 1px solid rgba(126, 96, 68, 0.12);
-  margin-bottom: 1.8rem;
-}
-
-/* Remove big top margin inside cards so titles hug the box nicely */
-.hub-section-card .section-title {
-  margin-top: 0;
-}
-
-
   </style>
 </head>
 <body class="loading reading-hub-page">
@@ -222,62 +302,126 @@
       sample titles available in school — a taste of how the full reading experience feels.
     </p>
 
-    <!-- shown only when logged out (your JS can toggle this) -->
+    <!-- can be toggled by JS if you want it shown when logged out -->
     <p class="locked-message" style="text-align:center; max-width:700px; margin:0 auto 2rem; display:none;">
       Please log in to access the Reading Hub.
     </p>
 
     <section class="reading-hub">
 
-  <!-- Created by Students (box 1) -->
-  <div class="hub-section-card">
-    <h2 class="section-title">Created by Students</h2>
-    <p class="section-desc">
-      A space for campus writers to share their own stories, poems, and light novels.
-      These are original works made by students, for students.
-    </p>
+      <!-- Created by Students (box, fixed-ish height, empty message) -->
+      <div class="hub-section-card students-section-card">
+        <h2 class="section-title">Created by Students</h2>
+        <p class="section-desc">
+          A space for campus writers to share their own stories, poems, and light novels.
+          These are original works made by students, for students.
+        </p>
 
-    <div class="stories-grid">
-      <!-- student-created cards can be injected here later -->
-    </div>
-  </div>
-
-  <!-- Available on Campus (box 2) -->
-  <div class="hub-section-card">
-    <h2 class="section-title">Available on Campus</h2>
-    <p class="section-desc">
-      Curated titles that you can explore anytime inside campus — sample novels,
-      light novels, and poetry collections to showcase how ChapterFlow works as a reading platform.
-    </p>
-
-    <div class="stories-grid campus-grid">
-      <!-- Book 1 -->
-      <article class="story-card">
-        <span class="tag novel">Novel</span>
-        <img src="https://media.assettype.com/gulfnews%2F2025-11-11%2Fmzk9b427%2FYes-Man.jpeg?w=480&auto=format%2Ccompress&fit=max" alt="An Elegy for King">
-        <div class="story-card-body">
-          <h3>An Elegy for King</h3>
-          <p class="genre">Drama / Romance (placeholder)</p>
-          <p class="author">Verzola</p>
-          <button class="read-btn" onclick="location.href='books/story-king.html'">Read</button>
+        <div class="stories-grid students-grid" id="students-stories-grid">
+          <div class="students-empty-placeholder" id="students-empty-placeholder">
+            “Some stories are still waiting to be written.”
+            <span>Once a student uploads their work, it will appear here.</span>
+          </div>
+          <!-- Student stories will go here later (dynamically or static) -->
         </div>
-      </article>
+      </div>
 
-      <!-- Book 2 -->
-      <article class="story-card">
-        <span class="tag lightnovel">Light Novel</span>
-        <img src="https://m.media-amazon.com/images/M/MV5BYjUyN2JkMjMtNTY2Yy00ZDg2LWI0OTQtOTVkYzgxYTgxMDRhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="The Dreamybull Chronicles">
-        <div class="story-card-body">
-          <h3>The Dreamybull Chronicles: Definitive Edition</h3>
-          <p class="genre">Adventure / Slice of Life / Action</p>
-          <p class="author">UnliRiceKing</p>
-          <button class="read-btn" onclick="location.href='books/story-dreamybull.html'">Read</button>
+      <!-- Available on Campus (box + horizontal scroll + arrows) -->
+      <div class="hub-section-card">
+        <div class="hub-section-header-row">
+          <h2 class="section-title">Available on Campus</h2>
+          <div class="hub-section-controls">
+            <button class="campus-slider-arrow campus-arrow-left" aria-label="Previous campus book">
+              ‹
+            </button>
+            <button class="campus-slider-arrow campus-arrow-right" aria-label="Next campus book">
+              ›
+            </button>
+          </div>
         </div>
-      </article>
-    </div>
-  </div>
-</section>
 
+        <p class="section-desc">
+          Curated titles that you can explore anytime inside campus — sample novels,
+          light novels, and poetry collections to showcase how ChapterFlow works as a reading platform.
+        </p>
+
+        <div class="campus-track-wrapper" id="campus-track-wrapper">
+          <div class="campus-track" id="campus-stories-track">
+            <!-- Book 1 -->
+            <article class="story-card">
+              <span class="tag novel">Novel</span>
+              <img src="https://media.assettype.com/gulfnews%2F2025-11-11%2Fmzk9b427%2FYes-Man.jpeg?w=480&auto=format%2Ccompress&fit=max" alt="An Elegy for King">
+              <div class="story-card-body">
+                <h3>An Elegy for King</h3>
+                <p class="genre">Drama / Romance (placeholder)</p>
+                <p class="author">Verzola</p>
+                <button class="read-btn" onclick="location.href='books/story-king.html'">Read</button>
+              </div>
+            </article>
+
+            <!-- Book 2 -->
+            <article class="story-card">
+              <span class="tag lightnovel">Light Novel</span>
+              <img src="https://m.media-amazon.com/images/M/MV5BYjUyN2JkMjMtNTY2Yy00ZDg2LWI0OTQtOTVkYzgxYTgxMDRhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="The Dreamybull Chronicles">
+              <div class="story-card-body">
+                <h3>The Dreamybull Chronicles: Definitive Edition</h3>
+                <p class="genre">Adventure / Slice of Life / Action</p>
+                <p class="author">UnliRiceKing</p>
+                <button class="read-btn" onclick="location.href='books/story-dreamybull.html'">Read</button>
+              </div>
+            </article>
+
+            <!-- Add more campus titles here later; scroll will handle them -->
+          </div>
+        </div>
+      </div>
+
+    </section>
   </main>
+
+  <script>
+    // Simple left/right scroll for "Available on Campus" section
+    document.addEventListener('DOMContentLoaded', () => {
+      const wrapper = document.getElementById('campus-track-wrapper');
+      const leftBtn = document.querySelector('.campus-arrow-left');
+      const rightBtn = document.querySelector('.campus-arrow-right');
+
+      if (wrapper && leftBtn && rightBtn) {
+        const scrollAmount = () => wrapper.clientWidth * 0.8;
+
+        leftBtn.addEventListener('click', () => {
+          wrapper.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+        });
+
+        rightBtn.addEventListener('click', () => {
+          wrapper.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+        });
+      }
+
+      // Empty state handling for "Created by Students"
+      const studentsGrid = document.getElementById('students-stories-grid');
+      const emptyPlaceholder = document.getElementById('students-empty-placeholder');
+
+      if (!studentsGrid || !emptyPlaceholder) return;
+
+      function updateStudentsEmptyState() {
+        const hasStories = studentsGrid.querySelector('.story-card') !== null;
+        emptyPlaceholder.style.display = hasStories ? 'none' : 'block';
+      }
+
+      // Run once on load
+      updateStudentsEmptyState();
+
+      // Watch for future added/removed cards (if you add via JS later)
+      const observer = new MutationObserver(() => {
+        updateStudentsEmptyState();
+      });
+
+      observer.observe(studentsGrid, { childList: true, subtree: false });
+
+      // Optional: expose function so you can manually call after rendering from Appwrite
+      window.updateStudentsEmptyState = updateStudentsEmptyState;
+    });
+  </script>
 </body>
 </html>

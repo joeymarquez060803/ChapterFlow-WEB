@@ -987,7 +987,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ===========================
+   // ===========================
   // READING BUBBLE (chapter pages only, REAL points)
   // ===========================
   (function setupReadingBubble() {
@@ -1044,23 +1044,46 @@ document.addEventListener('DOMContentLoaded', function () {
     bubble.className = 'reading-bubble panel-left';
 
     bubble.innerHTML = `
-    <div class="reading-bubble-main" title="Reading assistant">⏱</div>
-    <div class="reading-bubble-panel">
-      <p class="rb-time">Reading time: 0:00</p>
-      <p class="rb-next">Next point in: 5:00</p>
-      <button type="button" class="rb-prev-btn" style="display:none;">Previous chapter</button>
-      <button type="button" class="rb-next-btn">Next chapter</button>
-    </div>
-  `;
+      <div class="reading-bubble-main" title="Reading assistant">⏱</div>
+      <div class="reading-bubble-panel">
+        <p class="rb-time">Reading time: 0:00</p>
+        <p class="rb-next">Next point in: 5:00</p>
+        <p class="rb-points">Points: --</p>
+        <div class="rb-shortcuts">
+          <button type="button" class="rb-hub-btn">Reading Hub</button>
+          <button type="button" class="rb-rewards-btn">Points &amp; Rewards</button>
+        </div>
+        <button type="button" class="rb-prev-btn" style="display:none;">Previous chapter</button>
+        <button type="button" class="rb-next-btn">Next chapter</button>
+      </div>
+    `;
 
     document.body.appendChild(bubble);
 
-    const mainBtn   = bubble.querySelector('.reading-bubble-main');
-    const panel     = bubble.querySelector('.reading-bubble-panel');
-    const timeLabel = bubble.querySelector('.rb-time');
-    const nextLabel = bubble.querySelector('.rb-next');
-    const prevBtn   = bubble.querySelector('.rb-prev-btn');
-    const nextBtn   = bubble.querySelector('.rb-next-btn');
+    const mainBtn     = bubble.querySelector('.reading-bubble-main');
+    const panel       = bubble.querySelector('.reading-bubble-panel');
+    const timeLabel   = bubble.querySelector('.rb-time');
+    const nextLabel   = bubble.querySelector('.rb-next');
+    const pointsLabel = bubble.querySelector('.rb-points');
+    const hubBtn      = bubble.querySelector('.rb-hub-btn');
+    const rewardsBtn  = bubble.querySelector('.rb-rewards-btn');
+    const prevBtn     = bubble.querySelector('.rb-prev-btn');
+    const nextBtn     = bubble.querySelector('.rb-next-btn');
+
+    // --- shortcuts: Reading Hub + Points & Rewards ---
+    if (hubBtn) {
+      hubBtn.addEventListener('click', () => {
+        // chapter pages live in "Chapter - Story", hub is one level up
+        window.location.href = '../readinghub.html';
+      });
+    }
+
+    if (rewardsBtn) {
+      rewardsBtn.addEventListener('click', () => {
+        // points-rewards.html is in "Slide nav buttons"
+        window.location.href = '../Slide nav buttons/points-rewards.html';
+      });
+    }
 
     // --- decide which side the panel opens on (left/right) ---
     function updatePanelSide() {
@@ -1198,6 +1221,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     updateLabels();
 
+    // initial points display inside bubble
+    (async () => {
+      const userNow = await getLoggedInUserSafe();
+      if (userNow && pointsLabel) {
+        const pts = await getUserPoints(userNow);
+        pointsLabel.textContent = `Points: ${pts}`;
+      }
+    })();
+
     setInterval(() => {
       const now = Date.now();
       const inactiveFor = now - lastActivity;
@@ -1211,11 +1243,15 @@ document.addEventListener('DOMContentLoaded', function () {
           pointsAwarded = thresholds;
           saveProgress();
 
-          // Add REAL POINTS into Appwrite prefs
+          // Add REAL POINTS into Appwrite prefs + update bubble label
           (async () => {
             const userNow = await getLoggedInUserSafe();
             if (userNow) {
               await addUserPoints(userNow, delta);
+              if (pointsLabel) {
+                const updated = await getUserPoints(userNow);
+                pointsLabel.textContent = `Points: ${updated}`;
+              }
             }
           })();
         } else {
@@ -1226,6 +1262,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }, 1000);
   })();
+
 
   // ===========================
   // POINTS & REWARDS PAGE (redeem items)
