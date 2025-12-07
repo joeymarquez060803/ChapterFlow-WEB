@@ -621,11 +621,6 @@ body.edit-profile-page {
     text-align: center;   /* matches your screenshot; change if you want */
 }
 
-/* CARD AREA ONLY */
-.profile-stories-wrapper {
-    /* you can put layout stuff here if needed in future */
-}
-
 /* Container where JS injects the cards */
 .profile-stories-list {
     display: flex;
