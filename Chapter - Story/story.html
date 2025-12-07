@@ -24,12 +24,31 @@
     }
 
     .story-layout {
-      max-width: 980px;
-      margin: 0 auto 64px;
-      padding: 0 16px 48px;
-      position: relative;
-      top: -120px;
-    }
+  max-width: 980px;
+  margin: 0 auto 64px;
+  padding: 0 16px 48px;
+  position: relative;
+  top: -120px;
+
+  /* 🔽 hide card until JS marks it as ready */
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+/* when story data is ready */
+.story-layout.is-ready {
+  opacity: 1;
+}
+
+.story-meta {
+  margin-left: 12px;
+}
+
+.story-description-label {
+  margin-top: 10px;        /* space under the author */
+  font-weight: 600;
+  font-size: 0.95rem;
+}
 
     .story-card {
       background-color: #ffffff;
@@ -39,14 +58,13 @@
       display: grid;
       grid-template-columns: minmax(160px, 220px) 1fr;
       gap: 24px;
-      align-items: center;
+      align-items: flex-start;
     }
 
     .story-cover-box {
       width: 100%;
       aspect-ratio: 3 / 4;
       border-radius: 18px;
-      background: #e4ddcf;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -80,16 +98,25 @@
       color: rgba(0, 0, 0, 0.55);
     }
 
+    .story-description {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: rgba(0, 0, 0, 0.78);
+      margin-top: 10px;
+      font-style: italic;
+    }
+
     .story-meta p.story-description {
-      margin: 0;
+      margin: -5px;
+      margin-left: 0px;
       font-size: 0.95rem;
       line-height: 1.6;
       color: rgba(0, 0, 0, 0.75);
     }
 
     .story-meta .story-author {
-      margin-top: 10px;
-      font-size: 0.85rem;
+      margin-top: 1px;
+      font-size: 1.0rem;
       color: rgba(0, 0, 0, 0.6);
     }
 
@@ -101,12 +128,13 @@
 
     .chapters-header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 50px;
+      margin-top: -150px;
     }
 
     .chapters-header h2 {
       margin: 0;
-      font-size: 1.3rem;
+      font-size: 1.9rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
     }
@@ -174,6 +202,7 @@
       font-size: 0.9rem;
       color: rgba(0, 0, 0, 0.6);
       margin-top: 10px;
+      display: none;
     }
 
     .story-not-found {
@@ -185,11 +214,6 @@
       color: rgba(120, 60, 60, 0.85);
     }
 
-    .story-page .back-btn {
-      position: relative;
-      z-index: 5;
-      margin: 16px 0 0 16px;
-    }
 
     @media (max-width: 768px) {
       .story-layout {
@@ -200,6 +224,7 @@
       }
     }
   </style>
+
 </head>
 <body class="story-page">
   <a href="../Slide nav buttons/edit-profile.html" class="back-btn">← Back</a>
@@ -216,9 +241,11 @@
         <div class="story-meta">
           <p class="story-tagline">Series</p>
           <h1 id="story-title">Story Title</h1>
-          <p class="story-description" id="story-description">
-            Description of the story will appear here.
-          </p>
+
+          <p class="story-author" id="story-author"></p>
+          <p class="story-description-label">Description:</p>
+          <p class="story-description" id="story-description"></p>
+
           <p class="story-author" id="story-author"></p>
         </div>
       </article>
@@ -227,7 +254,6 @@
     <section class="story-main-section">
       <div class="chapters-header">
         <h2>Chapters</h2>
-        <p>This is where all chapters for this series will appear.</p>
       </div>
 
       <div id="chapter-list" class="chapter-list"></div>
@@ -281,6 +307,7 @@
       const chapterListEl = document.getElementById('chapter-list');
       const chapterEmpty  = document.getElementById('chapter-empty');
       const storyNotFound = document.getElementById('story-not-found');
+      const storyLayout   = document.querySelector('.story-layout');   // 👈 add this
 
       async function loadStoryAndChapters() {
         if (!seriesId) {
@@ -295,10 +322,19 @@
             seriesId
           );
 
-          titleEl.textContent = storyDoc.title || 'Untitled story';
-          descEl.textContent  = storyDoc.description || 'No description yet.';
-          // ownerName doesn't exist in schema anymore, so just leave author blank
-          authorEl.textContent = '';
+titleEl.textContent = storyDoc.title || 'Untitled story';
+descEl.textContent  = storyDoc.description || 'No description yet.';
+
+// 🔹 NEW: show uploader name if present
+const uploaderName =
+  storyDoc.ownerName ||    // from DB (we just added this)
+  '';                      // fallback
+
+if (uploaderName) {
+  authorEl.textContent = 'Uploaded by: ' + uploaderName.toUpperCase();
+} else {
+  authorEl.textContent = ''; // no line if we don't know
+}
 
           // 🔴 Use coverImageId (the column in your Stories table)
           const coverUrl = getImageUrl(storyDoc.coverImageId);
@@ -311,6 +347,12 @@
             coverHolder.style.display = 'block';
             coverHolder.textContent = 'COVER';
           }
+
+          // 🔽 only now show the card
+           if (storyLayout) {
+            storyLayout.classList.add('is-ready');
+          }
+
         } catch (err) {
           console.error('Failed to load story', err);
           storyNotFound.style.display = 'block';

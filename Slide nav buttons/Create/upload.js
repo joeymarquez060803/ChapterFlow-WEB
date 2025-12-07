@@ -703,18 +703,25 @@ async function finishSeriesCreation() {
 
     // 🔴 Only send fields that actually exist in the Stories schema
     createdDoc = await databases.createDocument(
-      DATABASE_ID,
-      STORIES_COLLECTION_ID,
-      Appwrite.ID.unique(),
-      {
-        title:        seriesDraft.title,
-        description:  seriesDraft.description || '',
-        coverImageId: seriesDraft.coverFileId,          // required string
-        ownerId:      ownerId,                          // required string
-        createdAt:    new Date().toISOString()          // required datetime
-      },
-      permissions
-    );
+  DATABASE_ID,
+  STORIES_COLLECTION_ID,
+  Appwrite.ID.unique(),
+  {
+    title:        seriesDraft.title,
+    description:  seriesDraft.description || '',
+    coverImageId: seriesDraft.coverFileId,          // required string
+    ownerId:      ownerId,                          // required string
+
+    // 🔹 NEW: store uploader name in the story document
+    ownerName:
+      user.name ||
+      (user.email ? user.email.split('@')[0] : ''),
+
+    createdAt:    new Date().toISOString()          // required datetime
+  },
+  permissions
+);
+
   } catch (err) {
     console.error('Failed to create story in Appwrite:', err);
     alert(
@@ -727,13 +734,17 @@ async function finishSeriesCreation() {
   // If we reach here, the story exists in the DB.
   // Locally we can keep extra fields for the UI (coverName, etc.)
   const newSeries = {
-    id:          createdDoc.$id,
-    title:       createdDoc.title,
-    description: createdDoc.description || '',
-    coverName:   seriesDraft.coverName || null,          // local only
-    coverFileId: createdDoc.coverImageId || seriesDraft.coverFileId || null,
-    ownerId:     createdDoc.ownerId || ownerId
-  };
+  id:          createdDoc.$id,
+  title:       createdDoc.title,
+  description: createdDoc.description || '',
+  coverName:   seriesDraft.coverName || null,
+  coverFileId: createdDoc.coverImageId || seriesDraft.coverFileId || null,
+  ownerId:     createdDoc.ownerId || ownerId,
+  ownerName:
+    createdDoc.ownerName ||
+    user.name ||
+    (user.email ? user.email.split('@')[0] : null)
+};
 
   seriesList.push(newSeries);
   saveSeries();
@@ -921,20 +932,71 @@ async function finishSeriesCreation() {
     applyFontSize(lastFontSizeValue);
   }
 
-  /* ---- Insert image events ---- */
+    /* ---- Insert image events ---- */
   if (insertImageBtn && insertImageInput) {
     insertImageBtn.addEventListener('click', () => {
       insertImageInput.click();
     });
 
-    insertImageInput.addEventListener('change', (e) => {
+    insertImageInput.addEventListener('change', async (e) => {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
-      const url = URL.createObjectURL(file);
-      addImageToEditor(url);
-      insertImageInput.value = '';
+
+      // Basic validation
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file.');
+        insertImageInput.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image must be less than 5MB.');
+        insertImageInput.value = '';
+        return;
+      }
+
+      if (!storage || !account) {
+        alert('Appwrite is not ready yet. Please refresh the page.');
+        insertImageInput.value = '';
+        return;
+      }
+
+      try {
+        const user = await getLoggedInUserForUpload();
+        if (!user) {
+          alert('You are not logged in. Please log in again before inserting images.');
+          insertImageInput.value = '';
+          return;
+        }
+
+        const permissions = [
+          Appwrite.Permission.read(Appwrite.Role.any()),
+          Appwrite.Permission.update(Appwrite.Role.user(user.$id)),
+          Appwrite.Permission.delete(Appwrite.Role.user(user.$id)),
+        ];
+
+        const response = await storage.createFile(
+          BUCKET_ID,
+          Appwrite.ID.unique(),
+          file,
+          permissions
+        );
+
+        const fileId = response.$id;
+        const imageUrl =
+          `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${fileId}` +
+          `/view?project=${encodeURIComponent(PROJECT_ID)}`;
+
+        // Insert the permanent Appwrite image URL into the editor
+        addImageToEditor(imageUrl);
+      } catch (err) {
+        console.error('Failed to upload image for chapter:', err);
+        alert('Failed to upload image. Please try again.');
+      } finally {
+        insertImageInput.value = '';
+      }
     });
   }
+
 
   /* ---- Series UI events ---- */
   if (seriesSelectBtn) {
@@ -1023,40 +1085,23 @@ async function finishSeriesCreation() {
     });
   }
 
-  seriesBackButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const step = btn.dataset.step;
-      if (step === 'description') {
-        setSeriesStep(1);
-      } else if (step === 'cover') {
-        setSeriesStep(2);
-      }
-    });
+ // Back buttons in the series panel
+seriesBackButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const step = btn.dataset.step;
+    if (step === 'description') {
+      setSeriesStep(1);
+    } else if (step === 'cover') {
+      setSeriesStep(2);
+    }
   });
+});
 
-  seriesSaveButtons.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const step = btn.dataset.step;
-      if (step === 'title') {
-        const title = (seriesTitleInput.value || '').trim();
-        if (!title) {
-          alert('Please enter a series title.');
-          return;
-        }
-        seriesDraft.title = title;
-        setSeriesStep(2);
-      } else if (step === 'description') {
-        seriesDraft.description = (seriesDescriptionInput.value || '').trim();
-        setSeriesStep(3);
-      } else if (step === 'cover') {
-        await finishSeriesCreation();
-      }
-    });
-  });
-
-  seriesSaveButtons.forEach(btn => {
+// Save buttons in the series panel
+seriesSaveButtons.forEach(btn => {
   btn.addEventListener('click', async () => {
     const step = btn.dataset.step;
+
     if (step === 'title') {
       const title = (seriesTitleInput.value || '').trim();
       if (!title) {
@@ -1069,10 +1114,20 @@ async function finishSeriesCreation() {
       seriesDraft.description = (seriesDescriptionInput.value || '').trim();
       setSeriesStep(3);
     } else if (step === 'cover') {
-      await finishSeriesCreation();
+      await finishSeriesCreation();  // 🔹 now called ONLY ONCE
     }
   });
 });
+
+// Cancel buttons in the series panel
+seriesCancelButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    seriesPanel.classList.add('hidden');
+    seriesStep = 0;
+    seriesDraft = { title: '', description: '', coverName: '', coverFileId: null };
+  });
+});
+
 
 
   /* ---- Draft save/load ---- */
@@ -1133,9 +1188,10 @@ async function finishSeriesCreation() {
     }
   }
 
+
 async function publishChapter() {
   const chapterTitle = chapterTitleEl ? chapterTitleEl.value.trim() : '';
-  const bodyText     = getPlainText().trim();              // plain text (for empty check)
+  const bodyText     = getPlainText().trim();            // plain text (for empty check)
   const bodyHtml     = editorEl ? editorEl.innerHTML : ''; // full HTML to save
 
   const hasTitle = !!chapterTitle;
@@ -1145,8 +1201,6 @@ async function publishChapter() {
   // CASE A: Only story/series, NO chapter
   // -------------------------
   if (!hasTitle && !hasBody) {
-    // 1) If a story is already selected → just treat this as
-    //    "confirm story exists" and go home.
     if (currentSeries) {
       try {
         localStorage.removeItem(DRAFT_KEY);
@@ -1156,8 +1210,6 @@ async function publishChapter() {
       return;
     }
 
-    // 2) No selected story, but there is data in the "Create New" panel
-    //    (seriesDraft.title) → finish creating that series and go home.
     if (seriesDraft && seriesDraft.title) {
       try {
         await finishSeriesCreation();
@@ -1174,23 +1226,22 @@ async function publishChapter() {
       }
     }
 
-    // 3) No series selected AND no draft → user really hasn’t created anything yet.
     alert('Please select or create a story/series first.');
     startSeriesCreation();
     return;
   }
 
   // -------------------------
-  // CASE B: Trying to publish a chapter
+  // CASE B: Publishing a chapter
   // -------------------------
 
-  // We need BOTH title and content for a chapter
   if (!hasTitle || !hasBody) {
-    alert('Please enter BOTH a chapter title and some content, or leave both empty if you only want to create a story/series.');
+    alert(
+      'Please enter BOTH a chapter title and some content, or leave both empty if you only want to create a story/series.'
+    );
     return;
   }
 
-  // Now we definitely need a story to attach this chapter to
   if (!currentSeries) {
     alert('Please select or create a story/series first.');
     startSeriesCreation();
@@ -1202,7 +1253,7 @@ async function publishChapter() {
     return;
   }
 
-  // Figure out the owner (current logged-in user)
+  // Figure out owner (logged-in user)
   let ownerId = null;
   if (uploadCurrentUser && uploadCurrentUser.$id) {
     ownerId = String(uploadCurrentUser.$id);
@@ -1216,7 +1267,7 @@ async function publishChapter() {
   }
 
   try {
-    // Determine next chapter number by counting existing chapters for this story
+    // Determine next chapter number
     let nextNumber = 1;
     try {
       const list = await databases.listDocuments(
@@ -1224,33 +1275,56 @@ async function publishChapter() {
         CHAPTERS_COLLECTION_ID,
         [Appwrite.Query.equal('storyId', currentSeries.id)]
       );
-      // Appwrite returns .total and .documents; use whichever is available
       nextNumber = (list.total || list.documents.length || 0) + 1;
     } catch (err) {
       console.warn('Could not count existing chapters, defaulting to chapter 1', err);
     }
 
-    await databases.createDocument(
-  DATABASE_ID,
-  CHAPTERS_COLLECTION_ID,
-  Appwrite.ID.unique(),
-  {
-    storyId:       currentSeries.id,
-    chapterTitle:  chapterTitle,
-    content:       bodyHtml,
-    chapterNumber: nextNumber,
-    ownerId:       ownerId,
-    createdAt:     new Date().toISOString()   // 👈 required datetime column
-  }
-);
+    // ---------- IMPORTANT PART ----------
+    // 1) "content" = short preview (≤16384 chars, required field)
+    // 2) "fullHtml" = full chapter HTML (new big field you created)
 
+    const rawHtml = String(bodyHtml || '');
+
+    const MAX_PREVIEW_LENGTH = 16000;   // under the 16384 limit
+    const previewHtml =
+      rawHtml.length > MAX_PREVIEW_LENGTH
+        ? rawHtml.slice(0, MAX_PREVIEW_LENGTH)
+        : rawHtml;
+
+    const MAX_FULL_LENGTH = 65000;      // must match/fit the size of fullHtml in Appwrite
+    const fullHtml =
+      rawHtml.length > MAX_FULL_LENGTH
+        ? rawHtml.slice(0, MAX_FULL_LENGTH)
+        : rawHtml;
+
+    await databases.createDocument(
+      DATABASE_ID,
+      CHAPTERS_COLLECTION_ID,
+      Appwrite.ID.unique(),
+      {
+        storyId:       currentSeries.id,
+        chapterTitle:  chapterTitle,
+
+        // required old field (small)
+        content:       previewHtml,
+
+        // 🔹 new big field for full chapter
+        fullHtml:      fullHtml,
+
+        chapterNumber: nextNumber,
+        ownerId:       ownerId,
+        createdAt:     new Date().toISOString()
+      }
+    );
+    // ---------- END IMPORTANT PART ----------
 
     try {
       localStorage.removeItem(DRAFT_KEY);
     } catch (_) {}
 
     alert('Chapter published successfully!');
-    goHome(); // redirect to homepage after publish
+    goHome();
   } catch (err) {
     console.error('Failed to publish chapter:', err);
     let msg = 'Failed to publish chapter. Please try again.';

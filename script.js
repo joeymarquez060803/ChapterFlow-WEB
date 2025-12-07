@@ -61,12 +61,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Initialize Appwrite Client and Account (conditionally, without blocking UI)
-  let client, account;
+  let client, account, databases;
   if (typeof Appwrite !== 'undefined') {
     client = new Appwrite.Client()
       .setEndpoint('https://nyc.cloud.appwrite.io/v1')
       .setProject('69230def0009866e3192');
-    account = new Appwrite.Account(client);
+
+    account   = new Appwrite.Account(client);
+    databases = new Appwrite.Databases(client);
   } else {
     console.error('Appwrite SDK not loaded. Auth and uploads may not work.');
   }
@@ -147,7 +149,41 @@ document.addEventListener('DOMContentLoaded', function () {
   const DEFAULT_AVATAR_SMALL = 'https://via.placeholder.com/50x50/cccccc/000000?text=U';
   const DEFAULT_AVATAR_LARGE = 'https://via.placeholder.com/200x200/cccccc/000000?text=U';
 
-  const storage = client ? new Appwrite.Storage(client) : null;
+  const DATABASE_ID = '69252c2f001121c41ace';
+  const STORIES_COLLECTION_ID = 'stories';
+  const CHAPTERS_COLLECTION_ID = 'chapters';
+
+  const storage   = client ? new Appwrite.Storage(client)  : null;
+
+    async function updateStoryOwnerNamesForUser(userId, newName) {
+    if (!databases || !userId || !newName) return;
+
+    try {
+      const res = await databases.listDocuments(
+        DATABASE_ID,
+        STORIES_COLLECTION_ID,
+        [Appwrite.Query.equal('ownerId', userId)]
+      );
+
+      const docs = Array.isArray(res.documents) ? res.documents : [];
+
+      await Promise.all(
+        docs.map(doc =>
+          databases.updateDocument(
+            DATABASE_ID,
+            STORIES_COLLECTION_ID,
+            doc.$id,
+            { ownerName: newName }
+          )
+        )
+      );
+
+      console.log('Updated ownerName on', docs.length, 'stories');
+    } catch (err) {
+      console.error('Failed to update stories ownerName:', err);
+    }
+  }
+
 
   const PROJECT_ID = client?.config?.project || '69230def0009866e3192';
   const ENDPOINT = (client?.config?.endpoint || 'https://nyc.cloud.appwrite.io/v1').replace(/\/$/, '');
@@ -291,6 +327,8 @@ document.addEventListener('DOMContentLoaded', function () {
           user.name = fresh.name;
 
           nameDisplay.textContent = fresh.name || newName;
+
+          await updateStoryOwnerNamesForUser(user.$id, fresh.name || newName);
 
           const slideUsername = document.querySelector('.profile-container .username');
           if (slideUsername) slideUsername.textContent = fresh.name || newName;
@@ -527,6 +565,58 @@ document.addEventListener('DOMContentLoaded', function () {
   // LocalStorage key used by upload.js
   const SERIES_STORAGE_KEY = 'chapterflow:series';
 
+  // 🔹 NEW: Appwrite is the source of truth for THIS user's stories
+  async function syncSeriesFromAppwriteToStorage(user) {
+    if (!databases || !user || !user.$id) return;
+
+    let existing = [];
+    try {
+      existing = getSeriesFromStorage();
+    } catch (e) {
+      console.warn('Failed to read existing series from storage', e);
+      existing = [];
+    }
+
+    try {
+      const res = await databases.listDocuments(
+        DATABASE_ID,
+        STORIES_COLLECTION_ID,
+        [Appwrite.Query.equal('ownerId', user.$id)]
+      );
+
+      const docs = (res && Array.isArray(res.documents)) ? res.documents : [];
+
+      // Map Appwrite docs into the same structure upload.js uses locally
+      const fromDb = docs.map((doc) => ({
+        id:          doc.$id,
+        title:       doc.title || 'Untitled story',
+        description: doc.description || '',
+        coverName:   doc.coverName || null,
+        coverFileId: doc.coverImageId || doc.coverFileId || null,
+        ownerId:     doc.ownerId || user.$id,
+        ownerName:
+          doc.ownerName ||
+          user.name ||
+          (user.email ? user.email.split('@')[0] : null),
+      }));
+
+      // 🔥 Important:
+      // Keep stories from OTHER users (if any share this browser),
+      // but for THIS user, use EXACTLY the stories from Appwrite.
+      const userIdStr = String(user.$id);
+      const otherUsersStories = existing.filter(
+        (s) => String(s.ownerId) !== userIdStr
+      );
+
+      const merged = otherUsersStories.concat(fromDb);
+
+      saveSeriesToStorage(merged);
+    } catch (err) {
+      console.warn('Failed to sync series from Appwrite for profile page', err);
+    }
+  }
+
+
   function getSeriesFromStorage() {
     try {
       const raw = localStorage.getItem(SERIES_STORAGE_KEY);
@@ -715,13 +805,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const isOpen = menu.classList.contains('open');
 
-      // close all menus first
-      const allMenus = profileStoriesContainer.querySelectorAll('.profile-story-menu.open');
-      allMenus.forEach(m => m.classList.remove('open'));
+      // Close all menus first
+      const allMenus = profileStoriesContainer.querySelectorAll('.profile-story-menu');
+      allMenus.forEach((m) => m.classList.remove('open'));
 
+      // Toggle this one
       if (!isOpen) {
         menu.classList.add('open');
       }
+
       return;
     }
 
@@ -733,22 +825,70 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!seriesId) return;
 
       const sure = window.confirm('Delete this story/series? This cannot be undone.');
+      const menu = card.querySelector('.profile-story-menu');
+
       if (!sure) {
-        const menu = card.querySelector('.profile-story-menu');
         if (menu) menu.classList.remove('open');
         return;
       }
 
+      // 1) Remove from localStorage (so UI updates immediately)
       const list = getSeriesFromStorage();
-      const filtered = list.filter(s => String(s.id) !== String(seriesId));
+      const filtered = list.filter((s) => String(s.id) !== String(seriesId));
       saveSeriesToStorage(filtered);
+
+      // 2) Remove card from DOM + re-render list
+      card.remove();
       renderProfileStories();
+
+      // 3) Also delete from Appwrite (story + its chapters)
+      (async () => {
+        if (!databases) return; // Appwrite not ready
+
+        try {
+          // Delete the story/series document
+          await databases.deleteDocument(DATABASE_ID, STORIES_COLLECTION_ID, seriesId);
+        } catch (err) {
+          console.error('Failed to delete story in Appwrite:', err);
+          alert(
+            'The story was removed in this browser, but deleting it from Appwrite failed.\n' +
+            'Please check the console for details.'
+          );
+          return;
+        }
+
+        // Best-effort: delete all chapters belonging to this story
+        try {
+          const res = await databases.listDocuments(
+            DATABASE_ID,
+            CHAPTERS_COLLECTION_ID,
+            [Appwrite.Query.equal('storyId', seriesId)]
+          );
+
+          if (res && Array.isArray(res.documents)) {
+            for (const doc of res.documents) {
+              try {
+                await databases.deleteDocument(
+                  DATABASE_ID,
+                  CHAPTERS_COLLECTION_ID,
+                  doc.$id
+                );
+              } catch (err) {
+                console.warn('Failed to delete chapter', doc.$id, err);
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to load/delete chapters for story', seriesId, err);
+        }
+      })();
+
       return;
     }
 
     // Clicked somewhere else inside the container → close any open menus
     const openMenus = profileStoriesContainer.querySelectorAll('.profile-story-menu.open');
-    openMenus.forEach(menu => {
+    openMenus.forEach((menu) => {
       if (!menu.contains(evt.target)) {
         menu.classList.remove('open');
       }
@@ -886,9 +1026,9 @@ document.addEventListener('DOMContentLoaded', function () {
       await applyProfilePictureToUI(user);
       setupEditableUsername(user);
 
-      // Render the series/stories under the profile card
+      // 🔹 First sync this user's stories from Appwrite → localStorage, then render
+      await syncSeriesFromAppwriteToStorage(user);
       renderProfileStories();
-
       revealEditProfileSectionWhenReady();
 
       // Edit-profile "Create" button → upload page
@@ -987,7 +1127,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-   // ===========================
+  // ===========================
   // READING BUBBLE (chapter pages only, REAL points)
   // ===========================
   (function setupReadingBubble() {
@@ -1262,7 +1402,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }, 1000);
   })();
-
 
   // ===========================
   // POINTS & REWARDS PAGE (redeem items)

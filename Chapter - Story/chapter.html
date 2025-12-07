@@ -8,6 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css">
 
+  <!-- Appwrite SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+
   <style>
     body.chapter-page {
       margin: 0;
@@ -27,105 +30,195 @@
       margin: 0 auto 64px;
       padding: 0 16px 48px;
       position: relative;
-      top: -110px;
+      top: -80px;
+    }
+
+    .chapter-back-btn {
+      position: absolute;
+      top: -36px;
+      left: 8px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      border-radius: 999px;
+      border: none;
+      background-color: #f7f3e9;
+      color: #3c2b1a;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chapter-back-btn:hover {
+      background-color: #efe3cf;
     }
 
     .chapter-card {
-      background-color: #ffffff;
-      border-radius: 26px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.13);
-      padding: 26px 30px 32px;
+      background-color: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+      padding: 24px 28px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle at top left, rgba(201,177,132,0.18) 0, transparent 60%);
+      pointer-events: none;
+    }
+
+    .chapter-card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .chapter-series-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #a0885c;
+      margin-bottom: 4px;
     }
 
     .chapter-series-name {
-      margin: 0 0 6px;
-      font-size: 0.86rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: rgba(0, 0, 0, 0.6);
+      color: #7a6238;
+      margin-bottom: 16px;
     }
 
-    .chapter-title-text {
-      margin: 0 0 8px;
+    .chapter-title {
       font-size: 1.6rem;
-      line-height: 1.3;
+      margin: 0 0 4px;
+      color: #2b1c0b;
+    }
+
+    .chapter-author {
+      font-size: 0.9rem;
+      margin: 0 0 16px;
+      color: #6c5a3c;
     }
 
     .chapter-meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.8rem;
-      color: rgba(0, 0, 0, 0.6);
+      font-size: 0.85rem;
+      color: #8b7a5b;
+      border-bottom: 1px solid #e4d7c1;
+      padding-bottom: 8px;
       margin-bottom: 18px;
-      gap: 8px;
     }
 
-    .chapter-meta-row span {
-      white-space: nowrap;
-    }
+ .chapter-body {
+  margin-top: 4px;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.85);
+  white-space: normal;      /* let the HTML control line breaks */
+  position: relative;       /* anchor for absolutely-positioned images */
+}
 
-    .chapter-body {
-      margin-top: 4px;
-      font-size: 1rem;
-      line-height: 1.8;
-      color: rgba(0, 0, 0, 0.85);
-      white-space: pre-wrap;
-    }
+/* normal paragraph spacing */
+.chapter-body p {
+  margin: 0 0 1em;
+}
+
+/* ---------- images from the editor ---------- */
+
+/* wrapper div around each editor image */
+.chapter-body .editor-image {
+  position: absolute;          /* keep absolute → same vertical behavior you liked */
+  left: 50% !important;        /* override inline left from the editor */
+  transform: translateX(-50%); /* center horizontally */
+}
+
+.chapter-body .editor-image img {
+  display: block;
+  max-width: 100%;
+  height: auto !important; /* override saved inline height so image doesn't stretch */
+}
+
+/* hide the resize handle in the reader */
+.chapter-body .editor-image-resize {
+  display: none;
+}
+
+
+
+
 
     .chapter-empty-message {
+      font-size: 0.95rem;
+      color: #9b8b6b;
+      font-style: italic;
       margin-top: 16px;
-      font-size: 0.9rem;
-      color: rgba(0, 0, 0, 0.6);
-    }
-
-    .chapter-page .back-btn {
-      position: relative;
-      z-index: 5;
-      margin: 16px 0 0 16px;
     }
 
     .chapter-not-found {
-      max-width: 760px;
-      margin: -70px auto 40px;
+      max-width: 880px;
+      margin: 0 auto;
       padding: 16px;
-      text-align: center;
       font-size: 0.95rem;
-      color: rgba(120, 60, 60, 0.85);
+      color: #7a4b3a;
+      background-color: #fbe9e6;
+      border-radius: 12px;
+      border: 1px solid #f2c2b8;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
       .chapter-layout {
-        top: -90px;
+        padding: 0 10px 40px;
+      }
+
+      .chapter-card {
+        padding: 18px 18px 28px;
+      }
+
+      .chapter-title {
+        font-size: 1.4rem;
       }
     }
   </style>
 </head>
 <body class="chapter-page">
-  <a href="javascript:void(0)" id="chapter-back-btn" class="back-btn">← Back</a>
-
   <div class="chapter-banner"></div>
 
-  <main>
-    <section class="chapter-layout">
-      <article class="chapter-card">
-        <p id="chapter-series-name" class="chapter-series-name">Story Title</p>
-        <h1 id="chapter-title" class="chapter-title-text">Chapter title</h1>
+  <main class="chapter-layout">
+    <button id="chapter-back-btn" class="chapter-back-btn">
+      ← Back
+    </button>
+
+    <section class="chapter-card">
+      <div class="chapter-card-inner">
+        <div class="chapter-series-label">Series</div>
+        <div id="chapter-series-name" class="chapter-series-name">
+          <!-- Filled by JS -->
+        </div>
+
+        <h1 id="chapter-title" class="chapter-title">Loading chapter...</h1>
+        <p id="chapter-author" class="chapter-author"></p>
 
         <div class="chapter-meta-row">
-          <span id="chapter-author"></span>
+          <span id="chapter-meta-left">Chapter</span>
           <span id="chapter-meta-right"></span>
         </div>
 
-        <div id="chapter-body" class="chapter-body">
-          This is where the chapter text will appear.
-        </div>
+        <article id="chapter-body" class="chapter-body">
+          <!-- Full chapter content (HTML) goes here -->
+        </article>
 
         <p id="chapter-empty" class="chapter-empty-message" style="display:none;">
           This chapter doesn’t have any content yet. Once you wire the upload page to save chapters,
           the full text will be shown here.
         </p>
-      </article>
+      </div>
     </section>
 
     <div id="chapter-not-found" class="chapter-not-found" style="display:none;">
@@ -160,68 +253,162 @@
         }
       }
 
-      const params     = new URLSearchParams(window.location.search);
-      const seriesId   = params.get('seriesId');
-      const chapterId  = params.get('chapterId');
+      const params    = new URLSearchParams(window.location.search);
+      const seriesId  = params.get('seriesId');
+      const chapterId = params.get('chapterId');
 
-      const backBtn       = document.getElementById('chapter-back-btn');
-      const seriesNameEl  = document.getElementById('chapter-series-name');
-      const titleEl       = document.getElementById('chapter-title');
-      const authorEl      = document.getElementById('chapter-author');
-      const metaRightEl   = document.getElementById('chapter-meta-right');
-      const bodyEl        = document.getElementById('chapter-body');
-      const emptyEl       = document.getElementById('chapter-empty');
-      const notFoundEl    = document.getElementById('chapter-not-found');
+      const backBtn      = document.getElementById('chapter-back-btn');
+      const seriesNameEl = document.getElementById('chapter-series-name');
+      const titleEl      = document.getElementById('chapter-title');
+      const authorEl     = document.getElementById('chapter-author');
+      const metaRightEl  = document.getElementById('chapter-meta-right');
+      const bodyEl       = document.getElementById('chapter-body');
+      const emptyEl      = document.getElementById('chapter-empty');
+      const notFoundEl   = document.getElementById('chapter-not-found');
 
-      // Back button: go to story page if seriesId exists, otherwise back to profile
-      backBtn.addEventListener('click', () => {
-        if (seriesId) {
-          const url = `story.html?seriesId=${encodeURIComponent(seriesId)}`;
-          window.location.href = url;
-        } else {
-          window.location.href = '../Slide nav buttons/edit-profile.html';
-        }
-      });
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          if (seriesId) {
+            const url = `story.html?seriesId=${encodeURIComponent(seriesId)}`;
+            window.location.href = url;
+          } else {
+            window.location.href = '../Slide nav buttons/edit-profile.html';
+          }
+        });
+      }
 
       if (!chapterId) {
-        notFoundEl.style.display = 'block';
+        if (notFoundEl) notFoundEl.style.display = 'block';
         return;
       }
 
-      const seriesList   = getSeriesList();
-      const chaptersList = getChaptersList();
+      // ---- Appwrite setup ----
+      let client = null;
+      let databases = null;
 
-      const series  = seriesList.find(s => String(s.id) === String(seriesId));
-      const chapter = chaptersList.find(c => String(c.id) === String(chapterId));
+      const DATABASE_ID            = '69252c2f001121c41ace';
+      const STORIES_COLLECTION_ID  = 'stories';
+      const CHAPTERS_COLLECTION_ID = 'chapters';
 
-      if (!chapter) {
-        notFoundEl.style.display = 'block';
-        return;
+      if (typeof Appwrite !== 'undefined') {
+        client = new Appwrite.Client()
+          .setEndpoint('https://nyc.cloud.appwrite.io/v1')
+          .setProject('69230def0009866e3192');
+
+        databases = new Appwrite.Databases(client);
       }
 
-      if (series) {
-        seriesNameEl.textContent = series.title || 'Untitled story';
-        if (series.ownerName) {
-          authorEl.textContent = 'By ' + series.ownerName;
+      function renderChapter(series, chapter) {
+        if (!chapter) {
+          if (notFoundEl) notFoundEl.style.display = 'block';
+          return;
         }
-      } else {
-        seriesNameEl.textContent = 'Chapter';
+
+        if (series) {
+          if (seriesNameEl) {
+            seriesNameEl.textContent = series.title || 'Untitled story';
+          }
+          if (authorEl && series.ownerName) {
+            authorEl.textContent = 'By ' + series.ownerName;
+          }
+        } else if (seriesNameEl) {
+          seriesNameEl.textContent = 'Chapter';
+        }
+
+        if (titleEl) {
+          titleEl.textContent = chapter.title || 'Untitled chapter';
+        }
+
+        if (metaRightEl && chapter.createdAt) {
+          const dt = new Date(chapter.createdAt);
+          if (!isNaN(dt.getTime())) {
+            metaRightEl.textContent = dt.toLocaleDateString();
+          }
+        }
+
+        if (chapter.bodyHtml && bodyEl) {
+          bodyEl.innerHTML = chapter.bodyHtml;
+        } else if (chapter.bodyText && bodyEl) {
+          bodyEl.textContent = chapter.bodyText;
+        } else if (emptyEl) {
+          emptyEl.style.display = 'block';
+        }
       }
 
-      titleEl.textContent = chapter.title || 'Untitled chapter';
+      async function loadFromAppwrite() {
+        if (!databases) return false;
 
-      if (chapter.createdAt) {
-        const dt = new Date(chapter.createdAt);
-        metaRightEl.textContent = dt.toLocaleDateString();
+        let chapterDoc;
+        try {
+          chapterDoc = await databases.getDocument(
+            DATABASE_ID,
+            CHAPTERS_COLLECTION_ID,
+            chapterId
+          );
+        } catch (err) {
+          console.warn('Chapter not found in Appwrite or failed to load:', err);
+          return false;
+        }
+
+        let storyId = seriesId || chapterDoc.storyId || null;
+        let seriesDoc = null;
+
+        if (storyId) {
+          try {
+            seriesDoc = await databases.getDocument(
+              DATABASE_ID,
+              STORIES_COLLECTION_ID,
+              storyId
+            );
+          } catch (err) {
+            console.warn('Failed to load series for chapter:', err);
+          }
+        }
+
+        const chapterData = {
+          id:        chapterDoc.$id,
+          title:     chapterDoc.chapterTitle || chapterDoc.title || 'Untitled chapter',
+          bodyHtml:  chapterDoc.fullHtml || chapterDoc.content || chapterDoc.bodyHtml || '',
+          bodyText:  chapterDoc.bodyText || '',
+          createdAt: chapterDoc.createdAt
+        };
+
+        const seriesData = seriesDoc
+          ? {
+              id:        seriesDoc.$id,
+              title:     seriesDoc.title || 'Untitled story',
+              ownerName: seriesDoc.ownerName || ''
+            }
+          : null;
+
+        renderChapter(seriesData, chapterData);
+        return true;
       }
 
-      if (chapter.bodyHtml) {
-        bodyEl.innerHTML = chapter.bodyHtml;
-      } else if (chapter.bodyText) {
-        bodyEl.textContent = chapter.bodyText;
-      } else {
-        emptyEl.style.display = 'block';
+      function loadFromLocalStorage() {
+        const seriesList   = getSeriesList();
+        const chaptersList = getChaptersList();
+
+        const series  = seriesList.find((s) => String(s.id) === String(seriesId));
+        const chapter = chaptersList.find((c) => String(c.id) === String(chapterId));
+
+        renderChapter(series, chapter);
       }
+
+      (async function init() {
+        let loaded = false;
+
+        try {
+          loaded = await loadFromAppwrite();
+        } catch (err) {
+          console.warn('Error while loading from Appwrite:', err);
+          loaded = false;
+        }
+
+        if (!loaded) {
+          loadFromLocalStorage();
+        }
+      })();
     })();
   </script>
 </body>
