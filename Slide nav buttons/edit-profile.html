@@ -14,6 +14,37 @@
     <script src="../script.js" defer></script>
 </head>
 
+<header>
+    <nav class="navbar">
+        <button class="hamburger" aria-label="Open menu">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </button>
+
+        <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+
+        <h2 class="site-title">ChapterFlow</h2>
+
+        <div class="nav-links">
+            <a href="../ChapterFlow.html" class="nav-link nav-main-link">Home</a>
+            <a href="../about.html" class="nav-link nav-main-link">About</a>
+            <a href="#" class="nav-link nav-auth-link nav-login-link">Log in</a>
+            <a href="#" class="nav-link nav-auth-link nav-signup-cta">Sign up</a>
+        </div>
+    </nav>
+
+    <div class="slide-nav">
+        <button class="close-btn" aria-label="Close menu">&lt;</button>
+        <p class="slide-message">Please log in first</p>
+
+        <!-- Pre-logged in Log in button -->
+        <button class="login-btn">Log in</button>
+    </div>
+    <div class="backdrop"></div>
+</header>
+
+
 <body class="loading edit-profile-page">
     <div class="profile-page">
         <!-- Back button -->
@@ -92,5 +123,39 @@
 
     <!-- Hidden file input for avatar -->
     <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
+
+    <section class="footer-main">
+    <div class="footer-inner">
+        <div class="footer-col company">
+            <h3 class="footer-title">ChapterFlow</h3>
+            <p class="footer-description">
+                A campus reading platform where students discover stories,
+                earn rewards, and share their creative voice.
+            </p>
+        </div>
+        <div class="footer-col links">
+            <h3 class="footer-title">Quick Links</h3>
+            <ul class="footer-links">
+                <li><a href="../ChapterFlow.html">Home</a></li>
+                <li><a href="../readinghub.html">Explore Stories</a></li>
+                <li><a href="../about.html">About Us</a></li>
+                <li><a href="points-rewards.html">Points &amp; Rewards</a></li>
+            </ul>
+        </div>
+        <div class="footer-col connect">
+            <h3 class="footer-title">Connect</h3>
+            <div class="social-icons">
+                <a href="#" aria-label="Facebook"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0e400277d96f69d/view?project=69230def0009866e3192&mode=admin" alt="Facebook"></a>
+                <a href="#" aria-label="Twitter"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0dd0035010d51ae/view?project=69230def0009866e3192&mode=admin" alt="Twitter"></a>
+                <a href="#" aria-label="Instagram"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0d60001a41452ee/view?project=69230def0009866e3192&mode=admin" alt="Instagram"></a>
+            </div>
+        </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom">
+        <p>© 2025 ChapterFlow. All rights reserved. | Powered by Readdy</p>
+    </div>
+</section>
+
 </body>
 </html>

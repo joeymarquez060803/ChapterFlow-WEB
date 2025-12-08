@@ -80,17 +80,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Show points ONLY in the top navbar
   function updateHeaderPoints(points) {
-    const navContainer = document.querySelector('.nav-links');
-    if (!navContainer) return;
+  const navContainer = document.querySelector('.nav-links');
+  if (!navContainer) return;
 
-    let badge = navContainer.querySelector('.nav-points-display');
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.className = 'nav-points-display';
+  // Look for the first "main" nav link (Home) to insert before it
+  const firstMainLink = navContainer.querySelector('.nav-main-link');
+
+  let badge = navContainer.querySelector('.nav-points-display');
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'nav-points-display';
+
+    if (firstMainLink) {
+      // Insert [ Points: 123 ] before [ Home ]
+      navContainer.insertBefore(badge, firstMainLink);
+    } else {
+      // Fallback: just append at the end if something is weird
       navContainer.appendChild(badge);
     }
-    badge.textContent = `Points: ${points}`;
   }
+
+  badge.textContent = `Points: ${points}`;
+}
+
 
   // OPTIONAL: If you ever want to show points on profile page
   function updateProfilePoints(points) {
@@ -489,6 +501,33 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+    // "Get Started" button behavior:
+  // - Logged OUT  -> open login modal
+  // - Logged IN   -> go to upload page
+const ctaBtn = document.querySelector('.cta-btn');
+if (ctaBtn) {
+  ctaBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    if (currentUser) {
+      // LOGGED IN → go to upload.html
+      window.location.href = './Slide nav buttons/Create/upload.html';
+    } else {
+      // NOT LOGGED IN → open login modal
+      const usernameInput = document.getElementById('usernameInput');
+      const passwordInput = document.getElementById('passwordInput');
+      if (usernameInput) usernameInput.value = '';
+      if (passwordInput) passwordInput.value = '';
+      if (modal) {
+        modal.style.display = 'block';
+        modalTitle.textContent = 'Log in';
+        submitBtn.textContent = 'Log in';
+      }
+    }
+  });
+}
+
+
   if (closeModal) {
     closeModal.addEventListener('click', () => {
       if (modal) modal.style.display = 'none';
@@ -732,7 +771,7 @@ document.addEventListener('DOMContentLoaded', function () {
         cover.appendChild(placeholder);
       }
 
-      // Right side: title + description
+      // Right side: title + uploaded by + description label + description
       const content = document.createElement('div');
       content.className = 'profile-story-content';
 
@@ -751,12 +790,34 @@ document.addEventListener('DOMContentLoaded', function () {
         window.location.href = url;
       });
 
+      // Figure out the uploader name (from series, or fall back to current user)
+      const uploaderName =
+        (series.ownerName && String(series.ownerName).trim()) ||
+        (currentUser &&
+          (currentUser.name ||
+            (currentUser.email || '').split('@')[0])) ||
+        '';
+
+      if (uploaderName) {
+        const authorP = document.createElement('p');
+        authorP.className = 'profile-story-author';
+        authorP.textContent = 'Uploaded by: ' + uploaderName;
+        content.appendChild(authorP);
+      }
+
+      const descLabel = document.createElement('p');
+      descLabel.className = 'profile-story-description-label';
+      descLabel.textContent = 'Description:';
+      content.appendChild(descLabel);
+
       const descP = document.createElement('p');
       descP.className = 'profile-story-description';
       descP.textContent = desc;
-
-      content.appendChild(titleBtn);
       content.appendChild(descP);
+
+      // title goes on top
+      content.insertBefore(titleBtn, content.firstChild);
+
 
       // 3-dot menu (delete)
       const menu = document.createElement('div');
@@ -898,15 +959,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // ===========================
   // UI for logged in / logged out
   // ===========================
-  async function updateUIForLoggedInUser(user) {
-    // Hide "Log in / Sign up" in navbar
-    const navLinks = document.querySelectorAll('.nav-links a');
-    navLinks.forEach((link) => {
-      const text = (link.textContent || '').trim();
-      if (text === 'Log in' || text === 'Sign up') {
-        link.style.display = 'none';
-      }
-    });
+async function updateUIForLoggedInUser(user) {
+    // Mark body as logged-in so CSS can hide auth-only links in navbar
+    document.body.classList.add('cf-logged-in');
+    document.body.classList.remove('cf-logged-out');
 
     // Points for this user
     const userPoints = await getUserPoints(user);
@@ -1044,13 +1100,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function updateUIForLoggedOutUser() {
-    // Show "Log in / Sign up" again
+function updateUIForLoggedOutUser() {
+    // Mark body as logged-out so CSS shows auth-only links in navbar
+    document.body.classList.remove('cf-logged-in');
+    document.body.classList.add('cf-logged-out');
+
+    // Show "Log in / Sign up" again (if they exist)
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach((link) => {
       const text = (link.textContent || '').trim();
       if (text === 'Log in' || text === 'Sign up') {
-        link.style.display = 'inline';
+        // Let CSS control display in most cases, but clear any inline override
+        link.style.display = '';
       }
     });
 
@@ -1094,7 +1155,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (readingHubSection)   readingHubSection.style.display = 'none';
       if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'block';
     }
-  }
+}
+
 
   if (submitBtn) {
     submitBtn.addEventListener('click', async function () {

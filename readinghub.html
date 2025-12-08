@@ -106,9 +106,11 @@
       object-fit: cover;
     }
 
-    .reading-hub .story-card-body {
-      padding: 1.05rem 1.15rem 1.35rem;
-    }
+    body.reading-hub-page {
+      margin: 0;
+      padding: 0;
+      background-color: var(--hero-bg); /* same beige as ChapterFlow hero */
+}
 
     .reading-hub .story-card-body h3 {
       font-size: 1.02rem;
@@ -277,7 +279,7 @@
       </button>
 
       <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
-      <h2><a href="ChapterFlow.html">ChapterFlow</a></h2>
+      <h2 class="site-title">ChapterFlow</h2>
 
       <div class="nav-links">
         <a href="ChapterFlow.html" class="nav-link nav-main-link">Home</a>

@@ -17,50 +17,55 @@
       font-family: "Merriweather", serif;
       background-color: #f7f3e9;
       color: #3c2b1a;
+      position: relative;
     }
 
-    .chapter-banner {
-      background-color: #c9b184;
-      height: 180px;
-      width: 100%;
-    }
+      .chapter-banner {
+        background-color: var(--footer-bg);
+        height: 250px;
+        width: 100%;
+      }
 
     .chapter-layout {
       max-width: 880px;
-      margin: 0 auto 64px;
+      margin: 0 auto -100px;
       padding: 0 16px 48px;
       position: relative;
-      top: -80px;
+      top: -140px;
     }
 
     .chapter-back-btn {
-      position: absolute;
-      top: -36px;
-      left: 8px;
+      position: fixed;
+      top: 16px;
+      left: 16px;
       padding: 6px 10px;
       font-size: 0.9rem;
       border-radius: 999px;
-      border: none;
-      background-color: #f7f3e9;
+      border: 1px solid black;
+      background-color: #f2eee5;
       color: #3c2b1a;
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      z-index: 10;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .chapter-back-btn:hover {
-      background-color: #efe3cf;
+      background-color: #e8dbc9;
+      ;
     }
 
     .chapter-card {
       background-color: #fff;
-      border-radius: 24px;
+      border-radius: 0px;
       box-shadow: 0 8px 18px rgba(0,0,0,0.08);
       padding: 24px 28px 32px;
       position: relative;
       overflow: hidden;
+      min-height: 800px;
     }
 
     .chapter-card::before {
@@ -198,15 +203,12 @@
     <section class="chapter-card">
       <div class="chapter-card-inner">
         <div class="chapter-series-label">Series</div>
-        <div id="chapter-series-name" class="chapter-series-name">
-          <!-- Filled by JS -->
-        </div>
+        <div id="chapter-series-name" class="chapter-series-name"></div>
 
-        <h1 id="chapter-title" class="chapter-title">Loading chapter...</h1>
         <p id="chapter-author" class="chapter-author"></p>
 
         <div class="chapter-meta-row">
-          <span id="chapter-meta-left">Chapter</span>
+          <span id="chapter-meta-left"></span>
           <span id="chapter-meta-right"></span>
         </div>
 
@@ -224,6 +226,8 @@
     <div id="chapter-not-found" class="chapter-not-found" style="display:none;">
       We couldn’t find this chapter. It may have been removed or not yet created on this device.
     </div>
+
+
   </main>
 
   <script>
@@ -259,8 +263,8 @@
 
       const backBtn      = document.getElementById('chapter-back-btn');
       const seriesNameEl = document.getElementById('chapter-series-name');
-      const titleEl      = document.getElementById('chapter-title');
       const authorEl     = document.getElementById('chapter-author');
+      const metaLeftEl   = document.getElementById('chapter-meta-left');
       const metaRightEl  = document.getElementById('chapter-meta-right');
       const bodyEl       = document.getElementById('chapter-body');
       const emptyEl      = document.getElementById('chapter-empty');
@@ -304,20 +308,36 @@
           return;
         }
 
-        if (series) {
-          if (seriesNameEl) {
-            seriesNameEl.textContent = series.title || 'Untitled story';
+          if (series) {
+            if (seriesNameEl) {
+              seriesNameEl.textContent = series.title || 'Untitled story';
+            }
+            if (authorEl && series.ownerName) {
+              authorEl.textContent = 'Uploaded by: ' + series.ownerName;
+            }
+          } else if (seriesNameEl) {
+            seriesNameEl.textContent = 'Untitled story';
           }
-          if (authorEl && series.ownerName) {
-            authorEl.textContent = 'By ' + series.ownerName;
-          }
-        } else if (seriesNameEl) {
-          seriesNameEl.textContent = 'Chapter';
-        }
 
-        if (titleEl) {
-          titleEl.textContent = chapter.title || 'Untitled chapter';
-        }
+          // Build "Chapter X - Title" for the left meta text
+          const chapterTitle =
+            (chapter && chapter.title) || 'Untitled chapter';
+
+          const chapterNumber =
+            (chapter && chapter.chapterNumber != null)
+              ? chapter.chapterNumber
+              : (chapter && chapter.number != null
+                  ? chapter.number
+                  : null);
+
+          if (metaLeftEl) {
+            if (chapterNumber != null) {
+              metaLeftEl.textContent = `Chapter ${chapterNumber} - ${chapterTitle}`;
+            } else {
+              metaLeftEl.textContent = chapterTitle;
+            }
+          }
+
 
         if (metaRightEl && chapter.createdAt) {
           const dt = new Date(chapter.createdAt);
@@ -365,13 +385,14 @@
           }
         }
 
-        const chapterData = {
-          id:        chapterDoc.$id,
-          title:     chapterDoc.chapterTitle || chapterDoc.title || 'Untitled chapter',
-          bodyHtml:  chapterDoc.fullHtml || chapterDoc.content || chapterDoc.bodyHtml || '',
-          bodyText:  chapterDoc.bodyText || '',
-          createdAt: chapterDoc.createdAt
-        };
+          const chapterData = {
+            id:            chapterDoc.$id,
+            title:         chapterDoc.chapterTitle || chapterDoc.title || 'Untitled chapter',
+            chapterNumber: chapterDoc.chapterNumber ?? chapterDoc.number ?? null,
+            bodyHtml:      chapterDoc.fullHtml || chapterDoc.content || chapterDoc.bodyHtml || '',
+            bodyText:      chapterDoc.bodyText || '',
+            createdAt:     chapterDoc.createdAt
+          };
 
         const seriesData = seriesDoc
           ? {
@@ -411,5 +432,41 @@
       })();
     })();
   </script>
+
+<section class="footer-main">
+    <div class="footer-inner">
+        <div class="footer-col company">
+            <h3 class="footer-title">ChapterFlow</h3>
+            <p class="footer-description">
+                A campus reading platform where students discover stories,
+                earn rewards, and share their creative voice.
+            </p>
+        </div>
+        <div class="footer-col links">
+            <h3 class="footer-title">Quick Links</h3>
+            <ul class="footer-links">
+                <li><a href="../ChapterFlow.html">Home</a></li>
+                <li><a href="../readinghub.html">Explore Stories</a></li>
+                <li><a href="../about.html">About Us</a></li>
+                <li><a href="../Slide nav buttons/points-rewards.html">Points &amp; Rewards</a></li>
+
+            </ul>
+        </div>
+        <div class="footer-col connect">
+            <h3 class="footer-title">Connect</h3>
+            <div class="social-icons">
+                <a href="#" aria-label="Facebook"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0e400277d96f69d/view?project=69230def0009866e3192&mode=admin" alt="Facebook"></a>
+                <a href="#" aria-label="Twitter"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0dd0035010d51ae/view?project=69230def0009866e3192&mode=admin" alt="Twitter"></a>
+                <a href="#" aria-label="Instagram"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0d60001a41452ee/view?project=69230def0009866e3192&mode=admin" alt="Instagram"></a>
+            </div>
+        </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom">
+        <p>© 2025 ChapterFlow. All rights reserved. | Powered by Readdy</p>
+    </div>
+</section>
+
+
 </body>
 </html>

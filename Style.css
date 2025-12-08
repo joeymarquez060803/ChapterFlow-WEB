@@ -3,81 +3,91 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 20px;
-    padding: 20px;
-    background-color: silver;
+    height: 70px;
+    padding: 0 40px;
+    background-color: #f4ead6; /* warm beige similar to reference */
     display: flex;
     align-items: center;
-    border-bottom: 1px solid black;
-    z-index: 900;  /* ✅ keep header above cards */
+    border-bottom: 1px solid #e4d8c4;
+    z-index: 1000; /* keep header above other content */
 }
 
-
-.logo {  
-    height: 50px; 
-    margin-left: 25px;  
-    cursor: pointer;  
+.logo {
+    height: 45px;
+    margin-left: 0;
+    margin-right: 12px;
+    cursor: pointer;
 }
 
-h2   {
+.site-title {
+    font-size: 26px;
+    color: #4d3a28;
     margin-left: 5px;
+    margin-right: auto; /* pushes nav-links to the far right */
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
 }
 
+/* Container for navigation links. Remove absolute positioning and use
+   `margin-left: auto` so the links naturally align to the right of
+   the title. A consistent gap provides breathing room between items. */
 .nav-links {
-    position: absolute;
-    right: 20px;
-    top: 15px;
+    position: static;
     display: flex;
-    justify-content: flex-end;
-    gap: 10px; 
-    right: 90px;
+    align-items: center;
+    gap: 30px;
+    margin-left: auto;
 }
 
 /* Nav bar links: Home, About, Log in, Sign up */
-.navbar a {
-    color: black;
+/* Generic link styling inside the nav bar. A slightly smaller
+   font-size and reduced letter-spacing offers a cleaner look.
+   Colors are drawn from the warm palette; transitions add
+   subtle movement and colour changes on hover. */
+.navbar .nav-link {
+    color: #4d3a28;
     text-decoration: none;
-    margin-right: 0;
-    font-size: 19px;
+    font-size: 16px;
     cursor: pointer;
-    padding: 5px 10px;
+    padding: 5px 8px;
     font-family: "Merriweather", serif;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    transition: color 150ms ease, transform 120ms ease, background-color 150ms ease;
+    letter-spacing: 0.05em;
+    margin: 0;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
-/* default hover color for all nav links */
-.navbar a:hover {
-    color: orangered;
+/* Hover effect for normal nav links */
+.navbar .nav-link:hover {
+    color: #8f7958;
+    transform: translateY(-1px);
 }
 
-/* Home, About, Log in: match slide-nav hover/click feel */
-.navbar .nav-main-link:hover,
-.navbar .nav-login-link:hover {
-    color: orangered;
-    transform: translateX(4px);   /* smooth slide right on hover */
+/* Active/click effect: small downward movement for feedback */
+.navbar .nav-link:active {
+    transform: translateY(0);
 }
 
-.navbar .nav-main-link:active,
-.navbar .nav-login-link:active {
-    transform: translateX(2px);   /* tiny movement when clicked */
-}
-
-/* Sign up CTA button: new background color */
-/* Sign up button in nav bar */
+/* The sign-up CTA in the header resembles a pill-shaped button. It has
+   a border and tinted background. Hovering darkens the tint slightly. */
 .navbar .nav-signup-cta {
-    border: 1px solid black;      /* 1px black border (normal) */
-    border-radius: 10px;
-    background-color: rgb(72, 172, 206); /* or whatever color you want */
-    color: black;
+    border: 1px solid #4d3a28;
+    border-radius: 999px;
+    background-color: #e6d7b9;
+    color: #4d3a28;
+    padding: 5px 8px;
+    font-weight: 600;
 }
 
-/* Hover state for Sign up */
 .navbar .nav-signup-cta:hover {
-    border: 1px solid black;      /* keep border black on hover */
-    background-color: lightgray;  /* or your hover color */
-    color: black;
+    background-color: #d6c3a4;
+    color: #4d3a28;
+}
+
+/* Adjust spacing for the hamburger to prevent crowding the logo and
+   title. */
+.hamburger {
+    margin-right: 16px;
 }
 
 
@@ -113,9 +123,9 @@ h2   {
     left: 0;
     width: 0px;
     height: 100vh;
-    background-color: rgb(225, 223, 223);
+    background-color: var(--hero-bg);
     transition: width 0.3s ease;
-    z-index: 1000;
+    z-index: 1200;
     
 }
 
@@ -163,7 +173,7 @@ h2   {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 999;
+    z-index: 1100;
 }
 
 .backdrop.active {
@@ -222,8 +232,10 @@ h2   {
 }
 
 body {
-    background-color: #f2edda;
+    margin: 0;  /* remove the default 8px margin so corners are filled */
+    background-color: #ffffff;
 }
+
 
 
 /* HERO SECTION IN NORMAL FLOW */
@@ -264,57 +276,47 @@ body {
 }
 
 .explore-btn {
-    padding: 0.7rem 2.3rem;
+    padding: 0.8rem 2.4rem;
     border-radius: 999px;
-    border: 1px solid black;
-    background: silver;
+    border: 2px solid #5d4a3b;
+    background-color: transparent;
     font-family: "Merriweather", serif;
     font-size: 1rem;
-    color: black;
+    color: #5d4a3b;
     cursor: pointer;
-    font-weight: bold;
-    transition:
-        background-color 0.15s ease,
-        color 0.15s ease,
-        box-shadow 0.15s ease;
-}
-
-.explore-btn:hover {
-    background-color: lightgray;
-    color: white;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .explore-btn:active {
-    box-shadow: 0 1px 5px rgba(0,0,0,0.25);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transform: translateY(1px);
 }
 
 .reading-hub-btn {
-  padding: 0.7rem 2.3rem;
+  padding: 0.8rem 2.4rem;
   border-radius: 999px;
-  border: 1px solid black;
-  background: silver;
+  border: 2px solid #5d4a3b;
+  background-color: #5d4a3b;
   font-family: "Merriweather", serif;
   font-size: 1rem;
-  color: black;
+  color: #ffffff;
   cursor: pointer;
-  font-weight: bold;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    box-shadow 0.15s ease;
+  font-weight: 600;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   margin-left: 10px;          /* optional spacing from Explore */
   display: none;              /* 🔒 hidden by default */
 }
 
 .reading-hub-btn:hover {
-  background-color: lightgray;
-  color: white;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+  background-color: #463628;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .reading-hub-btn:active {
-  box-shadow: 0 1px 5px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transform: translateY(1px);
 }
 
 
@@ -503,10 +505,80 @@ body.loading .profile-stories {
   visibility: hidden;
 }
 
+/* While auth is still loading, hide nav links so "Points" doesn't flash late */
+body.loading .navbar .nav-links {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* While auth is loading, also hide the hero buttons so the wrong one
+   (Explore vs Start Reading) doesn't flash briefly */
+body.loading .hero-buttons {
+  opacity: 0;
+  visibility: hidden;
+}
+
+
 /* Nice fade-in once loading finishes */
 .edit-profile-page .profile-section,
 .edit-profile-page .profile-stories {
   transition: opacity 160ms ease;
+}
+
+/* ========================================================================
+   ULTIMATE NAVBAR FIX
+   
+   The final portion of this stylesheet may still include a `.navbar` block
+   with `!important` rules leftover from earlier prototypes. To ensure
+   the nav bar consistently matches our unified design across all pages,
+   we add highly specific overrides below. By targeting `.navbar` via
+   the `body` element and using `!important`, these declarations take
+   precedence over any previous ones—even those marked `!important`.
+*/
+body .navbar {
+    /* A slightly slimmer header height to better match the reference */
+    height: 60px !important;
+    /* Remove vertical padding so that nav items align centrally */
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    /* Adjust left and right padding to better centre nav content */
+    padding-left: 32px !important;
+    padding-right: 150px !important;
+    /* Pure white background and subtle border */
+    background-color: var(--nav-bg) !important;
+    border-bottom: 1px solid var(--nav-border) !important;
+    display: flex !important;
+    align-items: center !important;
+    /* Lay out the nav bar in a single row. The title uses margin-right: auto
+       to push the navigation links to the far right. */
+    justify-content: flex-start !important;
+    overflow: visible !important; /* allow children to extend fully */
+}
+
+body .site-title {
+    font-size: 26px !important;
+    margin-left: 5px !important;
+    margin-right: auto !important; /* push nav links to the far right */
+    font-family: 'Merriweather', serif !important;
+    font-weight: 700 !important;
+    color: var(--nav-text) !important;
+    letter-spacing: 0.05em !important;
+}
+
+
+/* Provide additional breathing room between the hamburger icon and the logo/title */
+body .hamburger {
+    /* Provide a modest gap between the hamburger and logo; not too far, not too close */
+    margin-right: 16px !important;
+}
+
+/* Ensure nav links remain visible even while the page carries the
+   `.loading` class. Without this override, they would be hidden until
+   the script removes the class, which can be confusing during
+   development or if an error occurs. */
+body .nav-links a {
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 
@@ -526,8 +598,26 @@ body.loading .nav-links a {
    ========================================================= */
 
 :root {
+    /* Palette variables used throughout the front page and navigation */
     --khaki: #c8b38a;
     --page-cream: #faf8f0;
+
+    /* Navigation bar colours */
+    --nav-bg: #ffffff;              /* pure white navbar background */
+    --nav-border: #e4d8c4;          /* subtle bottom border */
+    --nav-text: #4d3a28;            /* dark brown nav text */
+    --nav-hover: #8f7958;           /* slightly lighter brown on hover */
+    --signup-bg: #f2eee5;           /* light beige background for sign‑up button */
+    --signup-hover: #e8dbc9;        /* darker beige on hover */
+
+    /* Section backgrounds */
+    --hero-bg: #F2EEE5;             /* warm beige for hero and CTA sections */
+    --feature-bg: #ffffff;          /* white background for features */
+    --cta-bg: #F2EEE5;              /* CTA background matches hero */
+    --footer-bg: #5d4a3b;           /* dark brown for footer */
+    --footer-text: #ffffff;         /* light text for footer */
+    --feature-card-border: #eaeaea;  /* subtle border for feature cards */
+    --feature-card-bg: #ffffff;      /* white card background */
 }
 
 /* Only edit-profile page body uses this class */
@@ -537,13 +627,530 @@ body.edit-profile-page {
     background: var(--page-cream);
 }
 
+/* =========================================================
+   FRONT PAGE LAYOUT STYLES
+   These rules style the hero, features, call‑to‑action and footer
+   sections on the ChapterFlow landing page. They use the colour
+   variables defined above to mirror the reference design exactly.
+*/
+
+/* Hero section */
+.hero-section {
+    background-color: var(--hero-bg);
+    padding: 120px 1rem 100px;             /* space above/below hero content */
+    text-align: center;
+    position: relative;
+}
+
+.hero-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hero-logo {
+    /* Make the center logo more prominent without overpowering the hero */
+    height: 280px;
+    width: auto;
+    margin-bottom: 1rem;
+}
+
+.hero-title {
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+    font-size: 84px;
+    color: var(--nav-text);
+    margin: 0;
+}
+
+.hero-tagline {
+    font-family: 'Merriweather', serif;
+    font-weight: 400;
+    font-size: 24px;
+    color: var(--nav-text);
+    margin-top: 10px;
+}
+
+.hero-description {
+    font-family: 'Merriweather', serif;
+    font-size: 18px;
+    color: var(--nav-text);
+    max-width: 680px;
+    line-height: 1.6;
+    margin: 20px auto 0;
+}
+
+.hero-buttons {
+    margin-top: 32px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Buttons in hero section */
+/* Buttons within the hero section. Use !important to override
+   earlier global button styles. */
+.hero-section .explore-btn,
+.hero-section .reading-hub-btn {
+    padding: 0.8rem 2.4rem;
+    border-radius: 999px;
+    font-family: 'Merriweather', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    border: 2px solid #5d4a3b !important;
+    background-color: transparent !important;
+    color: #5d4a3b !important;
+}
+
+.hero-section .reading-hub-btn {
+    background-color: #5d4a3b !important;
+    color: #ffffff !important;
+    border: 2px solid #5d4a3b !important;
+}
+
+.hero-section .explore-btn:hover {
+    background-color: #5d4a3b;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.hero-section .reading-hub-btn:hover {
+    background-color: #463628;
+    border-color: #463628;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.hero-section .explore-btn:active,
+.hero-section .reading-hub-btn:active {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transform: translateY(1px);
+}
+
+/* Hero-specific button classes added to ensure stronger specificity. */
+.hero-explore-btn {
+    padding: 0.8rem 2.4rem;
+    border-radius: 999px;
+    font-family: 'Merriweather', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    border: 2px solid #5d4a3b !important;
+    background-color: transparent !important;
+    color: #5d4a3b !important;
+    white-space: nowrap;
+}
+
+.hero-explore-btn:hover {
+    background-color: #5d4a3b !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.hero-explore-btn:active {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transform: translateY(1px);
+}
+
+.hero-reading-btn {
+    padding: 0.8rem 2.4rem;
+    border-radius: 999px;
+    font-family: 'Merriweather', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    border: 2px solid #5d4a3b !important;
+    background-color: #5d4a3b !important;
+    color: #ffffff !important;
+    white-space: nowrap;
+}
+
+.hero-reading-btn:hover {
+    background-color: #463628 !important;
+    border-color: #463628 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.hero-reading-btn:active {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transform: translateY(1px);
+}
+
+/* Designed by badge */
+.designed-by {
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    background-color: #f5ecef;
+    color: #8f7958;
+    font-family: 'Merriweather', serif;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.designed-by .readdy {
+    color: #9971c2;
+    font-weight: 600;
+    margin-left: 2px;
+}
+
+/* Features section */
+.features-section {
+    background-color: var(--feature-bg);
+    padding: 100px 1rem 100px;
+    text-align: center;
+}
+
+.features-heading {
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+    font-size: 48px;
+    color: var(--nav-text);
+    margin-bottom: 50px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 32px;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background-color: var(--feature-card-bg);
+    border: 1px solid var(--feature-card-border);
+    border-radius: 18px;
+    padding: 40px 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: #f2eee5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.feature-icon img {
+    width: 50px;
+    height: 50px;
+}
+
+.feature-title {
+    font-family: 'Merriweather', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--nav-text);
+    margin: 0 0 12px;
+}
+
+.feature-text {
+    font-family: 'Merriweather', serif;
+    font-size: 16px;
+    color: var(--nav-text);
+    line-height: 1.6;
+}
+
+/* Call-to-action section */
+.cta-section {
+    background-color: var(--cta-bg);
+    text-align: center;
+    padding: 100px 1rem;
+}
+
+.cta-title {
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+    font-size: 50px;
+    color: var(--nav-text);
+    margin-bottom: 20px;
+}
+
+.cta-subtitle {
+    font-family: 'Merriweather', serif;
+    font-size: 20px;
+    color: var(--nav-text);
+    margin-bottom: 40px;
+}
+
+.cta-btn {
+    background-color: #5d4a3b;
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.9rem 2.6rem;
+    font-family: 'Merriweather', serif;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cta-btn:hover {
+    background-color: #4c3a2e;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+}
+
+.cta-btn:active {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+    transform: translateY(1px);
+}
+
+/* Footer (dark section) */
+.footer-main {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 10px 1rem 25px;
+}
+
+.footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 0 auto;
+    gap: 40px;
+}
+
+.footer-col {
+    flex: 1;
+    min-width: 220px;
+}
+
+.footer-title {
+    font-family: 'Merriweather', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.footer-description {
+    font-family: 'Merriweather', serif;
+    font-size: 14px;
+    color: #e0d6ce;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    font-family: 'Merriweather', serif;
+    font-size: 16px;
+    color: #e0d6ce;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.social-icons {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.social-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: #8f7958;
+    transition: background-color 0.2s ease;
+}
+
+.social-icons a:hover {
+    background-color: #a08a69;
+}
+
+.social-icons img {
+    width: 20px;
+    height: 20px;
+}
+
+.footer-divider {
+    margin-top: 60px;
+    border: none;
+    border-top: 1px solid #7a6149;
+}
+
+.footer-bottom {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.footer-bottom p {
+    font-family: 'Merriweather', serif;
+    font-size: 14px;
+    color: #e0d6ce;
+    margin: 0;
+}
+
+/* ========================================================================
+   Landing Page: Final Navbar Overrides
+   Placed near the end of the stylesheet to ensure the landing page
+   navigation bar matches the reference design exactly. These rules
+   override the general final navbar styles defined earlier, using
+   increased specificity (`body .navbar`) and `!important` declarations.
+*/
+body .navbar {
+    /* A slightly slimmer header height to mirror the original ChapterFlow header */
+    height: 60px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    /* Adjust horizontal padding so the content sits closer to the edges without being cramped */
+    padding-left: 32px !important;
+    padding-right: 150px !important;
+    /* Pure white background as requested */
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e4d8c4 !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    overflow: visible !important;
+    /* account for the vertical scrollbar to prevent nav items from being clipped */
+    width: calc(100% - 15px) !important;
+}
+
+body .navbar .logo {
+    /* Adjust the logo height to sit neatly within a 60px navbar */
+    height: 36px !important;
+    margin-right: 10px !important;
+}
+
+/* Give a little breathing room between the hamburger icon and the logo */
+body .hamburger {
+    /* Provide a modest gap between the hamburger and the logo; not too far, not too close */
+    margin-right: 16px !important;
+}
+
+body .navbar .site-title {
+    font-size: 26px !important;
+    margin-left: 5px !important;
+    margin-right: auto !important;
+    color: #4d3a28 !important;
+}
+
+body .navbar .nav-links {
+    position: static !important;
+    margin-left: auto !important;      /* keeps them after the title */
+    margin-right: 60px !important;     /* <-- move Home/About/Log in/Sign up LEFT */
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
+    flex-shrink: 0 !important;
+}
+
+
+body .navbar .nav-link {
+    font-family: 'Merriweather', serif !important;
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: #4d3a28 !important;
+    background: none !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    /* Match nav item height to the slimmer 60px nav bar */
+    height: 60px !important;
+    padding: 0 0.6rem !important;
+    cursor: pointer !important;
+    transition: color 0.2s ease, transform 0.2s ease !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+body .navbar .nav-link:hover {
+    color: #8f7958 !important;
+    transform: translateY(-1px) !important;
+}
+
+body .navbar .nav-link:active {
+    transform: translateY(0) !important;
+}
+
+body .navbar .nav-signup-cta {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    /* Ensure the full text fits without wrapping */
+    min-width: 120px !important;
+    /* Match sign‑up height to the slimmer 60px nav bar */
+    height: 60px !important;
+    padding: 0 1rem !important;
+    border: 1px solid #4d3a28 !important;
+    border-radius: 999px !important;
+    background-color: #f2eee5 !important;
+    color: #4d3a28 !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+    /* Increase font size for better legibility on the slimmer header */
+    font-size: 14px !important;
+}
+
+body .navbar .nav-signup-cta:hover {
+    background-color: #e8dbc9 !important;
+    color: #4d3a28 !important;
+}
+
+
+.profile-banner {
+    background-color: var(--footer-bg);  /* same brown as the footer section */
+    height: 500px;                       /* make this bigger/smaller to change strip height */
+    width: 100%;
+}
+
+
 .profile-page {
     position: relative;
     min-height: 100vh;
     display: flex;
     flex-direction: column;      /* stack children: card on top, stories below */
     align-items: center;         /* center them horizontally */
-    padding: 100px 16px 40px;    /* space above & below card */
+    padding: 180px 16px 40px;    /* space above & below card */
 }
 
 
@@ -552,8 +1159,6 @@ body.edit-profile-page {
     top: 20px;
     left: 20px;
     padding: 6px 12px;
-    border-radius: 999px;
-    background-color: silver;
     border: 1px solid black;
     text-decoration: none;
     font-family: 'Merriweather', serif;
@@ -568,6 +1173,11 @@ body.edit-profile-page {
         transform 0.15s ease;
 }
 
+.story-page .back-btn {
+    border-radius: 16px;
+}
+
+
 .back-btn:hover {
     background-color: lightgray;
     color: black;
@@ -581,20 +1191,20 @@ body.edit-profile-page {
     top: 0;
     left: 0;
     right: 0;
-    height: 220px;         /* this is the cut-off; adjust if needed */
-    background: var(--khaki);
+    height: 300px;         /* this is the cut-off; adjust if needed */
+    background: var(--footer-bg);
     z-index: -1;           /* behind the card */
 }
 
 /* CARD BOX */
 .profile-section {
     position: relative;
-    max-width: 820px;
+    max-width: 1000px;
     width: 90%;
     margin: 0 auto;
     padding: 90px 40px 40px;
     border: none;
-    border-radius: 18px;
+    border-radius: 10px;
     background: #ffffff;    /* card is pure white */
     box-shadow: 0 10px 24px rgba(0,0,0,0.08);
     display: flex;
@@ -609,9 +1219,9 @@ body.edit-profile-page {
 
 /* Outer section that holds both the heading and the cards */
 .profile-stories {
-    max-width: 820px;
+    max-width: 900px;
     width: 90%;
-    margin: 26px 0 48px;
+    margin: 26px auto 48px;
     font-family: 'Merriweather', serif;
 }
 
@@ -621,11 +1231,15 @@ body.edit-profile-page {
     text-align: center;   /* matches your screenshot; change if you want */
 }
 
-/* Container where JS injects the cards */
+/* Container where JS injects the cards – now the BIG card */
 .profile-stories-list {
     display: flex;
     flex-direction: column;
-    gap: 18px;            /* vertical spacing between multiple story cards */
+    gap: 0;  /* no gaps – lines will separate the rows */
+    background-color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.13);
+    padding: 24px 28px 28px;
 }
 
 
@@ -643,18 +1257,18 @@ body.edit-profile-page {
     color: #555;
 }
 
-/* each story card (try to match your reference layout) */
+/* Each story row inside the big card */
 .profile-story-card {
-    position: relative;              /* NEW: so menu can sit in top-right */
+    position: relative;
     display: flex;
     gap: 18px;
-    padding: 16px 18px;
-    border-radius: 16px;
-    border: 1px solid rgba(0,0,0,0.18);
-    background: #ffffff;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.06);
-    min-height: 250px;
-    align-items: center;
+    padding: 18px 0;
+    border-radius: 0;             /* no own card corners */
+    border: none;                 /* no border around each row */
+    background: transparent;      /* background belongs to the big card */
+    box-shadow: none;             /* remove per-card shadow */
+    min-height: 0;
+    align-items: flex-start;
 }
 
 
@@ -694,7 +1308,7 @@ body.edit-profile-page {
     display: flex;
     flex-direction: column;
     padding-left: 20px;        /* move the text slightly right from the image */
-    margin-top: -120px;   
+    margin-top: 0px;   
 }
 
 /* big title = button */
@@ -719,18 +1333,38 @@ body.edit-profile-page {
     color: orangered;
 }
 
+.profile-story-author {
+    margin: 4px 0 0;
+    font-size: 0.95rem;
+    color: rgba(0, 0, 0, 0.65);
+}
+
+.profile-story-description-label {
+    margin: 6px 0 2px;
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #3c2b1a;
+}
+
 .profile-story-description {
     margin: 0;
+    margin-top: 5px;
     margin-left: 1px;
-    font-size: 1.0 rem;
+    font-size: 0.9rem;
+    font-style: italic;
     line-height: 1.6;
     color: #444;
 }
 
-/* spacing between multiple stories */
+
+/* Horizontal divider between stories */
 .profile-story-card + .profile-story-card {
-    margin-top: 18px;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);  /* dim line */
+    margin-top: 16px;      /* little gap before the line */
+    padding-top: 18px;     /* keep spacing consistent */
 }
+
 
 /* three-dot menu on each story card */
 .profile-story-menu {
@@ -936,10 +1570,10 @@ body.edit-profile-page {
 
 /* POINTS + CREATE BUTTON */
 .points-row {
-    margin-top: 6px;
+    margin-top: 15px;
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 20px;
     font-size: 15px;
 }
 
@@ -952,7 +1586,7 @@ body.edit-profile-page {
     padding: 6px 18px;
     border-radius: 999px;
     border: 1px solid black;
-    background-color: lightgray;
+    background-color: #f2eee5;
     color: black;
     font-size: 14px;
     cursor: pointer;
@@ -964,8 +1598,8 @@ body.edit-profile-page {
 }
 
 .points-create-btn:hover {
-    background: var(--khaki);
-    color: #ffffff;
+    background: #e8dbc9;
+    color: black;
     box-shadow: 0 4px 10px rgba(0,0,0,0.18);
     transform: translateY(-1px);
 }
@@ -977,88 +1611,127 @@ body.edit-profile-page {
 
 /* -------------------- THEME COLORS & TYPOGRAPHY -------------------- */
 :root {
-    /* keep khaki + page cream for edit-profile and add nav-specific colors */
+    /*
+     * Global colour definitions used throughout the site.
+     *
+     * --khaki and --page-cream remain from earlier styles for profile
+     * pages, but a new set of variables define the navigation palette
+     * so that the header matches the reference design. You can adjust
+     * these values in one place to tweak the nav bar across all pages.
+     */
     --khaki: #c8b38a;
     --page-cream: #faf8f0;
     --accent-red: #e45b34;
-    --nav-text: #2e2415;
+
+    /* Navigation palette */
+    /* Override navigation palette to match the redesigned front page */
+    --nav-bg: #ffffff;      /* pure white background for the nav bar */
+    --nav-border: #e4d8c4;  /* subtle bottom border */
+    --nav-text: #4d3a28;    /* dark brown text colour */
+    --nav-hover: #8f7958;   /* lighter brown on hover */
+    --signup-bg: #f2eee5;   /* light beige background for sign-up button */
+    --signup-hover: #e8dbc9;
+
     --silver: #c0c0c0;
+
+    /*
+     * Fallback colours used by the final navbar override further down the
+     * stylesheet. Assign them the same values as our nav palette so
+     * unexpected overrides still yield the correct design. If the
+     * `FINAL NAVBAR OVERRIDES` block changes height or padding, these
+     * variables ensure the background and border colours stay on brand.
+     */
+    --background-color: var(--nav-bg);
+    --border-color: var(--nav-border);
+    --primary-color: var(--nav-text);
+    --primary-hover: var(--nav-hover);
 }
 
 /* -------------------- NAVBAR -------------------- */
 
-/* base bar: still fixed from earlier rules, but now khaki + novel-ish text */
+/*
+ * Base nav bar for all pages. The bar is fixed to the top of the viewport,
+ * uses the defined nav variables for colouring, and arranges its
+ * children with flexbox. The height and padding ensure the content
+ * sits vertically centred within the bar.
+ */
 .navbar {
-    background-color: var(--khaki);
+    background-color: var(--nav-bg);
     color: var(--nav-text);
-}
-
-/* title text */
-.site-title {
-    font-family: "Merriweather", serif;
-    font-size: 1.4rem;
-    letter-spacing: 0.08em;
-}
-
-/* logo inside navbar */
-.navbar .logo {
-    height: 40px;
-    object-fit: contain;
-}
-
-/* nav links row (right side) */
-.navbar .nav-links {
-    position: absolute;
-    right: 90px;
-    top: 15px;
+    height: 70px;
+    padding: 0 40px;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    border-bottom: 1px solid var(--nav-border);
 }
 
-/* base nav buttons (Home, About, Log in) */
+/* Site title inherits serif font and sits next to the logo. A margin
+ * on the right pushes the nav-links group to the far right. */
+.site-title {
+    font-family: "Merriweather", serif;
+    font-size: 26px;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: var(--nav-text);
+    margin-left: 5px;
+    margin-right: auto;
+}
+
+/* Logo inside the nav bar: scaled to fit within 70px height. */
+.navbar .logo {
+    height: 45px;
+    object-fit: contain;
+    margin-right: 12px;
+}
+
+/* Nav links container sits to the right of the title, laid out with
+ * equal spacing. Removing absolute positioning prevents unintended
+ * whitespace and ensures responsiveness. */
+.navbar .nav-links {
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-left: auto;
+}
+
+/* Base nav button styles: uppercase serif text with a warm brown colour
+ * and subtle hover motion. */
 .navbar .nav-link {
-    font-family: "Merriweather", serif;          /* simple, bookish serif */
-    font-size: 0.9rem;
+    font-family: "Merriweather", serif;
+    font-size: 16px;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.05em;
     text-decoration: none;
     color: var(--nav-text);
     background: none;
     border: none;
     padding: 0.3rem 0.6rem;
     cursor: pointer;
-    transition: color 150ms ease;
-    transition: color 150ms ease, transform 120ms ease; /* 👈 add transform */
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
-/* same behavior pre-login & logged-in */
+/* Hover behaviour for all nav links: change colour and lift slightly. */
 .navbar .nav-link:hover {
-    color: var(--accent-red);                    /* orange-red hover */
+    color: var(--nav-hover);
+    transform: translateY(-1px);
 }
 
+/* Active state for links: reset transformation to mimic click feedback. */
 .navbar .nav-link:active {
-    color: var(--accent-red);
+    transform: translateY(0);
 }
 
-/* Home + About: match slide-nav hover / click feel */
-.navbar .nav-main-link:hover {
-    color: orangered;           /* same color as slide-nav buttons */
-    transform: translateX(4px); /* slide a bit to the right */
-}
-
-.navbar .nav-main-link:active {
-    transform: translateX(2px); /* tiny movement on click */
-}
-
-
-/* Sign up = pill button like "Create", but silver */
+/* Sign up CTA: styled as a pill button using the sign-up palette.
+ * It inherits the same serif font and has a slight tint to stand out
+ * without overpowering the other links. */
 .navbar .nav-signup-cta {
     border-radius: 999px;
-    border: 1px solid black;
-    background-color: silver;
+    border: 1px solid var(--nav-text);
+    background-color: var(--signup-bg);
     padding: 0.35rem 1.2rem;
     font-weight: 600;
+    color: var(--nav-text);
     box-shadow: 0 0 0 rgba(0,0,0,0);
     transition:
         background-color 150ms ease,
@@ -1066,14 +1739,27 @@ body.edit-profile-page {
         box-shadow 150ms ease;
 }
 
-.navbar .nav-signup-cta:hover {
-    background-color: lightgray;
-    color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
 .navbar .nav-signup-cta:active {
     box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+/* Points badge in the navbar */
+.navbar .nav-points-display {
+    font-family: "Merriweather", serif;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    color: var(--nav-text);
+    white-space: nowrap;
+    margin-right: 10px;   /* spacing before Home */
+}
+
+
+body.cf-logged-in .navbar .nav-auth-link {
+    display: none !important;
+}
+
+body.loading .navbar .nav-auth-link {
+    display: none !important;
 }
 
 /* -------------------- EXPLORE BUTTON (like Create, NO POSITION JUMP) -------------------- */
@@ -1104,15 +1790,11 @@ body.edit-profile-page {
     /* no transform here -> no jumping */
 }
 
-.explore-btn:active {
-    box-shadow: 0 1px 5px rgba(0,0,0,0.25);
-}
-
 /* -------------------- SLIDE NAV (both states) -------------------- */
 
 /* slide nav background khaki like edit-profile */
 .slide-nav {
-    background-color: var(--khaki);
+    background-color: var(--hero-bg);
     color: var(--nav-text);
 }
 
@@ -1180,17 +1862,6 @@ body.edit-profile-page {
 
 .slide-nav .slide-link:active {
     transform: translateX(2px);
-}
-
-/* -------------------- FOOTER -------------------- */
-
-.footer {
-    background-color: var(--khaki);
-    color: var(--nav-text);
-}
-
-.footer p {
-    margin: 0;
 }
 
 
@@ -1447,11 +2118,6 @@ body.edit-profile-page {
   margin-bottom: 0.8rem;
 }
 
-
-/* ===========================
-   READING BUBBLE (chapter pages)
-   =========================== */
-
 .reading-bubble {
   position: fixed;
   bottom: 80px;
@@ -1460,13 +2126,12 @@ body.edit-profile-page {
   user-select: none;
 }
 
-/* lighter bubble colour */
 .reading-bubble-main {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85);  /* lighter */
-  color: #333;                             /* dark icon/text */
+  background: rgba(255, 255, 255, 0.85); 
+  color: #333;                            
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1475,7 +2140,6 @@ body.edit-profile-page {
   cursor: grab;
 }
 
-/* info box beside the bubble */
 .reading-bubble-panel {
   position: absolute;
   top: 50%;
@@ -1493,19 +2157,17 @@ body.edit-profile-page {
   transition: opacity 120ms ease, transform 120ms ease;
 }
 
-/* panel opens when bubble has .open */
 .reading-bubble.open .reading-bubble-panel {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* default: panel on the LEFT of the bubble */
+
 .reading-bubble.panel-left .reading-bubble-panel {
-  right: 56px;   /* bubble width (48) + small gap */
+  right: 56px;   
   left: auto;
 }
 
-/* when near the left edge: panel on the RIGHT of the bubble */
 .reading-bubble.panel-right .reading-bubble-panel {
   left: 56px;
   right: auto;
@@ -1533,3 +2195,33 @@ body.edit-profile-page {
   background: #ffffff22;
 }
 
+.navbar {
+    height: auto !important;
+    padding: 0.75rem 1.5rem !important;
+    background-color: var(--background-color) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+    display: flex !important;
+    align-items: center !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 900 !important;
+
+}
+
+/* Smaller Sign Up pill in navbar */
+body .navbar .nav-signup-cta {
+    height: 38px !important;
+    padding: 0 0.1rem !important;
+    border-width: 1px !important;
+    border-radius: 999px !important;
+}
+
+/* Points & Rewards page — use same bg as ChapterFlow below navbar */
+body.points-page {
+    margin: 0;
+    padding: 0;
+    background-color: var(--hero-bg);  /* same beige used on ChapterFlow */
+}

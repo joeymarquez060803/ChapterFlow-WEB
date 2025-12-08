@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css">
   <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+  <script src="../script.js" defer></script>
 
   <style>
     body.story-page {
@@ -17,42 +18,65 @@
       color: #3c2b1a;
     }
 
+    .back-btn {
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      padding: 6px 10px;
+      border-radius: 10px;   /* ← change this to adjust roundness */
+      border: 1px solid #3c2b1a;
+      background: #f7f3e9;
+      font-family: "Merriweather", serif;
+      text-decoration: none;
+      color: #3c2b1a;
+    }
+
+    
+
     .story-banner {
-      background-color: #c9b184;
-      height: 260px;
+      background-color: var(--footer-bg);
+      height: 400px;
       width: 100%;
     }
 
+    /* back button position just under navbar, on the brown banner */
+    .story-page .back-btn {
+      position: absolute;
+      top: 80px;   /* adjust up/down as you like */
+      left: 20px;  /* adjust left/right as you like */
+      z-index: 10;
+    }
+
     .story-layout {
-  max-width: 980px;
-  margin: 0 auto 64px;
-  padding: 0 16px 48px;
-  position: relative;
-  top: -180px;
+      max-width: 1100px;
+      margin: 5px auto 64px;
+      padding: 0 16px 48px;
+      position: relative;
+      top: -180px;
 
-  /* 🔽 hide card until JS marks it as ready */
-  opacity: 0;
-  transition: opacity 150ms ease;
-}
+      /* hide card until JS marks it as ready */
+      opacity: 0;
+      transition: opacity 150ms ease;
+    }
 
-/* when story data is ready */
-.story-layout.is-ready {
-  opacity: 1;
-}
+    /* when story data is ready */
+    .story-layout.is-ready {
+      opacity: 1;
+    }
 
-.story-meta {
-  margin-left: 12px;
-}
+    .story-meta {
+      margin-left: 12px;
+    }
 
-.story-description-label {
-  margin-top: 10px;        /* space under the author */
-  font-weight: 600;
-  font-size: 0.95rem;
-}
+    .story-description-label {
+      margin-top: 10px; /* space under the author */
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
 
     .story-card {
       background-color: #ffffff;
-      border-radius: 26px;
+      border-radius: 15px;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.13);
       padding: 26px 32px;
       display: grid;
@@ -116,104 +140,130 @@
 
     .story-meta .story-author {
       margin-top: 1px;
-      font-size: 1.0rem;
+      font-size: 1rem;
       color: rgba(0, 0, 0, 0.6);
     }
 
     .story-main-section {
       max-width: 980px;
-      margin: -70px auto 72px;
+      margin: -150px auto 72px;
       padding: 0 16px 48px;
     }
 
+    /* big white card holding "Chapters" + list */
+    .chapters-card {
+      background-color: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.13);
+      padding: 32px 40px 36px;
+    }
+
+    /* "Chapters" heading */
     .chapters-header {
+      margin-bottom: 24px;
       text-align: center;
-      margin-bottom: 50px;
-      margin-top: -150px;
     }
 
     .chapters-header h2 {
       margin: 0;
-      font-size: 1.9rem;
-      letter-spacing: 0.2em;
+      font-size: 2.2rem;
       text-transform: uppercase;
+      color: #4d3a28;
     }
 
-    .chapters-header p {
-      margin: 4px 0 0;
-      font-size: 0.9rem;
-      color: rgba(0, 0, 0, 0.6);
-    }
-
+    /* list layout */
     .chapter-list {
-      max-width: 780px;
-      margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
+    /* each row (the beige bar) */
     .chapter-card {
-      background-color: #ffffff;
+      background-color: #f5efe3;
       border-radius: 18px;
-      border: 1px solid rgba(0, 0, 0, 0.14);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.07);
-      padding: 12px 18px;
+      padding: 16px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: transform 120ms ease, box-shadow 120ms ease;
+      border: none;
+      box-shadow: none;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease,
+        transform 0.15s ease;
     }
 
     .chapter-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+      background-color: #efe3cf;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
     }
 
-    .chapter-card-main {
+    /* left side: circle + text */
+    .chapter-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex: 1;
+    }
+
+    /* number circle */
+    .chapter-number-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background-color: #d5c093;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #4d3a28;
+      flex-shrink: 0;
+    }
+
+    /* title + meta text */
+    .chapter-row-main {
       display: flex;
       flex-direction: column;
-      gap: 2px;
     }
 
     .chapter-title {
-      font-size: 0.98rem;
+      margin: 0 0 4px;
+      font-size: 1.1rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      color: #4d3a28;
     }
 
-    .chapter-sub {
-      font-size: 0.85rem;
-      color: rgba(0, 0, 0, 0.65);
+    .chapter-meta-row {
+      display: flex;
+      gap: 16px;
+      font-size: 0.9rem;
+      color: rgba(0, 0, 0, 0.6);
     }
 
-    .chapter-meta {
-      font-size: 0.8rem;
-      color: rgba(0, 0, 0, 0.5);
-      text-align: right;
-      min-width: 120px;
-      margin-left: 16px;
+    /* little arrow on the right */
+    .chapter-arrow {
+      font-size: 1.2rem;
+      color: #8f7958;
+      margin-left: auto;
     }
 
+    /* empty + error messages */
     .chapter-empty {
       text-align: center;
       font-size: 0.9rem;
       color: rgba(0, 0, 0, 0.6);
-      margin-top: 10px;
+      margin-top: 18px;
       display: none;
     }
 
     .story-not-found {
-      max-width: 780px;
-      margin: -60px auto 40px;
-      padding: 16px;
       text-align: center;
       font-size: 0.95rem;
       color: rgba(120, 60, 60, 0.85);
+      margin-top: 18px;
     }
-
 
     @media (max-width: 768px) {
       .story-layout {
@@ -224,10 +274,43 @@
       }
     }
   </style>
-
 </head>
-<body class="story-page">
-  <a href="../Slide nav buttons/edit-profile.html" class="back-btn">← Back</a>
+
+<body class="story-page loading">
+  <header>
+    <nav class="navbar">
+      <button class="hamburger" aria-label="Open menu">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </button>
+
+      <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+
+      <h2 class="site-title">ChapterFlow</h2>
+
+      <div class="nav-links">
+        <a href="../ChapterFlow.html" class="nav-link nav-main-link">Home</a>
+        <a href="../about.html" class="nav-link nav-main-link">About</a>
+        <a href="#" class="nav-link nav-auth-link nav-login-link">Log in</a>
+        <a href="#" class="nav-link nav-auth-link nav-signup-cta">Sign up</a>
+      </div>
+    </nav>
+
+    <div class="slide-nav">
+      <button class="close-btn" aria-label="Close menu">&lt;</button>
+      <p class="slide-message">Please log in first</p>
+      <button class="login-btn">Log in</button>
+    </div>
+    <div class="backdrop"></div>
+  </header>
+
+  <!-- back button under navbar, on the brown banner -->
+  <a href="../Slide%20nav%20buttons/edit-profile.html" class="back-btn">← Back</a>
+
+
+
+
 
   <div class="story-banner"></div>
 
@@ -245,22 +328,55 @@
           <p class="story-author" id="story-author"></p>
           <p class="story-description-label">Description:</p>
           <p class="story-description" id="story-description"></p>
-
-          <p class="story-author" id="story-author"></p>
         </div>
       </article>
     </section>
 
     <section class="story-main-section">
-      <div class="chapters-header">
-        <h2>Chapters</h2>
+      <div class="chapters-card">
+        <div class="chapters-header">
+          <h2>Chapters</h2>
+        </div>
+
+        <div id="chapter-list" class="chapter-list"></div>
+        <p id="chapter-empty" class="chapter-empty">No chapters uploaded yet.</p>
+
+        <div id="story-not-found" class="story-not-found" style="display:none;">
+          We couldn’t find this story. It may have been deleted or not yet created.
+        </div>
       </div>
+    </section>
 
-      <div id="chapter-list" class="chapter-list"></div>
-      <p id="chapter-empty" class="chapter-empty">No chapters uploaded yet.</p>
-
-      <div id="story-not-found" class="story-not-found" style="display:none;">
-        We couldn’t find this story. It may have been deleted or not yet created.
+    <section class="footer-main">
+      <div class="footer-inner">
+        <div class="footer-col company">
+          <h3 class="footer-title">ChapterFlow</h3>
+          <p class="footer-description">
+            A campus reading platform where students discover stories,
+            earn rewards, and share their creative voice.
+          </p>
+        </div>
+        <div class="footer-col links">
+          <h3 class="footer-title">Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="../ChapterFlow.html">Home</a></li>
+            <li><a href="../readinghub.html">Explore Stories</a></li>
+            <li><a href="../about.html">About Us</a></li>
+            <li><a href="../Slide nav buttons/points-rewards.html">Points &amp; Rewards</a></li>
+          </ul>
+        </div>
+        <div class="footer-col connect">
+          <h3 class="footer-title">Connect</h3>
+          <div class="social-icons">
+            <a href="#" aria-label="Facebook"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0e400277d96f69d/view?project=69230def0009866e3192&mode=admin" alt="Facebook"></a>
+            <a href="#" aria-label="Twitter"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0dd0035010d51ae/view?project=69230def0009866e3192&mode=admin" alt="Twitter"></a>
+            <a href="#" aria-label="Instagram"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0d60001a41452ee/view?project=69230def0009866e3192&mode=admin" alt="Instagram"></a>
+          </div>
+        </div>
+      </div>
+      <hr class="footer-divider">
+      <div class="footer-bottom">
+        <p>© 2025 ChapterFlow. All rights reserved. | Powered by Readdy</p>
       </div>
     </section>
   </main>
@@ -296,8 +412,8 @@
         );
       }
 
-      const params    = new URLSearchParams(window.location.search);
-      const seriesId  = params.get('seriesId');
+      const params   = new URLSearchParams(window.location.search);
+      const seriesId = params.get('seriesId');
 
       const titleEl       = document.getElementById('story-title');
       const descEl        = document.getElementById('story-description');
@@ -307,7 +423,7 @@
       const chapterListEl = document.getElementById('chapter-list');
       const chapterEmpty  = document.getElementById('chapter-empty');
       const storyNotFound = document.getElementById('story-not-found');
-      const storyLayout   = document.querySelector('.story-layout');   // 👈 add this
+      const storyLayout   = document.querySelector('.story-layout');
 
       async function loadStoryAndChapters() {
         if (!seriesId) {
@@ -322,21 +438,17 @@
             seriesId
           );
 
-titleEl.textContent = storyDoc.title || 'Untitled story';
-descEl.textContent  = storyDoc.description || 'No description yet.';
+          titleEl.textContent = storyDoc.title || 'Untitled story';
+          descEl.textContent  = storyDoc.description || 'No description yet.';
 
-// 🔹 NEW: show uploader name if present
-const uploaderName =
-  storyDoc.ownerName ||    // from DB (we just added this)
-  '';                      // fallback
+          const uploaderName =
+            storyDoc.ownerName || '';
+          if (uploaderName) {
+            authorEl.textContent = 'Uploaded by: ' + uploaderName.toUpperCase();
+          } else {
+            authorEl.textContent = '';
+          }
 
-if (uploaderName) {
-  authorEl.textContent = 'Uploaded by: ' + uploaderName.toUpperCase();
-} else {
-  authorEl.textContent = ''; // no line if we don't know
-}
-
-          // 🔴 Use coverImageId (the column in your Stories table)
           const coverUrl = getImageUrl(storyDoc.coverImageId);
           if (coverUrl) {
             coverImg.src = coverUrl;
@@ -348,11 +460,9 @@ if (uploaderName) {
             coverHolder.textContent = 'COVER';
           }
 
-          // 🔽 only now show the card
-           if (storyLayout) {
+          if (storyLayout) {
             storyLayout.classList.add('is-ready');
           }
-
         } catch (err) {
           console.error('Failed to load story', err);
           storyNotFound.style.display = 'block';
@@ -378,37 +488,91 @@ if (uploaderName) {
 
           chapterEmpty.style.display = 'none';
 
-          chapters.forEach(doc => {
+          // helper to show "x weeks ago" style text
+          function formatTimeAgo(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            if (Number.isNaN(date.getTime())) return '';
+
+            const now = new Date();
+            const diffMs = now - date;
+            const minutes = Math.floor(diffMs / 60000);
+            if (minutes < 60) return minutes <= 1 ? '1 min ago' : `${minutes} min ago`;
+
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+
+            const days = Math.floor(hours / 24);
+            if (days < 7) return days === 1 ? '1 day ago' : `${days} days ago`;
+
+            const weeks = Math.floor(days / 7);
+            if (weeks < 4) return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`;
+
+            const months = Math.floor(days / 30);
+            if (months < 12)
+              return months === 1 ? '1 month ago' : `${months} months ago`;
+
+            const years = Math.floor(days / 365);
+            return years === 1 ? '1 year ago' : `${years} years ago`;
+          }
+
+          chapters.forEach((doc) => {
             const card = document.createElement('article');
             card.className = 'chapter-card';
 
+            const left = document.createElement('div');
+            left.className = 'chapter-left';
+
+            const numCircle = document.createElement('div');
+            numCircle.className = 'chapter-number-circle';
+            numCircle.textContent =
+              doc.chapterNumber != null ? doc.chapterNumber : '';
+
             const main = document.createElement('div');
-            main.className = 'chapter-card-main';
+            main.className = 'chapter-row-main';
 
             const title = document.createElement('div');
             title.className = 'chapter-title';
-            const num = doc.chapterNumber != null ? doc.chapterNumber : '';
-            title.textContent = (num ? 'Chapter ' + num + ' — ' : '') +
-              (doc.chapterTitle || 'Untitled chapter');
+            title.textContent = doc.chapterTitle || 'Untitled chapter';
 
-            const sub = document.createElement('div');
-            sub.className = 'chapter-sub';
-            sub.textContent = '';
+            const metaRow = document.createElement('div');
+            metaRow.className = 'chapter-meta-row';
+
+            const readingMinutes =
+              doc.readingTimeMinutes || doc.estimatedMinutes || null;
+            if (readingMinutes) {
+              const spanTime = document.createElement('span');
+              spanTime.textContent = `${readingMinutes} min`;
+              metaRow.appendChild(spanTime);
+            }
+
+            const created =
+              doc.createdAt || doc.$createdAt || null;
+            const agoText = formatTimeAgo(created);
+            if (agoText) {
+              const spanAgo = document.createElement('span');
+              if (metaRow.children.length) spanAgo.textContent = `• ${agoText}`;
+              else spanAgo.textContent = agoText;
+              metaRow.appendChild(spanAgo);
+            }
 
             main.appendChild(title);
-            if (sub.textContent) main.appendChild(sub);
+            if (metaRow.children.length) main.appendChild(metaRow);
 
-            const meta = document.createElement('div');
-            meta.className = 'chapter-meta';
-            meta.textContent = doc.createdAt
-              ? new Date(doc.createdAt).toLocaleDateString()
-              : (doc.$createdAt ? new Date(doc.$createdAt).toLocaleDateString() : '');
+            left.appendChild(numCircle);
+            left.appendChild(main);
 
-            card.appendChild(main);
-            card.appendChild(meta);
+            const arrow = document.createElement('div');
+            arrow.className = 'chapter-arrow';
+            arrow.innerHTML = '&rarr;';
+
+            card.appendChild(left);
+            card.appendChild(arrow);
 
             card.addEventListener('click', () => {
-              const url = `chapter.html?seriesId=${encodeURIComponent(seriesId)}&chapterId=${encodeURIComponent(doc.$id)}`;
+              const url = `chapter.html?seriesId=${encodeURIComponent(
+                seriesId
+              )}&chapterId=${encodeURIComponent(doc.$id)}`;
               window.location.href = url;
             });
 
