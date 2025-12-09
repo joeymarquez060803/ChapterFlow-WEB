@@ -5,134 +5,219 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - ChapterFlow</title>
 
-    <!-- Same font vibe as the rest of the site -->
+    <!-- Your main styles (navbar, etc.) -->
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Your main styles (navbar, etc.) -->
-    <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="Style.css">  <!-- capital S to match file name -->
+
+<!-- Appwrite + shared JS (same as ChapterFlow.html) -->
+<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+<script src="script.js" defer></script>
+
 </head>
 
-<body>
+    <body class="about-page loading">
 
-    <a href="ChapterFlow.html" class="back-btn">← Back</a>
+    <header>
+        <nav class="navbar">
+            <button class="hamburger" aria-label="Open menu">
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+            </button>
+
+            <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+
+            <h2 class="site-title">ChapterFlow</h2>
+
+            <div class="nav-links">
+                <a href="ChapterFlow.html" class="nav-link nav-main-link">Home</a>
+                <a href="about.html" class="nav-link nav-main-link">About</a>
+                <a href="#" class="nav-link nav-auth-link nav-login-link">Log in</a>
+                <a href="#" class="nav-link nav-auth-link nav-signup-cta">Sign up</a>
+            </div>
+        </nav>
+
+        <div class="slide-nav">
+            <button class="close-btn" aria-label="Close menu">&lt;</button>
+            <p class="slide-message">Please log in first</p>
+            <button class="login-btn">Log in</button>
+        </div>
+        <div class="backdrop"></div>
+    </header>
 
     <main class="about-wrapper">
-        <section class="about-card">
-            <h1>About ChapterFlow</h1>
+<section class="about-card">
+    <h1>About ChapterFlow</h1>
 
-            <p>
-                ChapterFlow started as a simple idea from our group: we wanted reading to feel
-                less like a school requirement and more like something you’d actually enjoy in
-                your free time. A lot of us grew up thinking that books are “for grades only”,
-                and we wanted to break that feeling even just a little.
-            </p>
+    <p class="about-intro">
+        ChapterFlow was born from a simple idea: what if reading could be more than just a
+        solitary activity? What if it could connect students, reward curiosity, and create a
+        vibrant community of storytellers right here on our campus?
+    </p>
 
-            <br>
+    <h2>Our Mission</h2>
+    <p>
+        We believe that every student has a story to tell and deserves an audience.
+        ChapterFlow provides a platform where aspiring writers can share their light novels,
+        short stories, and serialized fiction with fellow students who appreciate creative
+        writing. By gamifying the reading experience with our points system, we encourage
+        students to discover new voices and support their peers’ creative endeavors.
+    </p>
 
-            <p>
-                The platform is designed to make reading feel like a small journey each time you open it.
-                You can jump into different stories and series—whether it’s romance, mystery, fantasy,
-                or anything in between. While you’re reading, you’re not just passing time;
-                <strong>you’re improving your comprehension, building vocabulary, and letting your mind relax
-                from all the academic stress.</strong>
-            </p>
+    <h2>How It Works</h2>
+    <p>
+        Reading on ChapterFlow isn’t just enjoyable—it’s rewarding. As you read stories and
+        chapters, you earn points that can be exchanged for real rewards at the campus
+        library. From free coffee vouchers to study room reservations, your reading time
+        translates into tangible benefits. Writers benefit too, gaining exposure and building
+        an audience within the campus community.
+    </p>
 
-            <br>
+    <h2>Our Vision</h2>
+    <p>
+        We envision ChapterFlow as more than just a reading platform. It’s a creative hub
+        where students can escape the pressures of academic life, immerse themselves in
+        imaginative worlds, and connect with like-minded individuals. Whether you’re a
+        dedicated reader looking for your next favorite series or a writer ready to share your
+        voice, ChapterFlow is your literary home on campus.
+    </p>
 
-            <p>
-                We also added a simple reward system because we believe effort should be recognized.
-                The more you read, the more points you earn. In the future, these points can be used
-                for different rewards or features. It’s our way of making progress feel a little more
-                visible and a little more fun.
-            </p>
+    <h2>Join Our Community</h2>
+    <p>
+        ChapterFlow is built by students, for students. We’re constantly evolving based on
+        community feedback and adding new features to enhance your reading and writing
+        experience. Join us in creating a thriving literary community where creativity
+        flourishes and every story finds its readers.
+    </p>
+</section>
 
-            <br>
+        <!-- Experience slider card -->
+        <section class="experience-card">
+            <h2 class="experience-title">Experience ChapterFlow</h2>
 
-            <p>
-                Behind ChapterFlow are four college students trying to balance deadlines, projects,
-                and life in general. This isn’t a big company project—just something we built
-                with code, caffeine, late nights, and a shared love for stories. We made this
-                platform for students like us: people who enjoy reading, people who want to start,
-                and writers who want a place to share their work.
-            </p>
+            <div class="slideshow-container">
+                <!-- Slide 1 -->
+                <div class="slides fade">
+                    <img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/693712a800061669599b/view?project=69230def0009866e3192&mode=admin" alt="Online Reading">
+                    <button class="experience-cta">Read Stories Online</button>
+                </div>
 
-            <br>
+                <!-- Slide 2 -->
+                <div class="slides fade">
+                    <img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/693712b0001228d57c3f/view?project=69230def0009866e3192&mode=admin" alt="Upload online">
+                    <button class="experience-cta">Share your stories</button>
+                </div>
 
-            <p>
-                So whether you’re here to read, write, publish, or just look for something new to
-                escape into between classes, <strong>ChapterFlow is your space</strong>—created by students,
-                for students, and meant to prove that reading can be simple, meaningful, and actually fun.
-            </p>
+                <!-- Slide 3 -->
+                <div class="slides fade">
+                    <img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/693712b60000ad31066c/view?project=69230def0009866e3192&mode=admin" alt="Light Novels">
+                    <button class="experience-cta">Free Light Novels to Read</button>
+                </div>
+
+                <!-- Round arrows -->
+                <button class="slider-arrow prev" onclick="plusSlides(-1)" aria-label="Previous slide">❮</button>
+                <button class="slider-arrow next" onclick="plusSlides(1)" aria-label="Next slide">❯</button>
+            </div>
+
+            <!-- Dots -->
+            <div class="slider-dots">
+                <span class="dot" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+            </div>
         </section>
-
-        <!-- Slideshow -->
-        <div class="slideshow-container">
-
-            <!-- Slides -->
-            <div class="slides fade">
-                <img src="https://upload.wikimedia.org/wikipedia/en/4/4b/My_Bloody_Valentine_-_Loveless.png" alt="Image 1">
-            </div>
-
-            <div class="slides fade">
-                <img src="https://img.freepik.com/free-photo/attractive-young-woman-working-laptop-early-morning_169016-24935.jpg?semt=ais_hybrid&w=740&q=80" alt="Image 2">
-            </div>
-
-            <div class="slides fade">
-                <img src="https://media.istockphoto.com/id/543042274/photo/books-in-second-hand-bookshop.jpg?s=612x612&w=0&k=20&c=3XYYWrdQ3JrXa5Web1O0WCUEvMGp0LRKzYL3S1143lI=" alt="Image 3">
-            </div>
-
-            <!-- Arrows -->
-            <a class="prev" onclick="plusSlides(-1)">❮</a>
-            <a class="next" onclick="plusSlides(1)">❯</a>
-
-        </div>
     </main>
 
-    <!-- JS for slideshow -->
-    <script>
-        let slideIndex = 0;
-        showSlides();
+    <!-- FOOTER -->
+  <section class="footer-main">
+    <div class="footer-inner">
+        <div class="footer-col company">
+            <h3 class="footer-title">ChapterFlow</h3>
+            <p class="footer-description">
+                A campus reading platform where students discover stories,
+                earn rewards, and share their creative voice.
+            </p>
+        </div>
+        <div class="footer-col links">
+            <h3 class="footer-title">Quick Links</h3>
+        <ul class="footer-links">
+            <li><a href="ChapterFlow.html">Home</a></li>
+            <li><a href="readinghub.html">Explore Stories</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="Slide nav buttons/points-rewards.html">Points &amp; Rewards</a></li>
+        </ul>
+        </div>
+        <div class="footer-col connect">
+            <h3 class="footer-title">Connect</h3>
+            <div class="social-icons">
+                <a href="#" aria-label="Facebook"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0e400277d96f69d/view?project=69230def0009866e3192&mode=admin" alt="Facebook"></a>
+                <a href="#" aria-label="Twitter"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0dd0035010d51ae/view?project=69230def0009866e3192&mode=admin" alt="Twitter"></a>
+                <a href="#" aria-label="Instagram"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0d60001a41452ee/view?project=69230def0009866e3192&mode=admin" alt="Instagram"></a>
+            </div>
+        </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom">
+        <p>© 2025 ChapterFlow. All rights reserved.</p>
+    </div>
+  </section>
+    </main>
 
-        function showSlides() {
-            let slides = document.getElementsByClassName("slides");
+<script>
+    let slideIndex = 1;
+    let slideTimer = null;
 
-            for (let i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-            }
+    document.addEventListener("DOMContentLoaded", () => {
+        startSlides();
+    });
 
-            slideIndex++;
-            if (slideIndex > slides.length) {
-                slideIndex = 1;
-            }
+    function startSlides() {
+        showSlide(slideIndex);
+        slideTimer = setInterval(() => plusSlides(1), 5000);
+    }
 
-            slides[slideIndex - 1].style.display = "block";
-            setTimeout(showSlides, 5000); // autoplay speed
+    function resetTimer() {
+        if (slideTimer) {
+            clearInterval(slideTimer);
+        }
+        slideTimer = setInterval(() => plusSlides(1), 5000);
+    }
+
+    function plusSlides(n) {
+        slideIndex += n;
+        showSlide(slideIndex);
+        resetTimer();
+    }
+
+    function currentSlide(n) {
+        slideIndex = n;
+        showSlide(slideIndex);
+        resetTimer();
+    }
+
+    function showSlide(n) {
+        const slides = document.getElementsByClassName("slides");
+        const dots   = document.getElementsByClassName("dot");
+
+        if (slides.length === 0) return;
+
+        if (n > slides.length)  { slideIndex = 1; }
+        if (n < 1)              { slideIndex = slides.length; }
+
+        for (let i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].classList.remove("active");
         }
 
-        function plusSlides(n) {
-            let slides = document.getElementsByClassName("slides");
-            slideIndex += n;
-
-            if (slideIndex > slides.length) {
-                slideIndex = 1;
-            }
-            if (slideIndex < 1) {
-                slideIndex = slides.length;
-            }
-
-            showSpecificSlide(slideIndex);
+        slides[slideIndex - 1].style.display = "block";
+        if (dots[slideIndex - 1]) {
+            dots[slideIndex - 1].classList.add("active");
         }
-
-        function showSpecificSlide(n) {
-            let slides = document.getElementsByClassName("slides");
-
-            for (let i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-            }
-
-            slides[n - 1].style.display = "block";
-        }
-    </script>
+    }
+</script>
 
     <!-- Page-specific styling to match ChapterFlow vibe -->
     <style>
@@ -140,7 +225,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Merriweather', serif;
-            background-color: #f4e7c4; /* soft khaki */
+            background-color: var(--hero-bg); /* soft khaki */
             color: #333;
         }
 
@@ -158,16 +243,31 @@
             max-width: 900px;
             width: 100%;
             background-color: #ffffff;
-            border-radius: 18px;
+            border-radius: 10px;
             padding: 40px 28px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            text-align: center;
+            text-align: left;
         }
 
         h1 {
             font-size: 40px;
-            margin-bottom: 16px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #4d3a28;
         }
+
+        .about-card h2 {
+            font-size: 24px;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            margin-left: 60px;
+            color: #4d3a28;
+        }
+
+        .about-intro {
+            margin-bottom: 10px;
+        }
+
 
         p {
             max-width: 780px;
@@ -195,62 +295,130 @@
             background-color: #e1d3aa;
         }
 
-        /* =============== SLIDESHOW CSS =============== */
+        /* ============================
+           EXPERIENCE SLIDER CARD
+           ============================ */
+
+        .experience-card {
+            max-width: 900px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 28px 24px 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .experience-title {
+            font-size: 28px;
+            margin: 0 0 8px;
+            color: #4d3a28;
+        }
 
         .slideshow-container {
             position: relative;
-            max-width: 900px;
             width: 100%;
-            margin: 0 auto 24px;
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .slides {
+            display: none;
+            position: relative;
         }
 
         .slides img {
             width: 100%;
             height: 380px;
             object-fit: cover;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            display: block;
         }
 
-        .slides {
-            display: none;
+        /* Pill button on top of the image */
+        .experience-cta {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 22px;
+            border-radius: 999px;
+            border: none;
+            background-color: #ffffff;
+            color: #4d3a28;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
         }
 
-        /* Arrows */
-        .prev, .next {
+        /* Round arrows */
+        .slider-arrow {
             cursor: pointer;
             position: absolute;
             top: 50%;
-            padding: 12px 16px;
+            width: 44px;
+            height: 44px;
             transform: translateY(-50%);
-            color: white;
-            font-size: 22px;
-            font-weight: bold;
-            transition: 0.3s;
-            user-select: none;
             border-radius: 999px;
-            background: rgba(0, 0, 0, 0.3);
+            border: none;
+            background-color: #ffffff;
+            color: #4d3a28;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
 
-        .prev {
-            left: 12px;
+        .slider-arrow.prev {
+            left: 16px;
         }
 
-        .next {
-            right: 12px;
+        .slider-arrow.next {
+            right: 16px;
         }
 
-        .prev:hover, .next:hover {
-            background: rgba(0, 0, 0, 0.6);
+        .slider-arrow:hover {
+            transform: translateY(-50%) translateY(-1px);
+            background-color: #f5ecdd;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
         }
 
+        /* Dots */
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background-color: #e3d6c2;
+            cursor: pointer;
+            transition: background-color 0.2s ease, width 0.2s ease;
+        }
+
+        .dot.active {
+            width: 18px;
+            background-color: #b28953;
+        }
+
+        /* Keep your fade animation */
         .fade {
             animation: fadeEffect 1s;
         }
 
         @keyframes fadeEffect {
-            from { opacity: .4 }
-            to { opacity: 1 }
+            from { opacity: .4; }
+            to   { opacity: 1; }
         }
 
         @media (max-width: 600px) {
@@ -269,7 +437,28 @@
             .slides img {
                 height: 260px;
             }
+
+            .slider-arrow {
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
+            }
         }
+
+
+            h1 {
+                font-size: 30px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            .slides img {
+                height: 260px;
+            }
+        
+          
     </style>
 
 </body>

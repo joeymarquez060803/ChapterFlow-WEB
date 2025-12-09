@@ -27,7 +27,7 @@
     }
 
     main.rewards-main {
-      max-width: 1000px;
+      max-width: 1250px;
       margin: 130px auto 3.5rem;
       padding: 2.5rem 2.25rem 2.75rem;
       font-family: "Merriweather", serif;
@@ -95,27 +95,34 @@
       text-align: center;
     }
 
-    .rewards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 1.8rem;
-    }
+      .rewards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(220px, 1fr)); /* 3 columns */
+        gap: 1.6rem 1.8rem; /* row / column gap */
+      }
 
-    .reward-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 18px;
-      padding: 1.3rem 1.3rem 1.2rem;
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      border: 1px solid rgba(126, 96, 68, 0.12);
-      position: relative;
-      overflow: hidden;
-    }
+      /* reward card */
+      .reward-card {
+        background: #ffffff;
+        border-radius: 26px;
+        padding: 1.9rem 1.6rem 2.1rem;  /* slightly tighter padding */
+        box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
 
-    .reward-card::before {
+      /* keep image size modest so 3 fit comfortably */
+      .reward-card img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 22px;
+        margin-bottom: 1rem;
+      }
+
+     .reward-card::before {
       content: "";
       position: absolute;
       inset: 0;
@@ -125,16 +132,6 @@
         rgba(219, 188, 135, 0.35),
         transparent 60%);
       z-index: -1;
-    }
-
-    .reward-card img {
-      width: 135px;
-      height: 135px;
-      object-fit: cover;
-      border-radius: 16px;
-      margin-bottom: 0.85rem;
-      border: 3px solid rgba(255, 255, 255, 0.9);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
     }
 
     .reward-card h2 {
@@ -314,25 +311,39 @@
       opacity: 0.85;
     }
 
-    @media (max-width: 768px) {
-      main.rewards-main {
-        margin: 110px 1rem 2.5rem;
-        padding: 2rem 1.4rem 2.25rem;
-        border-radius: 20px;
-      }
 
-      .rewards-header {
-        text-align: center;
-      }
+/* tablet: 2 columns */
+@media (max-width: 1024px) {
+  .rewards-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
 
-      .rewards-header p {
-        margin: 0 auto;
-      }
+/* mobile: 1 column */
+@media (max-width: 768px) {
+  main.rewards-main {
+    margin: 110px 1rem 2.5rem;
+    padding: 2rem 1.4rem 2.25rem;
+    border-radius: 20px;
+  }
 
-      .rewards-balance {
-        margin-bottom: 1.8rem;
-      }
-    }
+  .rewards-header {
+    text-align: center;
+  }
+
+  .rewards-header p {
+    margin: 0 auto;
+  }
+
+  .rewards-balance {
+    margin-bottom: 1.8rem;
+  }
+
+  .rewards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
   </style>
 </head>
 <body class="loading points-page">
@@ -375,26 +386,102 @@
       Current points: <span id="rewards-current-points">--</span>
     </section>
 
-    <section class="rewards-grid">
-      <!-- PEN -->
-      <article class="reward-card" data-reward-key="pen" data-cost="2">
-        <img src="https://t3.ftcdn.net/jpg/15/98/44/20/360_F_1598442037_kRXWPSXvrbkJp6IwQb8tKJwSfImS7iNg.jpg" alt="Pen">
-        <h2>Library Pen</h2>
-        <p class="reward-cost">Cost: 2 points</p>
-        <p class="reward-note">Simple black ballpen for everyday notes.</p>
-        <button class="reward-exchange-btn">Exchange</button>
-      </article>
+<section class="rewards-grid">
+  <!-- PEN -->
+  <article class="reward-card" data-reward-key="pen" data-cost="2">
+    <img src="https://t3.ftcdn.net/jpg/15/98/44/20/360_F_1598442037_kRXWPSXvrbkJp6IwQb8tKJwSfImS7iNg.jpg" alt="Pen">
+    <h2>Library Pen</h2>
+    <p class="reward-cost">Cost: 2 points</p>
+    <p class="reward-note">Simple black ballpen for everyday notes.</p>
+    <button class="reward-exchange-btn">Exchange</button>
+  </article>
 
-      <!-- CORRECTION TAPE -->
-      <article class="reward-card" data-reward-key="tape" data-cost="4">
-        <img src="https://www.shutterstock.com/image-photo/blue-correction-tape-isolated-on-600nw-2439768105.jpg" alt="Correction tape">
-        <h2>Correction Tape</h2>
-        <p class="reward-cost">Cost: 4 points</p>
-        <p class="reward-note">Perfect for fixing written mistakes cleanly.</p>
-        <button class="reward-exchange-btn">Exchange</button>
-      </article>
+  <!-- CORRECTION TAPE -->
+  <article class="reward-card" data-reward-key="tape" data-cost="4">
+    <img src="https://www.shutterstock.com/image-photo/blue-correction-tape-isolated-on-600nw-2439768105.jpg" alt="Correction tape">
+    <h2>Correction Tape</h2>
+    <p class="reward-cost">Cost: 4 points</p>
+    <p class="reward-note">Perfect for fixing written mistakes cleanly.</p>
+    <button class="reward-exchange-btn">Exchange</button>
+  </article>
+
+  <!-- YELLOW PAD PAPER -->
+  <article class="reward-card" data-reward-key="pad" data-cost="8">
+    <!-- replace with your own image path if you have one -->
+    <img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6936f40d0003c7c307c7/view?project=69230def0009866e3192&mode=admin" alt="Yellow pad paper">
+    <h2>Yellow Pad Paper</h2>
+    <p class="reward-cost">Cost: 8 points</p>
+    <p class="reward-note">Classic yellow pad for longer handwritten notes.</p>
+    <button class="reward-exchange-btn">Exchange</button>
+  </article>
+
+  <!-- HIGHLIGHTER -->
+  <article class="reward-card" data-reward-key="highlighter" data-cost="10">
+    <!-- replace with your own image path if you have one -->
+    <img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6936f3fe0024e771a70c/view?project=69230def0009866e3192&mode=admin" alt="Highlighter">
+    <h2>Highlighter</h2>
+    <p class="reward-cost">Cost: 10 points</p>
+    <p class="reward-note">Bright highlighter to mark key ideas while reading.</p>
+    <button class="reward-exchange-btn">Exchange</button>
+  </article>
+
+  <!-- SCIENTIFIC CALCULATOR (expensive) -->
+  <article class="reward-card" data-reward-key="calculator" data-cost="60">
+    <!-- replace with your own calculator image -->
+    <img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6936f40400093a11f480/view?project=69230def0009866e3192&mode=admin" alt="Scientific calculator">
+    <h2>Scientific Calculator</h2>
+    <p class="reward-cost">Cost: 60 points</p>
+    <p class="reward-note">Essential tool for math-heavy courses and exams.</p>
+    <button class="reward-exchange-btn">Exchange</button>
+  </article>
+
+  <!-- TUMBLER (expensive) -->
+  <article class="reward-card" data-reward-key="tumbler" data-cost="80">
+    <!-- replace with your own tumbler image -->
+    <img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6936f4080037b7329de7/view?project=69230def0009866e3192&mode=admin" alt="Tumbler">
+    <h2>Insulated Tumbler</h2>
+    <p class="reward-cost">Cost: 80 points</p>
+    <p class="reward-note">Keeps your coffee or water at the perfect temperature during long study sessions.</p>
+    <button class="reward-exchange-btn">Exchange</button>
+  </article>
+</section>
+
     </section>
   </main>
+
+  <!-- FOOTER -->
+  <section class="footer-main">
+    <div class="footer-inner">
+        <div class="footer-col company">
+            <h3 class="footer-title">ChapterFlow</h3>
+            <p class="footer-description">
+                A campus reading platform where students discover stories,
+                earn rewards, and share their creative voice.
+            </p>
+        </div>
+        <div class="footer-col links">
+            <h3 class="footer-title">Quick Links</h3>
+            <ul class="footer-links">
+                <li><a href="../ChapterFlow.html">Home</a></li>
+                <li><a href="../readinghub.html">Explore Stories</a></li>
+                <li><a href="../about.html">About Us</a></li>
+                <li><a href="points-rewards.html">Points &amp; Rewards</a></li>
+            </ul>
+        </div>
+        <div class="footer-col connect">
+            <h3 class="footer-title">Connect</h3>
+            <div class="social-icons">
+                <a href="#" aria-label="Facebook"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0e400277d96f69d/view?project=69230def0009866e3192&mode=admin" alt="Facebook"></a>
+                <a href="#" aria-label="Twitter"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0dd0035010d51ae/view?project=69230def0009866e3192&mode=admin" alt="Twitter"></a>
+                <a href="#" aria-label="Instagram"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0d60001a41452ee/view?project=69230def0009866e3192&mode=admin" alt="Instagram"></a>
+            </div>
+        </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom">
+        <p>© 2025 ChapterFlow. All rights reserved.</p>
+    </div>
+  </section>
 
   <!-- MODAL -->
   <div class="reward-modal-backdrop" id="reward-modal-backdrop">
@@ -419,7 +506,7 @@
       </div>
     </div>
   </div>
-
+  
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // ---------- Appwrite setup ----------
@@ -601,11 +688,16 @@
 
           if (modalRewardName) {
             const niceName =
-              key === 'pen'  ? 'Library Pen' :
-              key === 'tape' ? 'Correction Tape' :
+              key === 'pen'         ? 'Library Pen' :
+              key === 'tape'        ? 'Correction Tape' :
+              key === 'pad'         ? 'Yellow Pad Paper' :
+              key === 'highlighter' ? 'Highlighter' :
+              key === 'calculator'  ? 'Scientific Calculator' :
+              key === 'tumbler'     ? 'Insulated Tumbler' :
               'Reward';
             modalRewardName.textContent = niceName;
           }
+
 
           if (modalRewardCost) {
             modalRewardCost.textContent = cost;
