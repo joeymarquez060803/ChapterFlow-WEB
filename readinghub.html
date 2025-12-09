@@ -366,12 +366,12 @@
         <span class="line"></span>
       </button>
 
-      <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/69246729002ff61f16a7/view?project=69230def0009866e3192&mode=admin" alt="Logo">
+      <img class="logo" src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6937c2300013315bfe8b/view?project=69230def0009866e3192&mode=admin" alt="Logo">
 
       <h2 class="site-title">ChapterFlow</h2>
 
       <div class="nav-links">
-        <a href="ChapterFlow.html" class="nav-link nav-main-link">Home</a>
+        <a href="index.html" class="nav-link nav-main-link">Home</a>
         <a href="about.html" class="nav-link nav-main-link">About</a>
         <a href="#" class="nav-link nav-auth-link nav-login-link">Log in</a>
         <a href="#" class="nav-link nav-auth-link nav-signup-cta">Sign up</a>
@@ -649,7 +649,9 @@ h3.className = 'student-story-title';
 
 const link = document.createElement('a');
 // path from root ReadingHub → your Chapter - Story folder
-link.href = `Chapter - Story/story.html?storyId=${encodeURIComponent(doc.$id)}`;
+// NOTE: story.html expects the query param "seriesId" — previously this used "storyId" which prevented story.html from loading chapters.
+// Fixed: use seriesId so story.html can read params.get('seriesId') and load the chapters correctly.
+link.href = `Chapter - Story/story.html?seriesId=${encodeURIComponent(doc.$id)}`;
 link.textContent = title;
 
 // inherit the existing heading look

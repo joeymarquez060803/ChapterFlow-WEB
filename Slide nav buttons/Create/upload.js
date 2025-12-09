@@ -105,7 +105,7 @@
   /* ---- Navigation: go back to homepage ---- */
   function goHome() {
     // Adjust path if your folder structure changes
-    window.location.href = '../../ChapterFlow.html';
+    window.location.href = '../../index.html';
   }
 
   /* ---- Utilities ---- */

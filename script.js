@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // -------------------------------
   // Page flags + anti-flash (FOUC) helpers
   // -------------------------------
-  const isChapterFlowPage = window.location.href.toLowerCase().includes('chapterflow.html');
+  const isChapterFlowPage = window.location.href.toLowerCase().includes('index.html');
   const isEditProfilePage = window.location.href.toLowerCase().includes('edit-profile.html');
 
   // Profile stories section (edit-profile.html)
@@ -997,12 +997,12 @@ async function updateUIForLoggedInUser(user) {
 `;
       slideNav.appendChild(profileContainer);
 
-      // Build a completely separate block for Create / History / Points & Rewards / Log out
+      // Build a completely separate block for Create / Reading Hub / Points & Rewards / Log out
       const actionsContainer = document.createElement('div');
       actionsContainer.className = 'slide-nav-buttons';
       actionsContainer.innerHTML = `
   <button class="slide-nav-btn">Create</button>
-  <button class="slide-nav-btn">History</button>
+  <button class="slide-nav-btn">Reading Hub</button>
   <button class="slide-nav-btn">Points & Rewards</button>
   <button class="slide-nav-btn logout-btn">Log out</button>
 `;
@@ -1013,7 +1013,7 @@ async function updateUIForLoggedInUser(user) {
       const editProfileBtn = profileContainer.querySelector('.edit-profile-btn');
       const slideButtons   = actionsContainer.querySelectorAll('.slide-nav-btn');
       const createBtn      = slideButtons[0];
-      const historyBtn     = slideButtons[1];
+      const readingHubBtn  = slideButtons[1];
       const pointsBtn      = slideButtons[2];
       const logoutBtn      = actionsContainer.querySelector('.logout-btn');
 
@@ -1032,10 +1032,11 @@ async function updateUIForLoggedInUser(user) {
         });
       }
 
-      if (historyBtn) {
-        historyBtn.addEventListener('click', (e) => {
+      if (readingHubBtn) {
+        readingHubBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          window.location.href = '../Slide nav buttons/history.html';
+          // Navigate to the reading hub root page
+          window.location.href = '../readinghub.html';
         });
       }
 
@@ -1051,7 +1052,7 @@ async function updateUIForLoggedInUser(user) {
           try {
             await account.deleteSession('current');
             alert('Logged out successfully!');
-            window.location.href = '../ChapterFlow.html';
+            window.location.href = '../index.html';
           } catch (error) {
             alert('Error logging out: ' + error.message);
           }
