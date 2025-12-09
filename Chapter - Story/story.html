@@ -306,7 +306,9 @@
   </header>
 
   <!-- back button under navbar, on the brown banner -->
-  <a href="../Slide%20nav%20buttons/edit-profile.html" class="back-btn">← Back</a>
+  <a href="../Slide%20nav%20buttons/edit-profile.html"
+   id="story-back-btn"
+   class="back-btn">← Back</a>
 
 
 
@@ -587,5 +589,33 @@
       loadStoryAndChapters();
     })();
   </script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const backBtn = document.getElementById('story-back-btn');
+    if (!backBtn) return;
+
+    backBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      let origin = null;
+      try {
+        origin = sessionStorage.getItem('cf_storyOrigin');
+      } catch (err) {
+        origin = null;
+      }
+
+      if (origin === 'hub') {
+        // story.html is in "Chapter - Story"
+        // Reading Hub is one folder up
+        window.location.href = '../readinghub.html';
+      } else {
+        // default: go back to profile
+        window.location.href = '../Slide nav buttons/edit-profile.html';
+      }
+    });
+  });
+</script>
+
 </body>
 </html>

@@ -134,21 +134,33 @@
     </main>
 
     <!-- Auth Modal (unchanged) -->
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 id="modalTitle">Log In</h2>
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
 
-            <input type="email" placeholder="Enter your email" id="usernameInput">
-
-            <div class="password-container">
-                <input type="password" id="passwordInput" placeholder="Enter your password">
-                <span id="togglePassword" class="eye"></span>
-            </div>
-            
-            <button id="submitBtn">Submit</button>
+        <!-- Brand logo + name -->
+        <div class="modal-brand">
+            <img
+                class="modal-logo"
+                src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6937c2300013315bfe8b/view?project=69230def0009866e3192&mode=admin"
+                alt="ChapterFlow logo"
+            >
+            <div class="modal-brand-name">ChapterFlow</div>
         </div>
+
+        <h2 id="modalTitle">Log In</h2>
+
+        <input type="email" placeholder="Enter your email" id="usernameInput">
+
+        <div class="password-container">
+            <input type="password" id="passwordInput" placeholder="Enter your password">
+            <span id="togglePassword" class="eye"></span>
+        </div>
+        
+        <button id="submitBtn">Submit</button>
     </div>
+</div>
+
 
 </body>
 

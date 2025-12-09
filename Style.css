@@ -343,6 +343,50 @@ body {
   text-align: center;
 }
 
+/* Modal content is already centered, but we'll be explicit for brand + title */
+.modal-brand,
+#modalTitle {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+/* Tweak brand spacing so logo + CHAPTERFLOW feel tighter */
+.modal-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+/* Make sure logo itself is perfectly centered */
+.modal-logo {
+  margin-top: -10px;
+  height: 48px;
+  width: auto;
+}
+
+/* Slightly reduce letter-spacing so it visually lines up better with "Log in" */
+.modal-brand-name {
+  font-family: "Merriweather", serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;   /* was 0.14em, a bit too wide */
+  text-transform: uppercase;
+  color: #4d3a28;
+}
+
+/* Center and position the title nicely under CHAPTERFLOW */
+#modalTitle {
+  margin-top: 6px;
+  margin-bottom: 18px;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+
 /* close button */
 .close {
   color: #aaa;
@@ -473,8 +517,12 @@ body {
     color: black;
     cursor: pointer;
     padding: 10px 0;
-    transition: color 0.15s ease, transform 0.12s ease;
+    transform: translateX(0);            /* starting position */
+    transition:
+      color 0.25s ease,                  /* smooth color fade */
+      transform 0.25s ease;              /* smooth slide movement */
 }
+
 
 /* keep original alignment differences */
 .slide-nav-btn {
@@ -488,15 +536,28 @@ body {
 /* Hover: turn orangered and slide slightly */
 .slide-nav-btn:hover,
 .edit-profile-btn:hover {
-    color: orangered;
+    color: orangered;        /* same color you use elsewhere */
     transform: translateX(4px);
 }
 
-/* Active state: tiny movement for click feedback */
+/* Active (when clicked) – tiny bounce back */
 .slide-nav-btn:active,
 .edit-profile-btn:active {
     transform: translateX(2px);
 }
+
+/* Smooth hover for slide-nav buttons when menu is open */
+.slide-nav.active .slide-nav-btn,
+.slide-nav.active .edit-profile-btn {
+    transition: color 0.25s ease, transform 0.25s ease, opacity 0.3s ease;
+}
+
+.slide-nav.active .slide-nav-btn:hover,
+.slide-nav.active .edit-profile-btn:hover {
+    color: orangered;          /* same hover color you use elsewhere */
+    transform: translateX(4px); /* smooth slide to the right */
+}
+
 
 /* Hide profile card + stories while the page is still "loading" */
 body.loading .profile-section,
@@ -2218,6 +2279,103 @@ body .navbar .nav-signup-cta {
     border-width: 1px !important;
     border-radius: 999px !important;
 }
+
+
+/* =========================
+   POINTS POPOVER (navbar + profile)
+   ========================= */
+
+.points-popover-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* so text still looks normal but can be hovered */
+.points-popover-toggle {
+  cursor: pointer;
+}
+
+.points-popover {
+  position: absolute;
+  top: 130%;
+  right: 0;
+  min-width: 220px;
+  padding: 0.75rem 1rem;
+  background-color: var(--hero-bg);   /* same bg as under navbar */
+  color: var(--nav-text);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  font-family: "Merriweather", serif;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 140ms ease, transform 140ms ease;
+  z-index: 1500;
+}
+
+.points-popover::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 18px;
+  border-width: 0 8px 8px 8px;
+  border-style: solid;
+  border-color: transparent transparent var(--hero-bg) transparent;
+}
+
+.points-popover.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.points-popover-title {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.points-popover-value {
+  margin: 0 0 0.6rem;
+  font-size: 0.9rem;
+}
+
+.points-popover-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.points-popover-buttons button {
+  flex: 1;
+  border-radius: 999px;
+  border: 1px solid #4d3a28;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.points-popover-buttons button:hover {
+  background-color: #4d3a28;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+}
+
+/* Hover styling for "Points" text (nav + profile) */
+.points-popover-toggle {
+  transition: color 0.15s ease;
+}
+
+.points-popover-toggle:hover {
+  color: orangered; /* same as slide-nav button hover */
+  
+}
+
 
 /* Points & Rewards page — use same bg as ChapterFlow below navbar */
 body.points-page {

@@ -11,6 +11,10 @@
   <!-- Appwrite SDK -->
   <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
 
+  <!-- MAIN SCRIPT (bubble timer, auth, etc.) -->
+  <!-- added so the reading bubble can run on this page -->
+  <script src="../script.js" defer></script>
+
   <style>
     body.chapter-page {
       margin: 0;
@@ -20,11 +24,11 @@
       position: relative;
     }
 
-      .chapter-banner {
-        background-color: var(--footer-bg);
-        height: 250px;
-        width: 100%;
-      }
+    .chapter-banner {
+      background-color: var(--footer-bg);
+      height: 250px;
+      width: 100%;
+    }
 
     .chapter-layout {
       max-width: 880px;
@@ -55,7 +59,6 @@
 
     .chapter-back-btn:hover {
       background-color: #e8dbc9;
-      ;
     }
 
     .chapter-card {
@@ -121,43 +124,34 @@
       margin-bottom: 18px;
     }
 
- .chapter-body {
-  margin-top: 4px;
-  font-size: 1rem;
-  line-height: 1.8;
-  color: rgba(0, 0, 0, 0.85);
-  white-space: normal;      /* let the HTML control line breaks */
-  position: relative;       /* anchor for absolutely-positioned images */
-}
+    .chapter-body {
+      margin-top: 4px;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: rgba(0, 0, 0, 0.85);
+      white-space: normal;
+      position: relative;
+    }
 
-/* normal paragraph spacing */
-.chapter-body p {
-  margin: 0 0 1em;
-}
+    .chapter-body p {
+      margin: 0 0 1em;
+    }
 
-/* ---------- images from the editor ---------- */
+    .chapter-body .editor-image {
+      position: absolute;
+      left: 50% !important;
+      transform: translateX(-50%);
+    }
 
-/* wrapper div around each editor image */
-.chapter-body .editor-image {
-  position: absolute;          /* keep absolute → same vertical behavior you liked */
-  left: 50% !important;        /* override inline left from the editor */
-  transform: translateX(-50%); /* center horizontally */
-}
+    .chapter-body .editor-image img {
+      display: block;
+      max-width: 100%;
+      height: auto !important;
+    }
 
-.chapter-body .editor-image img {
-  display: block;
-  max-width: 100%;
-  height: auto !important; /* override saved inline height so image doesn't stretch */
-}
-
-/* hide the resize handle in the reader */
-.chapter-body .editor-image-resize {
-  display: none;
-}
-
-
-
-
+    .chapter-body .editor-image-resize {
+      display: none;
+    }
 
     .chapter-empty-message {
       font-size: 0.95rem;
@@ -195,7 +189,8 @@
 <body class="chapter-page">
   <div class="chapter-banner"></div>
 
-  <main class="chapter-layout">
+  <!-- added reader-page class so script.js recognizes this as a reading page -->
+  <main class="chapter-layout reader-page">
     <button id="chapter-back-btn" class="chapter-back-btn">
       ← Back
     </button>
@@ -226,8 +221,6 @@
     <div id="chapter-not-found" class="chapter-not-found" style="display:none;">
       We couldn’t find this chapter. It may have been removed or not yet created on this device.
     </div>
-
-
   </main>
 
   <script>
@@ -308,36 +301,34 @@
           return;
         }
 
-          if (series) {
-            if (seriesNameEl) {
-              seriesNameEl.textContent = series.title || 'Untitled story';
-            }
-            if (authorEl && series.ownerName) {
-              authorEl.textContent = 'Uploaded by: ' + series.ownerName;
-            }
-          } else if (seriesNameEl) {
-            seriesNameEl.textContent = 'Untitled story';
+        if (series) {
+          if (seriesNameEl) {
+            seriesNameEl.textContent = series.title || 'Untitled story';
           }
-
-          // Build "Chapter X - Title" for the left meta text
-          const chapterTitle =
-            (chapter && chapter.title) || 'Untitled chapter';
-
-          const chapterNumber =
-            (chapter && chapter.chapterNumber != null)
-              ? chapter.chapterNumber
-              : (chapter && chapter.number != null
-                  ? chapter.number
-                  : null);
-
-          if (metaLeftEl) {
-            if (chapterNumber != null) {
-              metaLeftEl.textContent = `Chapter ${chapterNumber} - ${chapterTitle}`;
-            } else {
-              metaLeftEl.textContent = chapterTitle;
-            }
+          if (authorEl && series.ownerName) {
+            authorEl.textContent = 'Uploaded by: ' + series.ownerName;
           }
+        } else if (seriesNameEl) {
+          seriesNameEl.textContent = 'Untitled story';
+        }
 
+        const chapterTitle =
+          (chapter && chapter.title) || 'Untitled chapter';
+
+        const chapterNumber =
+          (chapter && chapter.chapterNumber != null)
+            ? chapter.chapterNumber
+            : (chapter && chapter.number != null
+                ? chapter.number
+                : null);
+
+        if (metaLeftEl) {
+          if (chapterNumber != null) {
+            metaLeftEl.textContent = `Chapter ${chapterNumber} - ${chapterTitle}`;
+          } else {
+            metaLeftEl.textContent = chapterTitle;
+          }
+        }
 
         if (metaRightEl && chapter.createdAt) {
           const dt = new Date(chapter.createdAt);
@@ -385,14 +376,14 @@
           }
         }
 
-          const chapterData = {
-            id:            chapterDoc.$id,
-            title:         chapterDoc.chapterTitle || chapterDoc.title || 'Untitled chapter',
-            chapterNumber: chapterDoc.chapterNumber ?? chapterDoc.number ?? null,
-            bodyHtml:      chapterDoc.fullHtml || chapterDoc.content || chapterDoc.bodyHtml || '',
-            bodyText:      chapterDoc.bodyText || '',
-            createdAt:     chapterDoc.createdAt
-          };
+        const chapterData = {
+          id:            chapterDoc.$id,
+          title:         chapterDoc.chapterTitle || chapterDoc.title || 'Untitled chapter',
+          chapterNumber: chapterDoc.chapterNumber ?? chapterDoc.number ?? null,
+          bodyHtml:      chapterDoc.fullHtml || chapterDoc.content || chapterDoc.bodyHtml || '',
+          bodyText:      chapterDoc.bodyText || '',
+          createdAt:     chapterDoc.createdAt
+        };
 
         const seriesData = seriesDoc
           ? {
@@ -433,40 +424,37 @@
     })();
   </script>
 
-<section class="footer-main">
+  <section class="footer-main">
     <div class="footer-inner">
-        <div class="footer-col company">
-            <h3 class="footer-title">ChapterFlow</h3>
-            <p class="footer-description">
-                A campus reading platform where students discover stories,
-                earn rewards, and share their creative voice.
-            </p>
+      <div class="footer-col company">
+        <h3 class="footer-title">ChapterFlow</h3>
+        <p class="footer-description">
+          A campus reading platform where students discover stories,
+          earn rewards, and share their creative voice.
+        </p>
+      </div>
+      <div class="footer-col links">
+        <h3 class="footer-title">Quick Links</h3>
+        <ul class="footer-links">
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../readinghub.html">Explore Stories</a></li>
+          <li><a href="../about.html">About Us</a></li>
+          <li><a href="../Slide nav buttons/points-rewards.html">Points &amp; Rewards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col connect">
+        <h3 class="footer-title">Connect</h3>
+        <div class="social-icons">
+          <a href="#" aria-label="Facebook"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0e400277d96f69d/view?project=69230def0009866e3192&mode=admin" alt="Facebook"></a>
+          <a href="#" aria-label="Twitter"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0dd0035010d51ae/view?project=69230def0009866e3192&mode=admin" alt="Twitter"></a>
+          <a href="#" aria-label="Instagram"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0d60001a41452ee/view?project=69230def0009866e3192&mode=admin" alt="Instagram"></a>
         </div>
-        <div class="footer-col links">
-            <h3 class="footer-title">Quick Links</h3>
-            <ul class="footer-links">
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="../readinghub.html">Explore Stories</a></li>
-                <li><a href="../about.html">About Us</a></li>
-                <li><a href="../Slide nav buttons/points-rewards.html">Points &amp; Rewards</a></li>
-
-            </ul>
-        </div>
-        <div class="footer-col connect">
-            <h3 class="footer-title">Connect</h3>
-            <div class="social-icons">
-                <a href="#" aria-label="Facebook"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0e400277d96f69d/view?project=69230def0009866e3192&mode=admin" alt="Facebook"></a>
-                <a href="#" aria-label="Twitter"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0dd0035010d51ae/view?project=69230def0009866e3192&mode=admin" alt="Twitter"></a>
-                <a href="#" aria-label="Instagram"><img src="https://nyc.cloud.appwrite.io/v1/storage/buckets/69230e950007fef02b5b/files/6935c0d60001a41452ee/view?project=69230def0009866e3192&mode=admin" alt="Instagram"></a>
-            </div>
-        </div>
+      </div>
     </div>
     <hr class="footer-divider">
     <div class="footer-bottom">
-        <p>© 2025 ChapterFlow. All rights reserved. | Powered by Readdy</p>
+      <p>© 2025 ChapterFlow. All rights reserved. | Powered by Readdy</p>
     </div>
-</section>
-
-
+  </section>
 </body>
 </html>

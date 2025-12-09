@@ -45,12 +45,20 @@
     /* Inner boxes for each section (Created by Students / Available on Campus) */
     .hub-section-card {
       background: rgba(255, 255, 255, 0.96);
-      border-radius: 20px;
+      border-radius: 0px;
       padding: 1.6rem 1.5rem 1.9rem;
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
       border: 1px solid rgba(126, 96, 68, 0.12);
       margin-bottom: 1.8rem;
     }
+
+.hub-available-card {
+  max-width: none;         /* don’t limit inside */
+  margin-left: -5.9rem;    /* match the page padding */
+  margin-right: -5.9rem;
+}
+
+
 
     /* Specific: Created by Students box should not shrink when empty */
     .students-section-card {
@@ -74,6 +82,13 @@
 
     /* Created by Students: vertical rows like in edit-profile */
     .reading-hub .students-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* We’ll also stack Available on Campus rows the same way */
+    .reading-hub .campus-stories-list {
       display: flex;
       flex-direction: column;
       gap: 1.6rem;
@@ -172,153 +187,20 @@
     }
 
     .student-story-title a {
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.student-story-title a:hover {
-  text-decoration: underline;
-}
-
-
-    /* Card style for "Available on Campus" carousel */
-    .campus-track {
-      display: flex;
-      gap: 1.25rem;
-      padding: 0.2rem 0.25rem;
-    }
-
-    .campus-track-wrapper {
-      position: relative;
-      overflow-x: auto;
-      overflow-y: visible;
-      scroll-behavior: smooth;
-      padding-bottom: 0.35rem;
-      margin: 0 -0.25rem;
-    }
-
-    .campus-track-wrapper::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    .campus-track-wrapper::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 999px;
-    }
-
-    .campus-track-wrapper::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .campus-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: none;
-      background-color: #ffffff;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      color: inherit;
+      text-decoration: none;
       cursor: pointer;
-      z-index: 2;
-      font-size: 18px;
-      color: #4b3622;
+      transition: color 140ms ease, text-decoration-color 140ms ease;
     }
 
-    .campus-arrow-left {
-      left: -17px;
+    /* Stronger specificity + !important so color change is visible even if other site-wide rules try to override */
+    .student-story-title a:hover {
+      text-decoration: underline;
+      color: orangered !important;
     }
 
-    .campus-arrow-right {
-      right: -17px;
-    }
 
-    .reading-hub .story-card {
-      background-color: rgba(255, 255, 255, 0.96);
-      border-radius: 18px;
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.16);
-      border: 1px solid rgba(126, 96, 68, 0.12);
-      overflow: hidden;
-      min-width: 240px;
-      max-width: 260px;
-      flex: 0 0 auto;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-
-    .reading-hub .story-card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-    }
-
-    .reading-hub .story-card .tag {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      background-color: rgba(0, 0, 0, 0.65);
-      color: #fff;
-    }
-
-    .reading-hub .story-card-body {
-      padding: 0.9rem 1rem 1.05rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-    }
-
-    .reading-hub .story-card-body h3 {
-      margin: 0 0 0.15rem;
-      font-size: 1rem;
-      color: #2f2217;
-    }
-
-    .reading-hub .story-card-body .meta {
-      margin: 0;
-      font-size: 0.8rem;
-      color: #7c6a54;
-    }
-
-    .reading-hub .story-card-body .genre {
-      font-size: 0.9rem;
-      color: #555;
-    }
-
-    .reading-hub .story-card-body .author {
-      font-size: 0.85rem;
-      color: #333;
-    }
-
-    .reading-hub .story-card-body .read-btn {
-      padding: 0.45rem 1.1rem;
-      border-radius: 999px;
-      border: 1px solid black;
-      background-color: white;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition:
-        background-color 0.15s ease,
-        color 0.15s ease,
-        box-shadow 0.15s ease;
-    }
-
-    .reading-hub .story-card-body .read-btn:hover {
-      background-color: lightgray;
-      color: white;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
-    }
-
-    /* Empty state line for Created by Students */
+    /* Empty state line */
     .students-empty-placeholder {
       grid-column: 1 / -1;
       align-self: center;
@@ -345,14 +227,6 @@
     @media (max-width: 768px) {
       .reading-hub-main {
         margin-top: 110px;
-      }
-
-      .campus-arrow-left {
-        left: -5px;
-      }
-
-      .campus-arrow-right {
-        right: -5px;
       }
     }
   </style>
@@ -413,65 +287,21 @@
             “Some stories are still waiting to be written.”
             <span>Once a student uploads their work, it will appear here.</span>
           </div>
-          <!-- Student stories will go here later (dynamically or static) -->
+          <!-- Student stories will go dynamically -->
         </div>
       </div>
 
-      <!-- Available on Campus (box + horizontal scroll + arrows) -->
-      <div class="hub-section-card">
+      <!-- Available on Campus: admin-only featured stories -->
+      <div class="hub-section-card hub-available-card">
         <h2 class="section-title">Available on Campus</h2>
         <p class="section-desc">
-          Preview a selection of titles you can find at the school library — from novels to
-          graphic literature and more. Visit the library to borrow the full books.
+          Curated titles featured by the campus admin. Visit the library to borrow the full books.
         </p>
 
-        <div class="campus-track-wrapper" id="campus-track-wrapper">
-          <button class="campus-arrow campus-arrow-left" aria-label="Scroll left">❮</button>
-          <button class="campus-arrow campus-arrow-right" aria-label="Scroll right">❯</button>
-
-          <div class="campus-track" id="campus-stories-track">
-            <!-- Book 1 -->
-            <article class="story-card">
-              <span class="tag novel">Novel</span>
-              <img src="https://media.assettype.com/gulfnews%2F2...g?w=480&auto=format%2Ccompress&fit=max" alt="An Elegy for King">
-              <div class="story-card-body">
-                <h3>An Elegy for King</h3>
-                <p class="meta">By Rachel Mantovani · Fiction</p>
-                <p class="genre">
-                  A moving story about loss, memory, and the stories we tell to heal.
-                </p>
-                <button class="read-btn" type="button">Available at Library</button>
-              </div>
-            </article>
-
-            <!-- Book 2 -->
-            <article class="story-card">
-              <span class="tag poetry">Poetry</span>
-              <img src="https://cdn.kobo.com/book-images/0bde2a97-ef67-4a3e-871c-a16c0daac824/1200/1200/False/the-sun-and-her-flowers-1.jpg" alt="The Sun and Her Flowers">
-              <div class="story-card-body">
-                <h3>The Sun and Her Flowers</h3>
-                <p class="meta">By Rupi Kaur · Poetry</p>
-                <p class="genre">
-                  A collection of poems about growth, healing, ancestry, and honoring roots.
-                </p>
-                <button class="read-btn" type="button">Available at Library</button>
-              </div>
-            </article>
-
-            <!-- Book 3 -->
-            <article class="story-card">
-              <span class="tag novel">Novel</span>
-              <img src="https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1673637483i/12345.jpg" alt="Project Hail Mary">
-              <div class="story-card-body">
-                <h3>Project Hail Mary</h3>
-                <p class="meta">By Andy Weir · Sci-Fi</p>
-                <p class="genre">
-                  A lone astronaut must save Earth with only his wits, science, and an
-                  unexpected ally.
-                </p>
-                <button class="read-btn" type="button">Available at Library</button>
-              </div>
-            </article>
+        <div class="campus-stories-list" id="campus-stories-list">
+          <div class="students-empty-placeholder" id="campus-empty-placeholder">
+            “No official campus selections yet.”
+            <span>Once the campus admin features a title, it will appear here.</span>
           </div>
         </div>
       </div>
@@ -521,26 +351,9 @@
     </div>
   </section>
 
+  <!-- Empty-state helper for Created by Students -->
   <script>
-    // Simple left/right scroll for "Available on Campus" section
     document.addEventListener('DOMContentLoaded', () => {
-      const wrapper = document.getElementById('campus-track-wrapper');
-      const leftBtn = document.querySelector('.campus-arrow-left');
-      const rightBtn = document.querySelector('.campus-arrow-right');
-
-      if (wrapper && leftBtn && rightBtn) {
-        const scrollAmount = () => wrapper.clientWidth * 0.8;
-
-        leftBtn.addEventListener('click', () => {
-          wrapper.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
-        });
-
-        rightBtn.addEventListener('click', () => {
-          wrapper.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
-        });
-      }
-
-      // Empty state handling for "Created by Students"
       const studentsGrid = document.getElementById('students-stories-grid');
       const emptyPlaceholder = document.getElementById('students-empty-placeholder');
 
@@ -551,22 +364,19 @@
         emptyPlaceholder.style.display = hasStories ? 'none' : 'block';
       }
 
-      // Run once on load
       updateStudentsEmptyState();
 
-      // Watch for future added/removed cards (if you add via JS later)
       const observer = new MutationObserver(() => {
         updateStudentsEmptyState();
       });
 
       observer.observe(studentsGrid, { childList: true, subtree: false });
 
-      // Optional: expose function so you can manually call after rendering from Appwrite
       window.updateStudentsEmptyState = updateStudentsEmptyState;
     });
   </script>
 
-  <!-- Appwrite loader for Created by Students -->
+  <!-- Appwrite loader for Created by Students (non-admin stories) -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const studentsGrid = document.getElementById('students-stories-grid');
@@ -580,6 +390,7 @@
       const DATABASE_ID           = '69252c2f001121c41ace';
       const STORIES_COLLECTION_ID = 'stories';
       const STORAGE_BUCKET_ID     = '69230e950007fef02b5b';
+      const CAMPUS_ADMIN_ID       = '69245d97c1b8172c70cb'; // your admin
 
       async function loadStudentStoriesForHub() {
         if (typeof Appwrite === 'undefined') {
@@ -605,7 +416,9 @@
           return;
         }
 
-        // Remove existing rows but keep any other children in the grid
+        // Exclude admin stories here
+        docs = docs.filter(doc => doc.ownerId !== CAMPUS_ADMIN_ID);
+
         const oldRows = studentsGrid.querySelectorAll('.student-story-row');
         oldRows.forEach(row => row.remove());
 
@@ -630,10 +443,9 @@
 
           if (coverId) {
             const img = document.createElement('img');
-              img.src =
-    `https://nyc.cloud.appwrite.io/v1/storage/buckets/${STORAGE_BUCKET_ID}` +
-    `/files/${coverId}/view?project=${PROJECT_ID}&mode=admin`;
-
+            img.src =
+              `https://nyc.cloud.appwrite.io/v1/storage/buckets/${STORAGE_BUCKET_ID}` +
+              `/files/${coverId}/view?project=${PROJECT_ID}&mode=admin`;
             img.alt = title + ' cover';
             coverWrap.appendChild(img);
           }
@@ -644,21 +456,25 @@
           const header = document.createElement('div');
           header.className = 'student-story-header';
 
-const h3 = document.createElement('h3');
-h3.className = 'student-story-title';
+          const h3 = document.createElement('h3');
+          h3.className = 'student-story-title';
 
-const link = document.createElement('a');
-// path from root ReadingHub → your Chapter - Story folder
-// NOTE: story.html expects the query param "seriesId" — previously this used "storyId" which prevented story.html from loading chapters.
-// Fixed: use seriesId so story.html can read params.get('seriesId') and load the chapters correctly.
-link.href = `Chapter - Story/story.html?seriesId=${encodeURIComponent(doc.$id)}`;
-link.textContent = title;
+          const link = document.createElement('a');
+          link.href = `Chapter - Story/story.html?seriesId=${encodeURIComponent(doc.$id)}`;
+          link.textContent = title;
+          link.style.color = 'inherit';
+          link.style.textDecoration = 'none';
 
-// inherit the existing heading look
-link.style.color = 'inherit';
-link.style.textDecoration = 'none';
+link.addEventListener('click', () => {
+  try {
+    // used by the chapter bubble
+    sessionStorage.setItem('cf_viaHub', '1');
+    // used by story.html back button
+    sessionStorage.setItem('cf_storyOrigin', 'hub');
+  } catch (e) {}
+});
 
-h3.appendChild(link);
+          h3.appendChild(link);
 
           const menuBtn = document.createElement('button');
           menuBtn.type = 'button';
@@ -668,6 +484,7 @@ h3.appendChild(link);
           header.appendChild(h3);
           header.appendChild(menuBtn);
           main.appendChild(header);
+
 
           const uploaderP = document.createElement('p');
           uploaderP.className = 'student-story-uploader';
@@ -690,13 +507,144 @@ h3.appendChild(link);
           studentsGrid.appendChild(row);
         });
 
-        // After rendering, update empty-state visibility if helper exists
         if (typeof window.updateStudentsEmptyState === 'function') {
           window.updateStudentsEmptyState();
         }
       }
 
       loadStudentStoriesForHub();
+    });
+  </script>
+
+  <!-- Appwrite loader for Available on Campus (admin-only stories) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const campusList  = document.getElementById('campus-stories-list');
+      const campusEmpty = document.getElementById('campus-empty-placeholder');
+      if (!campusList) return;
+
+      const PROJECT_ID            = '69230def0009866e3192';
+      const ENDPOINT              = 'https://nyc.cloud.appwrite.io/v1';
+      const DATABASE_ID           = '69252c2f001121c41ace';
+      const STORIES_COLLECTION_ID = 'stories';
+      const STORAGE_BUCKET_ID     = '69230e950007fef02b5b';
+      const CAMPUS_ADMIN_ID       = '69245d97c1b8172c70cb'; // same admin
+
+      async function loadCampusStories() {
+        if (typeof Appwrite === 'undefined') {
+          console.error('Appwrite SDK not available on Reading Hub page.');
+          return;
+        }
+
+        const client    = new Appwrite.Client()
+          .setEndpoint(ENDPOINT)
+          .setProject(PROJECT_ID);
+        const databases = new Appwrite.Databases(client);
+
+        let docs = [];
+        try {
+          const res = await databases.listDocuments(
+            DATABASE_ID,
+            STORIES_COLLECTION_ID,
+            [
+              Appwrite.Query.equal('ownerId', CAMPUS_ADMIN_ID),
+              Appwrite.Query.orderDesc('createdAt')
+            ]
+          );
+          docs = res.documents || [];
+        } catch (err) {
+          console.error('Failed to load campus stories for Reading Hub:', err);
+          return;
+        }
+
+        // Clear previous rows but keep the empty placeholder element
+        const oldRows = campusList.querySelectorAll('.student-story-row');
+        oldRows.forEach(row => row.remove());
+
+        if (!docs.length) {
+          if (campusEmpty) {
+            campusEmpty.style.display = 'block';
+          }
+          return;
+        }
+
+        if (campusEmpty) campusEmpty.style.display = 'none';
+
+        docs.forEach(doc => {
+          const title       = doc.title || 'Untitled story';
+          const description = (doc.description || '').trim();
+          const ownerName   = (doc.ownerName || '').trim();
+          const coverId     = doc.coverImageId || doc.coverFileId || null;
+
+          const row = document.createElement('article');
+          row.className = 'student-story-row';
+
+          const coverWrap = document.createElement('div');
+          coverWrap.className = 'student-story-cover';
+
+          if (coverId) {
+            const img = document.createElement('img');
+img.src =
+  `https://nyc.cloud.appwrite.io/v1/storage/buckets/${STORAGE_BUCKET_ID}` +
+  `/files/${coverId}/view?project=${PROJECT_ID}&mode=admin`;
+
+            img.alt = title + ' cover';
+            coverWrap.appendChild(img);
+          }
+
+          const main = document.createElement('div');
+          main.className = 'student-story-main';
+
+          const header = document.createElement('div');
+          header.className = 'student-story-header';
+
+          const h3 = document.createElement('h3');
+          h3.className = 'student-story-title';
+
+          const link = document.createElement('a');
+          link.href = `Chapter - Story/story.html?seriesId=${encodeURIComponent(doc.$id)}`;
+          link.textContent = title;
+          link.style.color = 'inherit';
+          link.style.textDecoration = 'none';
+
+link.addEventListener('click', () => {
+  try {
+    // used by the chapter bubble
+    sessionStorage.setItem('cf_viaHub', '1');
+    // used by story.html back button
+    sessionStorage.setItem('cf_storyOrigin', 'hub');
+  } catch (e) {}
+});
+
+          h3.appendChild(link);
+          header.appendChild(h3);
+          main.appendChild(header);
+
+
+          const uploaderP = document.createElement('p');
+          uploaderP.className = 'student-story-uploader';
+          uploaderP.innerHTML =
+            'Featured by: <span>' + (ownerName || 'Campus Admin').toUpperCase() + '</span>';
+          main.appendChild(uploaderP);
+
+          const labelP = document.createElement('p');
+          labelP.className = 'student-story-label';
+          labelP.textContent = 'Description:';
+          main.appendChild(labelP);
+
+          const descP = document.createElement('p');
+          descP.className = 'student-story-description';
+          descP.textContent = description || 'No description yet.';
+          main.appendChild(descP);
+
+          row.appendChild(coverWrap);
+          row.appendChild(main);
+
+          campusList.appendChild(row);
+        });
+      }
+
+      loadCampusStories();
     });
   </script>
 </body>

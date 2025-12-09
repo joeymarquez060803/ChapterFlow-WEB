@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const isChapterFlowPage = window.location.href.toLowerCase().includes('index.html');
   const isEditProfilePage = window.location.href.toLowerCase().includes('edit-profile.html');
 
+
+
   // Profile stories section (edit-profile.html)
   const profileStoriesSection   = isEditProfilePage ? document.querySelector('.profile-stories') : null;
   const profileStoriesContainer = isEditProfilePage ? document.getElementById('profile-stories-container') : null;
@@ -781,14 +783,21 @@ if (ctaBtn) {
       titleBtn.dataset.seriesId = series.id;
       titleBtn.textContent = title;
 
-      // When you click the story title, go to story.html for this series
-      titleBtn.addEventListener('click', () => {
-        // edit-profile.html is in "Slide nav buttons"
-        // story.html is in "Chapter - Story"
-        const base = '../Chapter - Story/story.html';
-        const url  = `${base}?seriesId=${encodeURIComponent(series.id)}`;
-        window.location.href = url;
-      });
+// When you click the story title, go to story.html for this series
+titleBtn.addEventListener('click', () => {
+  // Remember: we came from profile
+  try {
+    sessionStorage.setItem('cf_storyOrigin', 'profile');
+  } catch (e) {}
+
+  // edit-profile.html is in "Slide nav buttons"
+  // story.html is in "Chapter - Story"
+  const base = '../Chapter - Story/story.html';
+  const url  = `${base}?seriesId=${encodeURIComponent(series.id)}`;
+  window.location.href = url;
+});
+
+
 
       // Figure out the uploader name (from series, or fall back to current user)
       const uploaderName =
@@ -1202,6 +1211,17 @@ function updateUIForLoggedOutUser() {
     if (!isChapterView) return;
     if (typeof account === 'undefined' || !account) return;
 
+      // Only show bubble if we came from Reading Hub
+  let cameFromHub = false;
+  try {
+    cameFromHub = sessionStorage.getItem('cf_viaHub') === '1';
+  } catch (e) {
+    cameFromHub = false;
+  }
+
+  if (!cameFromHub) return;
+
+
     // --- identify the book so all its chapters share progress ---
     const pathname = window.location.pathname;
     const filename = pathname.split('/').pop() || '';
@@ -1210,10 +1230,12 @@ function updateUIForLoggedOutUser() {
     const STORAGE_KEY = `cf_progress:${bookId || 'default'}`;
 
     const INACTIVITY_LIMIT_MS = 60000;  // 60s no activity = pause
-    const POINT_INTERVAL_SEC = 300;     // 5 min per 1 point
+    const POINT_INTERVAL_SEC = 120;   
 
-    let secondsRead = 0;
-    let pointsAwarded = 0; // how many 5-min chunks already converted to points
+    let secondsRead = 0;       // total seconds used for points
+    let sessionSeconds = 0;    // seconds for this reading session (label only)
+    let pointsAwarded = 0;     // how many chunks already converted to points
+
 
     // --- load local progress (so time continues across chapters) ---
     try {
@@ -1250,7 +1272,7 @@ function updateUIForLoggedOutUser() {
       <div class="reading-bubble-main" title="Reading assistant">⏱</div>
       <div class="reading-bubble-panel">
         <p class="rb-time">Reading time: 0:00</p>
-        <p class="rb-next">Next point in: 5:00</p>
+        <p class="rb-next">Next point in: 2:00</p>
         <p class="rb-points">Points: --</p>
         <div class="rb-shortcuts">
           <button type="button" class="rb-hub-btn">Reading Hub</button>
@@ -1415,7 +1437,7 @@ function updateUIForLoggedOutUser() {
     }
 
     function updateLabels() {
-      timeLabel.textContent = `Reading time: ${formatTime(secondsRead)}`;
+      timeLabel.textContent = `Reading time: ${formatTime(sessionSeconds)}`;
       const thresholds = Math.floor(secondsRead / POINT_INTERVAL_SEC);
       const nextThresholdSec = (thresholds + 1) * POINT_INTERVAL_SEC;
       const remaining = nextThresholdSec - secondsRead;
@@ -1436,8 +1458,10 @@ function updateUIForLoggedOutUser() {
     setInterval(() => {
       const now = Date.now();
       const inactiveFor = now - lastActivity;
-      if (inactiveFor < INACTIVITY_LIMIT_MS) {
-        secondsRead += 1;
+        if (inactiveFor < INACTIVITY_LIMIT_MS) {
+        secondsRead += 1;    // persists → used for Next point in
+        sessionSeconds += 1; // session-only → used for Reading time label
+
 
         const thresholds = Math.floor(secondsRead / POINT_INTERVAL_SEC);
 
@@ -1464,12 +1488,137 @@ function updateUIForLoggedOutUser() {
         updateLabels();
       }
     }, 1000);
-  })();
+   })();  // end of READING BUBBLE
+
+  // =========================
+  // POINTS POPOVER (navbar + profile)
+  // =========================
+
+  function setupPointsPopovers() {
+    const path = window.location.pathname.toLowerCase();
+    const inSlideNavFolder =
+      path.includes('slide%20nav%20buttons') || path.includes('slide nav buttons');
+
+    // Correct links depending on where we are
+    const links = {
+      hub: inSlideNavFolder ? '../readinghub.html' : 'readinghub.html',
+      rewards: inSlideNavFolder ? 'points-rewards.html' : 'Slide nav buttons/points-rewards.html'
+    };
+
+    function getCurrentPointsFromNav() {
+      const badge = document.querySelector('.nav-points-display');
+      if (!badge) return null;
+      const match = badge.textContent.match(/\d+/);
+      if (!match) return null;
+      const value = parseInt(match[0], 10);
+      return Number.isNaN(value) ? null : value;
+    }
+
+    function attachPopoverToTarget(targetEl) {
+      if (!targetEl || targetEl.dataset.pointsPopoverAttached === '1') return;
+      targetEl.dataset.pointsPopoverAttached = '1';
+
+      // Wrap the element so we can position the bubble relative to it
+      const wrapper = document.createElement('div');
+      wrapper.className = 'points-popover-wrapper';
+
+      const parent = targetEl.parentNode;
+      parent.insertBefore(wrapper, targetEl);
+      wrapper.appendChild(targetEl);
+
+      targetEl.classList.add('points-popover-toggle');
+
+      const pop = document.createElement('div');
+      pop.className = 'points-popover';
+
+      const title = document.createElement('p');
+      title.className = 'points-popover-title';
+      title.textContent = 'Your points';
+
+      const value = document.createElement('p');
+      value.className = 'points-popover-value';
+      value.textContent = 'Points: --';
+
+      const btnRow = document.createElement('div');
+      btnRow.className = 'points-popover-buttons';
+
+      const hubBtn = document.createElement('button');
+      hubBtn.type = 'button';
+      hubBtn.textContent = 'Reading Hub';
+      hubBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.href = links.hub;
+      });
+
+      const rewardsBtn = document.createElement('button');
+      rewardsBtn.type = 'button';
+      rewardsBtn.textContent = 'Points & Rewards';
+      rewardsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.href = links.rewards;
+      });
+
+      btnRow.appendChild(hubBtn);
+      btnRow.appendChild(rewardsBtn);
+
+      pop.appendChild(title);
+      pop.appendChild(value);
+      pop.appendChild(btnRow);
+
+      wrapper.appendChild(pop);
+
+      function showPopover() {
+        const pts = getCurrentPointsFromNav();
+        if (pts != null) {
+          value.textContent = `You currently have ${pts} points.`;
+        } else {
+          value.textContent = 'Points: --';
+        }
+        pop.classList.add('visible');
+      }
+
+      function hidePopover() {
+        pop.classList.remove('visible');
+      }
+
+      wrapper.addEventListener('mouseenter', showPopover);
+      wrapper.addEventListener('mouseleave', hidePopover);
+    }
+
+    // Profile card "Points" in edit-profile.html
+    const profilePointsLabel = document.querySelector('.edit-profile-page .points-label');
+    if (profilePointsLabel) {
+      attachPopoverToTarget(profilePointsLabel);
+    }
+
+    // Navbar points badge may be injected later by auth logic,
+    // so watch the nav-links area.
+    const navLinks = document.querySelector('.navbar .nav-links');
+
+    function tryAttachNavBadge() {
+      const navBadge = document.querySelector('.nav-points-display');
+      if (navBadge) {
+        attachPopoverToTarget(navBadge);
+      }
+    }
+
+    // Try once now
+    tryAttachNavBadge();
+
+    // If nav exists, observe it for child mutations so we catch the
+    // points badge as soon as auth code inserts it.
+    if (navLinks && typeof MutationObserver !== 'undefined') {
+      const obs = new MutationObserver(tryAttachNavBadge);
+      obs.observe(navLinks, { childList: true, subtree: true });
+    }
+  }
 
   // ===========================
   // POINTS & REWARDS PAGE (redeem items)
   // ===========================
   async function setupRewardsPage() {
+    // ...
+
     const isPointsPage = window.location.href.toLowerCase().includes('points-rewards.html');
     if (!isPointsPage) return;
     if (!account) return;
@@ -1528,6 +1677,7 @@ function updateUIForLoggedOutUser() {
     });
   }
 
-  checkAuthState();
+    checkAuthState();
   setupRewardsPage();
+  setupPointsPopovers();
 });
