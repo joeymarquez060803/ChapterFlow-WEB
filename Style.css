@@ -16,7 +16,6 @@
     height: 45px;
     margin-left: 0;
     margin-right: 12px;
-    cursor: pointer;
 }
 
 .site-title {
@@ -215,21 +214,28 @@
     text-align: center;
 }
 
+/* Slide-nav Log in button – smaller + same style as Get Started */
 .login-btn {
-    margin: 20px auto;
-    padding: 10px 20px;
-    border: 1px solid black;
-    background-color: rgb(72, 172, 206);
-    color: black;
-    font-size: 16px;
+    margin: 16px auto 0;
+    padding: 0.6rem 1.8rem;
+    border-radius: 999px;
+    border: none;
+    background-color: #5d4a3b;   /* same as .cta-btn */
+    color: #ffffff;
+    font-family: 'Merriweather', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: inline-block;
     cursor: pointer;
-    border-radius: 5px;
-    display: block;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .login-btn:hover {
-    background-color: lightgray;
+    background-color: #4c3a2e;   /* same hover as .cta-btn */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    transform: translateY(-1px);
 }
+
 
 body {
     margin: 0;  /* remove the default 8px margin so corners are filled */
@@ -275,23 +281,7 @@ body {
     margin: 0 0 1.5rem;
 }
 
-.explore-btn {
-    padding: 0.8rem 2.4rem;
-    border-radius: 999px;
-    border: 2px solid #5d4a3b;
-    background-color: transparent;
-    font-family: "Merriweather", serif;
-    font-size: 1rem;
-    color: #5d4a3b;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-}
 
-.explore-btn:active {
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    transform: translateY(1px);
-}
 
 .reading-hub-btn {
   padding: 0.8rem 2.4rem;
@@ -754,7 +744,6 @@ body.edit-profile-page {
 /* Buttons in hero section */
 /* Buttons within the hero section. Use !important to override
    earlier global button styles. */
-.hero-section .explore-btn,
 .hero-section .reading-hub-btn {
     padding: 0.8rem 2.4rem;
     border-radius: 999px;
@@ -792,31 +781,6 @@ body.edit-profile-page {
     transform: translateY(1px);
 }
 
-/* Hero-specific button classes added to ensure stronger specificity. */
-.hero-explore-btn {
-    padding: 0.8rem 2.4rem;
-    border-radius: 999px;
-    font-family: 'Merriweather', serif;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-    border: 2px solid #5d4a3b !important;
-    background-color: transparent !important;
-    color: #5d4a3b !important;
-    white-space: nowrap;
-}
-
-.hero-explore-btn:hover {
-    background-color: #5d4a3b !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.hero-explore-btn:active {
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    transform: translateY(1px);
-}
 
 .hero-reading-btn {
     padding: 0.8rem 2.4rem;
@@ -1168,6 +1132,13 @@ body .navbar .nav-link:hover {
     transform: translateY(-1px) !important;
 }
 
+/* Make Home, About, and Log in hover color orangered on the navbar */
+body .navbar .nav-main-link:hover,
+body .navbar .nav-login-link:hover {
+    color: orangered !important;
+    transform: translateY(-1px) !important; /* keep the small lift effect */
+}
+
 body .navbar .nav-link:active {
     transform: translateY(0) !important;
 }
@@ -1387,7 +1358,8 @@ body .navbar .nav-signup-cta:hover {
 
     display: inline-block;    /* don’t stretch like a block */
     align-self: flex-start;   /* override flexbox “stretch” width */
-    width: auto;        
+    width: auto;       
+    transition: color 0.2s ease, transform 0.2s ease; 
 }
 
 .profile-story-title-btn:hover {
@@ -1862,39 +1834,6 @@ body.loading .navbar .nav-auth-link {
 /* keep close button readable on khaki */
 .slide-nav .close-btn {
     color: var(--nav-text);
-}
-
-/* ---------- PRE-LOGGED IN: LOG IN BUTTON (inside slide nav) ---------- */
-
-.slide-nav .login-btn {
-    margin: 1rem auto 0;
-    padding: 0.6rem 1.8rem;
-    border-radius: 999px;              /* like Create */
-    border: 1px solid black;   /* silver border */
-    background: silver;
-    font-family: "Merriweather", serif; /* same as nav bar buttons */
-    font-size: 0.95rem;
-    color: black;
-    cursor: pointer;
-    font-weight: bold;
-    transition:
-        background-color 0.15s ease,
-        color 0.15s ease,
-        box-shadow 0.15s ease;
-    
-    
-}
-
-.slide-nav .login-btn:hover {
-    background-color: lightgray;   /* silver fill on hover */
-    color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.18);
-    transform: translateY(-1px);
-}
-
-.slide-nav .login-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
 
 /* ---------- LOGGED-IN SLIDE NAV: TEXT BUTTONS ---------- */
@@ -2407,7 +2346,27 @@ body.points-page {
   .nav-links {
     gap: 8px;
     font-size: 0.85rem;
+    margin-left: 8px;
   }
+
+    /* Move Points to the right, close to Home on mobile */
+  .nav-points-display {
+    margin-left: auto;   /* pushes Points towards the right side */
+    margin-right: 8px;
+    font-size: 0.9rem;
+  }
+
+  /* Make the points popover open fully on screen for mobile */
+  .points-popover {
+    left: 0;
+    right: auto;         /* bubble extends to the right instead of off-screen */
+  }
+
+  .points-popover::before {
+    left: 22px;
+    right: auto;         /* little arrow lines up with the text again */
+  }
+
 
   /* Hero section (index.html) */
   .hero-section {
@@ -2460,3 +2419,163 @@ body.points-page {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== MOBILE NAVBAR (phones) ===== */
+@media (max-width: 768px) {
+
+  /* Navbar can grow taller and wrap to 2 rows if needed */
+  body .navbar {
+    height: auto !important;
+    padding: 6px 10px !important;
+    flex-wrap: wrap;
+    justify-content: flex-start !important;
+  }
+
+  body .navbar .site-title {
+    font-size: 1.05rem !important;
+    margin-right: 0.5rem !important;
+  }
+
+  .nav-points-display {
+    font-size: 0.75rem;
+    margin-right: 6px;
+  }
+
+  /* Row for Home / About / Log in / Sign up */
+  .nav-links {
+    width: 100%;
+    margin-top: 4px;
+    justify-content: space-between;  /* spread items across */
+    gap: 4px;                        /* smaller gaps */
+    flex-wrap: nowrap;               /* keep them on ONE line */
+  }
+
+  .navbar .nav-link {
+    font-size: 0.8rem;
+    padding: 4px 6px;
+  }
+
+  /* Make the Sign Up pill narrower so it fits with the others */
+  body .navbar .nav-signup-cta {
+    min-width: 90px !important;
+    height: 32px !important;
+    font-size: 0.8rem !important;
+    padding: 2px 8px !important;
+  }
+}
+
+/* ===== MOBILE LAYOUT FOR PROFILE STORIES ===== */
+@media (max-width: 768px) {
+
+  /* Make the whole stories section use full width on phones */
+  .profile-stories {
+    max-width: 100%;
+    width: 100%;
+    margin: 26px auto 40px;
+  }
+
+  /* Slightly tighter padding inside the big white card */
+  .profile-stories-list {
+    padding: 16px 14px 20px;
+  }
+
+  /* Stack each story vertically: cover on top, text below */
+  .profile-story-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  /* Cover image: full-width (but not too huge) and responsive */
+  .profile-story-cover {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 320px;   /* adjust if you want it smaller */
+    height: auto;
+  }
+
+  .profile-story-cover img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* Text block: no left padding so it lines up with the image */
+  .profile-story-content {
+    padding-left: 0;
+    margin-top: 4px;
+    width: 100%;
+  }
+
+  /* Slightly smaller title on mobile so it doesn’t feel cramped */
+  .profile-story-title-btn {
+    font-size: 1.4rem;
+  }
+}
+
+/* === FINAL OVERRIDES: SLIDE NAV LOGIN + HERO ABOUT US === */
+
+/* Slide-nav "Log in" button – smaller + same color as Get Started */
+.slide-nav .login-btn {
+  margin: 1rem auto 0;
+  padding: 0.4rem 1.2rem;
+  border-radius: 999px;                 /* pill shape */
+  border: 1px solid black;
+  background-color: silver ;            /* same as .cta-btn */
+  color: black;
+  font-family: 'Merriweather', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-block;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.slide-nav .login-btn:hover {
+  background-color: burlywood;            /* same hover as .cta-btn */
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+  transform: translateY(-1px);
+}
+
+.slide-nav .login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+/* Hero "About us" button – same look as Get Started */
+.hero-explore-btn {
+  padding: 0.8rem 2.4rem;
+  border-radius: 999px;
+  font-family: 'Merriweather', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  border: none !important;
+  background-color: #5d4a3b !important;  /* same as .cta-btn */
+  color: #ffffff !important;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.hero-explore-btn:hover {
+  background-color: #4c3a2e !important;  /* same hover as .cta-btn */
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transform: translateY(-1px);
+}
+
+.hero-explore-btn:active {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transform: translateY(1px);
+}
+
+

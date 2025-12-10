@@ -198,6 +198,15 @@ body.upload-page {
   box-shadow: 0 0 0 2px rgba(200,179,138,0.25);
 }
 
+/* Limit very wide text fields so they don't hit the edges / overlap */
+@media (min-width: 1100px) {
+  .series-input,
+  #chapter-title.upload-input {
+    max-width: 1000px;   /* adjust this number until you like the width */
+  }
+}
+
+
 .series-cover-row {
   display: flex;
   align-items: center;
@@ -581,7 +590,7 @@ body.upload-page {
 
 /* Back button – match story.html style */
 .upload-back-btn {
-  position: fixed;                  /* stay in place while scrolling, like story page */
+  position: absolute;       
   top: 16px;
   left: 16px;
   z-index: 2000;

@@ -160,6 +160,34 @@
       margin-top: 16px;
     }
 
+    /* Navigation buttons for previous/next chapters */
+    .chapter-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 24px 0;
+      width: 100%;
+    }
+    .chapter-navigation button {
+      background: none;
+      border: none;
+      padding: 8px 16px;
+      font-size: 1rem;
+      color: #7a6238;
+      cursor: pointer;
+      transition: color 0.25s ease;   /* smooth color change */
+    }
+
+    .chapter-navigation button:hover:not(:disabled) {
+      color: orangered;               /* hover color */
+    }
+
+    .chapter-navigation button:disabled {
+      color: #ccc;
+      cursor: default;
+      text-decoration: none;
+    }
+
     .chapter-not-found {
       max-width: 880px;
       margin: 0 auto;
@@ -217,6 +245,12 @@
         </p>
       </div>
     </section>
+
+    <!-- Navigation buttons for previous and next chapters -->
+    <div class="chapter-navigation">
+      <button id="prev-chapter-btn" class="chapter-nav-btn">Previous</button>
+      <button id="next-chapter-btn" class="chapter-nav-btn">Next Chapter</button>
+    </div>
 
     <div id="chapter-not-found" class="chapter-not-found" style="display:none;">
       We couldn’t find this chapter. It may have been removed or not yet created on this device.
@@ -423,6 +457,331 @@
       })();
     })();
   </script>
+
+  <script>
+    (function () {
+      const SERIES_KEY   = 'chapterflow:series';
+      const CHAPTERS_KEY = 'chapterflow:chapters';
+
+      function getSeriesList() {
+        try {
+          const raw = localStorage.getItem(SERIES_KEY);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function getChaptersList() {
+        try {
+          const raw = localStorage.getItem(CHAPTERS_KEY);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+
+      const params    = new URLSearchParams(window.location.search);
+      const seriesId  = params.get('seriesId');
+      const chapterId = params.get('chapterId');
+
+      const backBtn      = document.getElementById('chapter-back-btn');
+      const seriesNameEl = document.getElementById('chapter-series-name');
+      const authorEl     = document.getElementById('chapter-author');
+      const metaLeftEl   = document.getElementById('chapter-meta-left');
+      const metaRightEl  = document.getElementById('chapter-meta-right');
+      const bodyEl       = document.getElementById('chapter-body');
+      const emptyEl      = document.getElementById('chapter-empty');
+      const notFoundEl   = document.getElementById('chapter-not-found');
+
+      const prevBtn      = document.getElementById('prev-chapter-btn');
+      const nextBtn      = document.getElementById('next-chapter-btn');
+
+      // ---------------- BACK BUTTON ----------------
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          if (seriesId) {
+            const url = `story.html?seriesId=${encodeURIComponent(seriesId)}`;
+            window.location.href = url;
+          } else {
+            window.location.href = '../Slide nav buttons/edit-profile.html';
+          }
+        });
+      }
+
+      // If no chapterId at all, show not found and hide nav
+      if (!chapterId) {
+        if (notFoundEl) notFoundEl.style.display = 'block';
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+        return;
+      }
+
+      // ---------------- APPWRITE SETUP ----------------
+      let client = null;
+      let databases = null;
+
+      const DATABASE_ID            = '69252c2f001121c41ace';
+      const STORIES_COLLECTION_ID  = 'stories';
+      const CHAPTERS_COLLECTION_ID = 'chapters';
+
+      if (typeof Appwrite !== 'undefined') {
+        client = new Appwrite.Client()
+          .setEndpoint('https://nyc.cloud.appwrite.io/v1')
+          .setProject('69230def0009866e3192');
+
+        databases = new Appwrite.Databases(client);
+      }
+
+      // ---------------- RENDER CHAPTER TEXT ----------------
+      function renderChapter(series, chapter) {
+        if (!chapter) {
+          if (notFoundEl) notFoundEl.style.display = 'block';
+          return;
+        }
+
+        if (series) {
+          if (seriesNameEl) {
+            seriesNameEl.textContent = series.title || 'Untitled story';
+          }
+          if (authorEl && series.ownerName) {
+            authorEl.textContent = 'Uploaded by: ' + series.ownerName;
+          }
+        } else if (seriesNameEl) {
+          seriesNameEl.textContent = 'Untitled story';
+        }
+
+        const chapterTitle =
+          (chapter && chapter.title) || 'Untitled chapter';
+
+        const chapterNumber =
+          (chapter && chapter.chapterNumber != null)
+            ? chapter.chapterNumber
+            : (chapter && chapter.number != null
+                ? chapter.number
+                : null);
+
+        if (metaLeftEl) {
+          if (chapterNumber != null) {
+            metaLeftEl.textContent = `Chapter ${chapterNumber} - ${chapterTitle}`;
+          } else {
+            metaLeftEl.textContent = chapterTitle;
+          }
+        }
+
+        if (metaRightEl && chapter.createdAt) {
+          const dt = new Date(chapter.createdAt);
+          if (!isNaN(dt.getTime())) {
+            metaRightEl.textContent = dt.toLocaleDateString();
+          }
+        }
+
+        if (chapter.bodyHtml && bodyEl) {
+          bodyEl.innerHTML = chapter.bodyHtml;
+        } else if (chapter.bodyText && bodyEl) {
+          bodyEl.textContent = chapter.bodyText;
+        } else if (emptyEl) {
+          emptyEl.style.display = 'block';
+        }
+      }
+
+      // ---------------- NAVIGATION HELPERS ----------------
+      function setupNavFromList(chapters, currentChapterId, storyIdForNav) {
+        if (!prevBtn && !nextBtn) return;
+
+        if (!storyIdForNav || !chapters || !chapters.length) {
+          if (prevBtn) prevBtn.style.display = 'none';
+          if (nextBtn) nextBtn.disabled = true;
+          return;
+        }
+
+        const filtered = chapters
+          .filter((c) => {
+            const sId = c.storyId || c.seriesId || c.storyID || c.seriesID;
+            return String(sId) === String(storyIdForNav);
+          })
+          .sort((a, b) => {
+            const aNum = a.chapterNumber ?? a.number ?? 0;
+            const bNum = b.chapterNumber ?? b.number ?? 0;
+            return aNum - bNum;
+          });
+
+        if (!filtered.length) {
+          if (prevBtn) prevBtn.style.display = 'none';
+          if (nextBtn) nextBtn.disabled = true;
+          return;
+        }
+
+        const currentIndex = filtered.findIndex(
+          (c) => String(c.id || c.$id) === String(currentChapterId)
+        );
+
+        const prevChapter =
+          currentIndex > 0 ? filtered[currentIndex - 1] : null;
+        const nextChapter =
+          currentIndex >= 0 && currentIndex < filtered.length - 1
+            ? filtered[currentIndex + 1]
+            : null;
+
+        // ---- Previous button ----
+        if (prevBtn) {
+          if (prevChapter) {
+            const targetId = prevChapter.id || prevChapter.$id;
+            prevBtn.style.visibility = 'visible';   // visible from chapter 2+
+            prevBtn.disabled = false;
+            prevBtn.onclick = () => {
+              const url = `chapter.html?seriesId=${encodeURIComponent(
+                storyIdForNav
+              )}&chapterId=${encodeURIComponent(targetId)}`;
+              window.location.href = url;
+            };
+          } else {
+            // First chapter: hide completely
+            prevBtn.disabled = true;
+            prevBtn.onclick = null;
+            prevBtn.style.visibility = 'hidden';
+          }
+        }
+
+        // ---- Next button ----
+        if (nextBtn) {
+          if (nextChapter) {
+            const targetId = nextChapter.id || nextChapter.$id;
+            nextBtn.style.display = 'inline';
+            nextBtn.disabled = false;
+            nextBtn.onclick = () => {
+              const url = `chapter.html?seriesId=${encodeURIComponent(
+                storyIdForNav
+              )}&chapterId=${encodeURIComponent(targetId)}`;
+              window.location.href = url;
+            };
+          } else {
+            // No next chapter yet
+            nextBtn.disabled = true;
+            nextBtn.onclick = null;
+          }
+        }
+      }
+
+      async function setupNavFromAppwrite(storyIdForNav, currentChapterId) {
+        if (!databases || !storyIdForNav) return;
+
+        try {
+          const queries = [];
+          if (Appwrite.Query) {
+            queries.push(Appwrite.Query.equal('storyId', storyIdForNav));
+          }
+
+          const res = await databases.listDocuments(
+            DATABASE_ID,
+            CHAPTERS_COLLECTION_ID,
+            queries
+          );
+          const docs = Array.isArray(res.documents) ? res.documents : [];
+          setupNavFromList(docs, currentChapterId, storyIdForNav);
+        } catch (err) {
+          console.warn('Failed to load chapter list for navigation:', err);
+        }
+      }
+
+      // ---------------- LOAD FROM APPWRITE ----------------
+      async function loadFromAppwrite() {
+        if (!databases) return false;
+
+        let chapterDoc;
+        try {
+          chapterDoc = await databases.getDocument(
+            DATABASE_ID,
+            CHAPTERS_COLLECTION_ID,
+            chapterId
+          );
+        } catch (err) {
+          console.warn('Chapter not found in Appwrite or failed to load:', err);
+          return false;
+        }
+
+        let storyId = seriesId || chapterDoc.storyId || chapterDoc.seriesId || null;
+        let seriesDoc = null;
+
+        if (storyId) {
+          try {
+            seriesDoc = await databases.getDocument(
+              DATABASE_ID,
+              STORIES_COLLECTION_ID,
+              storyId
+            );
+          } catch (err) {
+            console.warn('Failed to load series for chapter:', err);
+          }
+        }
+
+        const chapterData = {
+          id:            chapterDoc.$id,
+          title:         chapterDoc.chapterTitle || chapterDoc.title || 'Untitled chapter',
+          chapterNumber: chapterDoc.chapterNumber ?? chapterDoc.number ?? null,
+          bodyHtml:      chapterDoc.fullHtml || chapterDoc.content || chapterDoc.bodyHtml || '',
+          bodyText:      chapterDoc.bodyText || '',
+          createdAt:     chapterDoc.createdAt
+        };
+
+        const seriesData = seriesDoc
+          ? {
+              id:        seriesDoc.$id,
+              title:     seriesDoc.title || 'Untitled story',
+              ownerName: seriesDoc.ownerName || ''
+            }
+          : null;
+
+        renderChapter(seriesData, chapterData);
+
+        // Use Appwrite list to wire prev/next
+        if (storyId) {
+          await setupNavFromAppwrite(storyId, chapterDoc.$id);
+        }
+
+        return true;
+      }
+
+      // ---------------- LOAD FROM LOCALSTORAGE (FALLBACK) ----------------
+      function loadFromLocalStorage() {
+        const seriesList   = getSeriesList();
+        const chaptersList = getChaptersList();
+
+        const series  = seriesList.find((s) => String(s.id) === String(seriesId));
+        const chapter = chaptersList.find((c) => String(c.id) === String(chapterId));
+
+        renderChapter(series, chapter);
+
+        const storyIdForNav =
+          seriesId ||
+          (chapter && (chapter.seriesId || chapter.storyId)) ||
+          (series && series.id);
+
+        setupNavFromList(chaptersList, chapterId, storyIdForNav);
+      }
+
+      // ---------------- INITIALIZE ----------------
+      (async function init() {
+        let loaded = false;
+
+        try {
+          loaded = await loadFromAppwrite();
+        } catch (err) {
+          console.warn('Error while loading from Appwrite:', err);
+          loaded = false;
+        }
+
+        if (!loaded) {
+          loadFromLocalStorage();
+        }
+      })();
+    })();
+  </script>
+
 
   <section class="footer-main">
     <div class="footer-inner">

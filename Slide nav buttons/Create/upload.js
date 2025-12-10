@@ -3,7 +3,7 @@
   const chapterTitleEl = document.getElementById('chapter-title');
   const statsEl = document.getElementById('editor-stats');
   const toolbarButtons = document.querySelectorAll('.editor-btn');
-  const saveDraftBtn = document.getElementById('save-draft-btn');
+  const cancelBtn = document.getElementById('cancel-btn');
   const publishBtn = document.getElementById('publish-btn');
   const fontSizeSelect = document.getElementById('font-size-select');
 
@@ -1335,18 +1335,20 @@ async function publishChapter() {
   }
 }
 
+if (cancelBtn) {
+  cancelBtn.addEventListener('click', () => {
+    // Optional: clear any old draft for this page
+    try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+    goHome();  // goes to ../../index.html
+  });
+}
 
+if (publishBtn) {
+  publishBtn.addEventListener('click', publishChapter);
+}
 
-  if (saveDraftBtn) {
-    saveDraftBtn.addEventListener('click', saveDraft);
-  }
-  if (publishBtn) {
-    publishBtn.addEventListener('click', publishChapter);
-  }
+// backBtn is null in this page (we use the <a> href), so no handler needed
 
-  if (backBtn) {
-    backBtn.addEventListener('click', goHome);
-  }
 
   // ---- Initialisation ----
   ensureEditableParagraph();
