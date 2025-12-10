@@ -111,9 +111,9 @@
 
     .student-story-cover img {
       width: 100%;
-      height: 230px;
+      height: 280px;
       object-fit: cover;
-      border-radius: 18px;
+      border-radius: 0px;
     }
 
     .student-story-main {
@@ -229,6 +229,36 @@
         margin-top: 110px;
       }
     }
+
+    /* Mobile tweaks for Reading Hub */
+@media (max-width: 768px) {
+  .reading-hub-main {
+    margin-top: 110px; /* you already have this – ok to keep */
+    padding: 0 1.25rem 2.5rem;
+  }
+
+  .hub-available-card {
+    margin-left: -1.25rem;   /* align to screen edges but not too crazy */
+    margin-right: -1.25rem;
+    border-radius: 0;
+  }
+
+  .hub-section-card {
+    padding: 1.3rem 1.2rem 1.6rem;
+  }
+
+  .student-story-row {
+    grid-template-columns: 1fr;
+    row-gap: 1rem;
+  }
+
+  .student-story-cover img {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+  }
+}
+
   </style>
 </head>
 <body>

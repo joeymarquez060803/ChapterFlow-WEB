@@ -76,7 +76,7 @@
 
     .story-card {
       background-color: #ffffff;
-      border-radius: 15px;
+      border-radius: 1px;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.13);
       padding: 26px 32px;
       display: grid;
@@ -266,13 +266,46 @@
     }
 
     @media (max-width: 768px) {
-      .story-layout {
-        top: -100px;
-      }
-      .story-card {
-        grid-template-columns: 1fr;
-      }
-    }
+  .story-banner {
+    height: 260px;
+  }
+
+  .story-layout {
+    max-width: 100%;
+    margin: -40px auto 40px;
+    padding: 0 1.1rem 40px;
+  }
+
+  .story-card {
+    grid-template-columns: 1fr;
+    padding: 18px 16px 22px;
+  }
+
+  .story-cover img {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+  }
+
+  .story-main-title {
+    font-size: 1.6rem;
+  }
+
+  .story-meta {
+    margin-top: 4px;
+    font-size: 0.9rem;
+  }
+
+  .story-description {
+    font-size: 0.95rem;
+  }
+
+  .chapters-list {
+    margin-top: 1.3rem;
+  }
+}
+
+
   </style>
 </head>
 

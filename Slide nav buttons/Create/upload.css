@@ -555,6 +555,30 @@ body.upload-page {
   }
 }
 
+/* Slightly larger breakpoint for tablets & small phones */
+@media (max-width: 768px) {
+  .upload-wrapper {
+    padding: 100px 12px 32px;
+  }
+
+  .upload-card {
+    border-radius: 16px;
+  }
+
+  .editor-toolbar {
+    gap: 8px;
+  }
+
+  .editor-content {
+    padding: 12px 10px;
+  }
+
+  .editor-stats {
+    font-size: 0.8rem;
+  }
+}
+
+
 /* Back button – match story.html style */
 .upload-back-btn {
   position: fixed;                  /* stay in place while scrolling, like story page */

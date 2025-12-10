@@ -1298,7 +1298,7 @@ body .navbar .nav-signup-cta:hover {
     flex-direction: column;
     gap: 0;  /* no gaps – lines will separate the rows */
     background-color: #ffffff;
-    border-radius: 24px;
+    border-radius: 1px;
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.13);
     padding: 24px 28px 28px;
 }
@@ -1984,7 +1984,7 @@ body.loading .navbar .nav-auth-link {
 .story-card {
   position: relative;                 /* needed for tag badge */
   background-color: #f5f5f5;
-  border-radius: 14px;
+  border-radius: 0px;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
   display: flex;
@@ -2382,4 +2382,81 @@ body.points-page {
     margin: 0;
     padding: 0;
     background-color: var(--hero-bg);  /* same beige used on ChapterFlow */
+}
+
+/* =======================
+   GLOBAL MOBILE TWEAKS
+   ======================= */
+@media (max-width: 768px) {
+  /* Navbar: keep it compact on phones */
+  .navbar {
+    height: 64px;
+    padding: 0 12px;
+  }
+
+  .logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .site-title {
+    font-size: 1.1rem;
+  }
+
+  /* Make links smaller so they don't feel cramped */
+  .nav-links {
+    gap: 8px;
+    font-size: 0.85rem;
+  }
+
+  /* Hero section (index.html) */
+  .hero-section {
+    padding: 110px 1.3rem 2.5rem;
+  }
+
+  .hero-inner {
+    max-width: 100%;
+  }
+
+  .hero-title {
+    font-size: 1.9rem;
+  }
+
+  .hero-tagline {
+    font-size: 1rem;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .hero-buttons .explore-btn,
+  .hero-buttons .reading-hub-btn,
+  .hero-buttons .hero-explore-btn,
+  .hero-buttons .hero-reading-hub-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Generic cards that appear in many pages */
+  .cf-card,
+  .features-card,
+  .profile-section,
+  .profile-stories,
+  .about-card {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  /* Make common grids stack to 1 column on small screens */
+  .features-grid,
+  .stories-grid,
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
 }
