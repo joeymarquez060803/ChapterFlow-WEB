@@ -582,13 +582,13 @@ body.loading .nav-links a {
     --khaki: #c8b38a;
     --page-cream: #faf8f0;
 
-    /* Navigation bar colours */
-    --nav-bg: #ffffff;              /* pure white navbar background */
-    --nav-border: #e4d8c4;          /* subtle bottom border */
-    --nav-text: #4d3a28;            /* dark brown nav text */
-    --nav-hover: #8f7958;           /* slightly lighter brown on hover */
-    --signup-bg: #f2eee5;           /* light beige background for sign‑up button */
-    --signup-hover: #e8dbc9;        /* darker beige on hover */
+  
+    --nav-bg: #ffffff;              
+    --nav-border: #e4d8c4;          
+    --nav-text: #4d3a28;           
+    --nav-hover: #8f7958;          
+    --signup-bg: #f2eee5;          
+    --signup-hover: #e8dbc9;        
 
     /* Section backgrounds */
     --hero-bg: #F2EEE5;             /* warm beige for hero and CTA sections */
