@@ -5,11 +5,11 @@
     width: 100%;
     height: 70px;
     padding: 0 40px;
-    background-color: #f4ead6; /* warm beige similar to reference */
+    background-color: #f4ead6; 
     display: flex;
     align-items: center;
     border-bottom: 1px solid #e4d8c4;
-    z-index: 1000; /* keep header above other content */
+    z-index: 1000; 
 }
 
 .logo {
@@ -22,14 +22,11 @@
     font-size: 26px;
     color: #4d3a28;
     margin-left: 5px;
-    margin-right: auto; /* pushes nav-links to the far right */
+    margin-right: auto; 
     font-family: 'Merriweather', serif;
     font-weight: 700;
 }
 
-/* Container for navigation links. Remove absolute positioning and use
-   `margin-left: auto` so the links naturally align to the right of
-   the title. A consistent gap provides breathing room between items. */
 .nav-links {
     position: static;
     display: flex;
@@ -38,11 +35,6 @@
     margin-left: auto;
 }
 
-/* Nav bar links: Home, About, Log in, Sign up */
-/* Generic link styling inside the nav bar. A slightly smaller
-   font-size and reduced letter-spacing offers a cleaner look.
-   Colors are drawn from the warm palette; transitions add
-   subtle movement and colour changes on hover. */
 .navbar .nav-link {
     color: #4d3a28;
     text-decoration: none;
@@ -56,19 +48,15 @@
     transition: color 0.2s ease, transform 0.2s ease;
 }
 
-/* Hover effect for normal nav links */
 .navbar .nav-link:hover {
     color: #8f7958;
     transform: translateY(-1px);
 }
 
-/* Active/click effect: small downward movement for feedback */
 .navbar .nav-link:active {
     transform: translateY(0);
 }
 
-/* The sign-up CTA in the header resembles a pill-shaped button. It has
-   a border and tinted background. Hovering darkens the tint slightly. */
 .navbar .nav-signup-cta {
     border: 1px solid #4d3a28;
     border-radius: 999px;
@@ -83,12 +71,10 @@
     color: #4d3a28;
 }
 
-/* Adjust spacing for the hamburger to prevent crowding the logo and
-   title. */
+
 .hamburger {
     margin-right: 16px;
 }
-
 
 
 .hamburger {
@@ -214,13 +200,12 @@
     text-align: center;
 }
 
-/* Slide-nav Log in button – smaller + same style as Get Started */
 .login-btn {
     margin: 16px auto 0;
     padding: 0.6rem 1.8rem;
     border-radius: 999px;
     border: none;
-    background-color: #5d4a3b;   /* same as .cta-btn */
+    background-color: #5d4a3b;  
     color: #ffffff;
     font-family: 'Merriweather', serif;
     font-size: 0.95rem;
@@ -231,27 +216,24 @@
 }
 
 .login-btn:hover {
-    background-color: #4c3a2e;   /* same hover as .cta-btn */
+    background-color: #4c3a2e; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.18);
     transform: translateY(-1px);
 }
 
 
 body {
-    margin: 0;  /* remove the default 8px margin so corners are filled */
+    margin: 0;
     background-color: #ffffff;
 }
 
 
-
-/* HERO SECTION IN NORMAL FLOW */
 .main-content {
     max-width: 900px;
-    margin: 90px auto 0;              /* leaves space under fixed navbar */
+    margin: 90px auto 0;         
     padding: 40px 1rem 60px;
     text-align: center;
 
-    /* make hero tall so Reading Hub appears after scroll */
     min-height: calc(100vh - 160px);
     display: flex;
     flex-direction: column;
@@ -294,8 +276,8 @@ body {
   cursor: pointer;
   font-weight: 600;
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-  margin-left: 10px;          /* optional spacing from Explore */
-  display: none;              /* 🔒 hidden by default */
+  margin-left: 10px;         
+  display: none;    
 }
 
 .reading-hub-btn:hover {
@@ -310,7 +292,6 @@ body {
 }
 
 
-/* Modal background */
 .modal {
   display: none; 
   position: fixed;
@@ -320,10 +301,9 @@ body {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.5); /*transparent bg */
+  background-color: rgba(0,0,0,0.5);
 }
 
-/* sqare */
 .modal-content {
   background-color: white;
   margin: 10% auto;
@@ -333,7 +313,6 @@ body {
   text-align: center;
 }
 
-/* Modal content is already centered, but we'll be explicit for brand + title */
 .modal-brand,
 #modalTitle {
   display: block;
@@ -341,7 +320,6 @@ body {
   text-align: center;
 }
 
-/* Tweak brand spacing so logo + CHAPTERFLOW feel tighter */
 .modal-brand {
   display: flex;
   flex-direction: column;
@@ -351,24 +329,21 @@ body {
   margin-bottom: 4px;
 }
 
-/* Make sure logo itself is perfectly centered */
 .modal-logo {
   margin-top: -10px;
   height: 48px;
   width: auto;
 }
 
-/* Slightly reduce letter-spacing so it visually lines up better with "Log in" */
 .modal-brand-name {
   font-family: "Merriweather", serif;
   font-size: 1rem;
   font-weight: 700;
-  letter-spacing: 0.12em;   /* was 0.14em, a bit too wide */
+  letter-spacing: 0.12em; 
   text-transform: uppercase;
   color: #4d3a28;
 }
 
-/* Center and position the title nicely under CHAPTERFLOW */
 #modalTitle {
   margin-top: 6px;
   margin-bottom: 18px;
@@ -377,7 +352,6 @@ body {
 }
 
 
-/* close button */
 .close {
   color: #aaa;
   float: right;
@@ -390,7 +364,6 @@ body {
   color: black;
 }
 
-/* username  */
 #usernameInput {
   width: 90%;
   padding: 10px;
@@ -407,7 +380,6 @@ body {
   border: 1px solid #ccc;
 }
 
-/* submit */
 #submitBtn {
   padding: 10px 20px;
   border: none;
@@ -429,13 +401,12 @@ body {
 
 .password-container input {
   width: 100%;
-  padding: 10px 40px 10px 10px; /* leave space for eye */
+  padding: 10px 40px 10px 10px; 
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 14px;
 }
 
-/* Eye icon */
 .eye {
   position: absolute;
   right: 10px;
@@ -446,15 +417,14 @@ body {
   background-image: url('https://cdn-icons-png.flaticon.com/512/709/709612.png'); /* eye icon */
   background-size: cover;
   cursor: pointer;
-  opacity: 0.4; /* faded by default */
+  opacity: 0.4;
   transition: opacity 0.2s ease;
 }
 
 .eye:active {
-  opacity: 0.7; /* slightly brighter when clicked */
+  opacity: 0.7; 
 }
 
-/* Profile container in slide nav */
 .profile-container {
     display: flex;
     flex-direction: column;
@@ -477,44 +447,40 @@ body {
 }
 
 .slide-nav-buttons {
-    position: absolute;      /* anchor inside .slide-nav */
-    bottom: 25px;            /* distance from bottom edge of slide nav */
-    left: 20px;              /* indent from the left */
-    right: 20px;             /* optional: keeps them away from right edge */
+    position: absolute;  
+    bottom: 25px;           
+    left: 20px;              
+    right: 20px;             
 
     display: flex;
     margin-left: 20px;
     flex-direction: column;
     gap: 15px;
-    margin: 0;               /* make sure old margins don’t interfere */
+    margin: 0;     
 }
 
 
-/* extra spacing between: Upload, View Uploads, History, Points & Rewards, Log out */
 .slide-nav-buttons .slide-nav-btn {
-    margin-bottom: 20px;   /* increase/decrease this value to taste */
+    margin-bottom: 20px; 
 }
 
 
-/* Slide-nav buttons: Profile + other items */
 .slide-nav-btn,
 .edit-profile-btn {
     background: none;
     border: none;
-    font-family: "Merriweather", serif;   /* same as nav bar */
+    font-family: "Merriweather", serif; 
     font-size: 0.95rem;
     letter-spacing: 0.14em;
     color: black;
     cursor: pointer;
     padding: 10px 0;
-    transform: translateX(0);            /* starting position */
+    transform: translateX(0);  
     transition:
-      color 0.25s ease,                  /* smooth color fade */
-      transform 0.25s ease;              /* smooth slide movement */
+      color 0.25s ease,               
+      transform 0.25s ease;     
 }
 
-
-/* keep original alignment differences */
 .slide-nav-btn {
     text-align: left;
 }
@@ -523,20 +489,17 @@ body {
     text-align: center;
 }
 
-/* Hover: turn orangered and slide slightly */
 .slide-nav-btn:hover,
 .edit-profile-btn:hover {
-    color: orangered;        /* same color you use elsewhere */
+    color: orangered;  
     transform: translateX(4px);
 }
 
-/* Active (when clicked) – tiny bounce back */
 .slide-nav-btn:active,
 .edit-profile-btn:active {
     transform: translateX(2px);
 }
 
-/* Smooth hover for slide-nav buttons when menu is open */
 .slide-nav.active .slide-nav-btn,
 .slide-nav.active .edit-profile-btn {
     transition: color 0.25s ease, transform 0.25s ease, opacity 0.3s ease;
@@ -544,72 +507,50 @@ body {
 
 .slide-nav.active .slide-nav-btn:hover,
 .slide-nav.active .edit-profile-btn:hover {
-    color: orangered;          /* same hover color you use elsewhere */
-    transform: translateX(4px); /* smooth slide to the right */
+    color: orangered;      
+    transform: translateX(4px); 
 }
 
-
-/* Hide profile card + stories while the page is still "loading" */
 body.loading .profile-section,
 body.loading .profile-stories {
   opacity: 0;
   visibility: hidden;
 }
 
-/* While auth is still loading, hide nav links so "Points" doesn't flash late */
 body.loading .navbar .nav-links {
   opacity: 0;
   visibility: hidden;
 }
 
-/* While auth is loading, also hide the hero buttons so the wrong one
-   (Explore vs Start Reading) doesn't flash briefly */
 body.loading .hero-buttons {
   opacity: 0;
   visibility: hidden;
 }
 
 
-/* Nice fade-in once loading finishes */
 .edit-profile-page .profile-section,
 .edit-profile-page .profile-stories {
   transition: opacity 160ms ease;
 }
 
-/* ========================================================================
-   ULTIMATE NAVBAR FIX
-   
-   The final portion of this stylesheet may still include a `.navbar` block
-   with `!important` rules leftover from earlier prototypes. To ensure
-   the nav bar consistently matches our unified design across all pages,
-   we add highly specific overrides below. By targeting `.navbar` via
-   the `body` element and using `!important`, these declarations take
-   precedence over any previous ones—even those marked `!important`.
-*/
 body .navbar {
-    /* A slightly slimmer header height to better match the reference */
     height: 60px !important;
-    /* Remove vertical padding so that nav items align centrally */
     padding-top: 0 !important;
     padding-bottom: 0 !important;
-    /* Adjust left and right padding to better centre nav content */
     padding-left: 32px !important;
     padding-right: 150px !important;
-    /* Pure white background and subtle border */
     background-color: var(--nav-bg) !important;
     border-bottom: 1px solid var(--nav-border) !important;
     display: flex !important;
     align-items: center !important;
-    /* Lay out the nav bar in a single row. The title uses margin-right: auto
-       to push the navigation links to the far right. */
     justify-content: flex-start !important;
-    overflow: visible !important; /* allow children to extend fully */
+    overflow: visible !important;
 }
 
 body .site-title {
     font-size: 26px !important;
     margin-left: 5px !important;
-    margin-right: auto !important; /* push nav links to the far right */
+    margin-right: auto !important; 
     font-family: 'Merriweather', serif !important;
     font-weight: 700 !important;
     color: var(--nav-text) !important;
@@ -617,16 +558,11 @@ body .site-title {
 }
 
 
-/* Provide additional breathing room between the hamburger icon and the logo/title */
+
 body .hamburger {
-    /* Provide a modest gap between the hamburger and logo; not too far, not too close */
     margin-right: 16px !important;
 }
 
-/* Ensure nav links remain visible even while the page carries the
-   `.loading` class. Without this override, they would be hidden until
-   the script removes the class, which can be confusing during
-   development or if an error occurs. */
 body .nav-links a {
     visibility: visible !important;
     opacity: 1 !important;
@@ -638,18 +574,11 @@ body.loading .nav-links a {
 }
 
 
-
-/* Utility class */
 .hidden {
     display: none !important;
 }
 
-/* =========================================================
-   EDIT PROFILE PAGE STYLES
-   ========================================================= */
-
 :root {
-    /* Palette variables used throughout the front page and navigation */
     --khaki: #c8b38a;
     --page-cream: #faf8f0;
 
