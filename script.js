@@ -1,13 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // -------------------------------
-  // Page flags + anti-flash (FOUC) helpers
-  // -------------------------------
+  
   const isChapterFlowPage = window.location.href.toLowerCase().includes('index.html');
   const isEditProfilePage = window.location.href.toLowerCase().includes('edit-profile.html');
 
 
 
-  // Profile stories section (edit-profile.html)
+  
   const profileStoriesSection   = isEditProfilePage ? document.querySelector('.profile-stories') : null;
   const profileStoriesContainer = isEditProfilePage ? document.getElementById('profile-stories-container') : null;
   const profileStoriesEmptyMsg  = isEditProfilePage ? document.querySelector('.profile-stories-empty') : null;
@@ -19,26 +17,24 @@ document.addEventListener('DOMContentLoaded', function () {
   const header = document.querySelector('header');
   const navLinksContainer = document.querySelector('.nav-links');
 
-  // Home hero buttons (only exist on ChapterFlow.html)
+  
   const exploreBtn = document.querySelector('.explore-btn');
   const homeHubBtn = document.querySelector('.reading-hub-btn');
 
-  // Is this the Reading Hub page?
+  
   const isReadingHubPage = window.location.href.toLowerCase().includes('readinghub.html');
 
-  // Elements that only exist (or mainly exist) on readinghub.html
+  
   const readingHubSection   = document.querySelector('.reading-hub');
   const readingHubLockedMsg = document.querySelector('.locked-message');
 
-  // Prevent nav flicker/layout shift on ChapterFlow.html:
-  // hide the entire .nav-links container during auth loading.
+  
   if (isChapterFlowPage) {
     if (header) header.style.display = 'block';
     if (navLinksContainer) navLinksContainer.style.display = 'none';
   }
 
-  // Prevent edit-profile flash of placeholder avatar/name/email:
-  // hide the whole profile section until we populate real data AND the image finishes loading.
+  
   const editProfileSection = isEditProfilePage ? document.querySelector('.profile-section') : null;
   if (editProfileSection) {
     editProfileSection.style.visibility = 'hidden';
@@ -62,8 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
     img.addEventListener('error', show, { once: true });
   }
 
-  // Initialize Appwrite Client and Account (conditionally, without blocking UI)
-  let client, account, databases;
+  
   if (typeof Appwrite !== 'undefined') {
     client = new Appwrite.Client()
       .setEndpoint('https://nyc.cloud.appwrite.io/v1')
@@ -75,17 +70,15 @@ document.addEventListener('DOMContentLoaded', function () {
     console.error('Appwrite SDK not loaded. Auth and uploads may not work.');
   }
 
-  // ===========================
-  // REAL POINTS stored in Appwrite prefs
-  // ===========================
+  
   const POINTS_PREF_KEY = 'readingPoints';
 
-  // Show points ONLY in the top navbar
+ 
   function updateHeaderPoints(points) {
   const navContainer = document.querySelector('.nav-links');
   if (!navContainer) return;
 
-  // Look for the first "main" nav link (Home) to insert before it
+  
   const firstMainLink = navContainer.querySelector('.nav-main-link');
 
   let badge = navContainer.querySelector('.nav-points-display');
@@ -94,10 +87,10 @@ document.addEventListener('DOMContentLoaded', function () {
     badge.className = 'nav-points-display';
 
     if (firstMainLink) {
-      // Insert [ Points: 123 ] before [ Home ]
+     
       navContainer.insertBefore(badge, firstMainLink);
     } else {
-      // Fallback: just append at the end if something is weird
+      
       navContainer.appendChild(badge);
     }
   }
@@ -106,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 
 
-  // OPTIONAL: If you ever want to show points on profile page
+  
   function updateProfilePoints(points) {
     const span = document.getElementById('profile-points-value');
     if (span) {
@@ -114,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Read points from Appwrite account prefs
+  
   async function getUserPoints(user) {
     if (!account || !user) return 0;
     try {
@@ -129,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Save points to Appwrite prefs + refresh navbar/profile UI
+  
   async function setUserPoints(user, points) {
     if (!account || !user) return;
     const safePoints = Math.max(0, Math.floor(Number(points) || 0));
@@ -144,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateProfilePoints(safePoints);
   }
 
-  // Helpers you can call anywhere
+ 
   async function addUserPoints(user, delta) {
     const current = await getUserPoints(user);
     return setUserPoints(user, current + (Number(delta) || 0));
@@ -155,9 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return setUserPoints(user, current - (Number(delta) || 0));
   }
 
-  // -------------------------------
-  // Profile picture persistence (per-account)
-  // -------------------------------
+ 
   const BUCKET_ID = '69230e950007fef02b5b';
   const PROFILE_PREF_KEY = 'profilePicFileId';
   const DEFAULT_AVATAR_SMALL = 'https://via.placeholder.com/50x50/cccccc/000000?text=U';
@@ -359,9 +350,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // -------------------------------
-  // Profile Picture Upload Functionality  (UPDATED)
-  // -------------------------------
+  
   const profilePic = document.getElementById('profile-pic');
   const profilePicUpload = document.getElementById('profile-pic-upload');
   const avatarWrapper = document.getElementById('avatar-wrapper');
@@ -371,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     clickable.addEventListener('click', (e) => {
       e.preventDefault();
-      profilePicUpload.click();   // single, central place to open dialog
+      profilePicUpload.click();   
     });
 
     if (profilePic) {
@@ -443,9 +432,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // -------------------------------
-  // Hamburger and Slide Nav
-  // -------------------------------
+  
   const hamburger = document.querySelector('.hamburger');
   const slideNav = document.querySelector('.slide-nav');
   const closeBtn = document.querySelector('.close-btn');
@@ -465,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ----- existing code continues here -----
+  
   const modal = document.getElementById('authModal');
   const modalTitle = document.getElementById('modalTitle');
   const closeModal = document.querySelector('.modal .close');
@@ -503,19 +490,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-    // "Get Started" button behavior:
-  // - Logged OUT  -> open login modal
-  // - Logged IN   -> go to upload page
+    
 const ctaBtn = document.querySelector('.cta-btn');
 if (ctaBtn) {
   ctaBtn.addEventListener('click', function (e) {
     e.preventDefault();
 
     if (currentUser) {
-      // LOGGED IN → go to upload.html
+      
       window.location.href = './Slide nav buttons/Create/upload.html';
     } else {
-      // NOT LOGGED IN → open login modal
+      
       const usernameInput = document.getElementById('usernameInput');
       const passwordInput = document.getElementById('passwordInput');
       if (usernameInput) usernameInput.value = '';
@@ -586,27 +571,25 @@ if (ctaBtn) {
     if (isChapterFlowPage && navLinksContainer) navLinksContainer.style.display = '';
   }
 
-  // Generate a unique-ish code for each redemption
+  
   function generateRewardCode(user, rewardId) {
-    const userPart = (user.$id || '').slice(-4).toUpperCase();      // last 4 chars of user id
-    const timePart = Date.now().toString(36).toUpperCase();         // timestamp in base36
-    const randPart = Math.floor(Math.random() * 46656)              // 0..36^3-1
+    const userPart = (user.$id || '').slice(-4).toUpperCase();      
+    const timePart = Date.now().toString(36).toUpperCase();         
+    const randPart = Math.floor(Math.random() * 46656)             
       .toString(36)
       .padStart(3, '0')
       .toUpperCase();
 
-    // Example: PEN-AB12-LKJ3F-0X9
+    
     return `${rewardId}-${userPart}-${timePart}-${randPart}`;
   }
 
-  // ===============================
-  // PROFILE STORIES / SERIES (edit-profile.html)
-  // ===============================
+  
 
-  // LocalStorage key used by upload.js
+  
   const SERIES_STORAGE_KEY = 'chapterflow:series';
 
-  // 🔹 NEW: Appwrite is the source of truth for THIS user's stories
+ 
   async function syncSeriesFromAppwriteToStorage(user) {
     if (!databases || !user || !user.$id) return;
 
@@ -627,7 +610,7 @@ if (ctaBtn) {
 
       const docs = (res && Array.isArray(res.documents)) ? res.documents : [];
 
-      // Map Appwrite docs into the same structure upload.js uses locally
+      
       const fromDb = docs.map((doc) => ({
         id:          doc.$id,
         title:       doc.title || 'Untitled story',
@@ -641,9 +624,7 @@ if (ctaBtn) {
           (user.email ? user.email.split('@')[0] : null),
       }));
 
-      // 🔥 Important:
-      // Keep stories from OTHER users (if any share this browser),
-      // but for THIS user, use EXACTLY the stories from Appwrite.
+      
       const userIdStr = String(user.$id);
       const otherUsersStories = existing.filter(
         (s) => String(s.ownerId) !== userIdStr
@@ -682,7 +663,7 @@ if (ctaBtn) {
     if (series.coverFileId) return series.coverFileId;
 
     const name = (series.coverName || '').trim();
-    // If coverName is a long ID with no dot, treat it as an Appwrite fileId
+    
     if (name && !name.includes('.') && name.length > 20) {
       return name;
     }
@@ -695,7 +676,7 @@ if (ctaBtn) {
     const allSeries = getSeriesFromStorage();
     profileStoriesContainer.innerHTML = '';
 
-    // If there is literally nothing in storage, show the empty message and stop.
+    
     if (!allSeries.length) {
       if (profileStoriesEmptyMsg) {
         profileStoriesEmptyMsg.style.display = 'block';
@@ -706,16 +687,16 @@ if (ctaBtn) {
     const userId =
       currentUser && currentUser.$id ? String(currentUser.$id) : null;
 
-    // --- MIGRATION: attach ownerId to old stories that don't have it yet ---
+    
     let changed = false;
     if (userId && allSeries.length) {
       allSeries.forEach((s) => {
-        // assign ownerId for old stories
+        
         if (!s.ownerId) {
           s.ownerId = userId;
           changed = true;
         }
-        // also upgrade stories where coverName was actually the fileId
+        
         if (!s.coverFileId) {
           const inferred = inferCoverFileId(s);
           if (inferred) {
@@ -729,7 +710,7 @@ if (ctaBtn) {
       }
     }
 
-    // Only show stories that belong to the current account
+    
     const seriesList = userId
       ? allSeries.filter((s) => String(s.ownerId) === userId)
       : allSeries;
@@ -756,8 +737,7 @@ if (ctaBtn) {
       const cover = document.createElement('div');
       cover.className = 'profile-story-cover';
 
-      // Try coverFileId first, then fall back to coverName if it looks like an ID
-      const fileId = inferCoverFileId(series);
+      
       const coverUrl = fileId ? getProfileImageUrl(fileId) : null;
 
       if (coverUrl) {
@@ -766,14 +746,14 @@ if (ctaBtn) {
         img.alt = series.title || 'Series cover';
         cover.appendChild(img);
       } else {
-        // No usable file id → gray box with text
+       
         const placeholder = document.createElement('div');
         placeholder.className = 'profile-story-cover-inner';
         placeholder.textContent = series.coverName || 'COVER';
         cover.appendChild(placeholder);
       }
 
-      // Right side: title + uploaded by + description label + description
+      
       const content = document.createElement('div');
       content.className = 'profile-story-content';
 
@@ -783,15 +763,14 @@ if (ctaBtn) {
       titleBtn.dataset.seriesId = series.id;
       titleBtn.textContent = title;
 
-// When you click the story title, go to story.html for this series
+
 titleBtn.addEventListener('click', () => {
-  // Remember: we came from profile
+ 
   try {
     sessionStorage.setItem('cf_storyOrigin', 'profile');
   } catch (e) {}
 
-  // edit-profile.html is in "Slide nav buttons"
-  // story.html is in "Chapter - Story"
+  
   const base = '../Chapter - Story/story.html';
   const url  = `${base}?seriesId=${encodeURIComponent(series.id)}`;
   window.location.href = url;
@@ -799,7 +778,7 @@ titleBtn.addEventListener('click', () => {
 
 
 
-      // Figure out the uploader name (from series, or fall back to current user)
+      
       const uploaderName =
         (series.ownerName && String(series.ownerName).trim()) ||
         (currentUser &&
@@ -824,11 +803,11 @@ titleBtn.addEventListener('click', () => {
       descP.textContent = desc;
       content.appendChild(descP);
 
-      // title goes on top
+      
       content.insertBefore(titleBtn, content.firstChild);
 
 
-      // 3-dot menu (delete)
+      
       const menu = document.createElement('div');
       menu.className = 'profile-story-menu';
 
@@ -866,7 +845,7 @@ titleBtn.addEventListener('click', () => {
     const menuBtn   = evt.target.closest('.story-menu-btn');
     const deleteBtn = evt.target.closest('.story-delete-btn');
 
-    // Toggle menu open/close
+    
     if (menuBtn) {
       const card = menuBtn.closest('.profile-story-card');
       if (!card) return;
@@ -875,11 +854,11 @@ titleBtn.addEventListener('click', () => {
 
       const isOpen = menu.classList.contains('open');
 
-      // Close all menus first
+      
       const allMenus = profileStoriesContainer.querySelectorAll('.profile-story-menu');
       allMenus.forEach((m) => m.classList.remove('open'));
 
-      // Toggle this one
+     
       if (!isOpen) {
         menu.classList.add('open');
       }
@@ -887,7 +866,7 @@ titleBtn.addEventListener('click', () => {
       return;
     }
 
-    // Delete story
+    
     if (deleteBtn) {
       const card = deleteBtn.closest('.profile-story-card');
       if (!card) return;
@@ -902,21 +881,21 @@ titleBtn.addEventListener('click', () => {
         return;
       }
 
-      // 1) Remove from localStorage (so UI updates immediately)
+      
       const list = getSeriesFromStorage();
       const filtered = list.filter((s) => String(s.id) !== String(seriesId));
       saveSeriesToStorage(filtered);
 
-      // 2) Remove card from DOM + re-render list
+      
       card.remove();
       renderProfileStories();
 
-      // 3) Also delete from Appwrite (story + its chapters)
+      
       (async () => {
-        if (!databases) return; // Appwrite not ready
+        if (!databases) return; 
 
         try {
-          // Delete the story/series document
+         
           await databases.deleteDocument(DATABASE_ID, STORIES_COLLECTION_ID, seriesId);
         } catch (err) {
           console.error('Failed to delete story in Appwrite:', err);
@@ -927,7 +906,7 @@ titleBtn.addEventListener('click', () => {
           return;
         }
 
-        // Best-effort: delete all chapters belonging to this story
+        
         try {
           const res = await databases.listDocuments(
             DATABASE_ID,
@@ -956,7 +935,7 @@ titleBtn.addEventListener('click', () => {
       return;
     }
 
-    // Clicked somewhere else inside the container → close any open menus
+    
     const openMenus = profileStoriesContainer.querySelectorAll('.profile-story-menu.open');
     openMenus.forEach((menu) => {
       if (!menu.contains(evt.target)) {
@@ -965,20 +944,18 @@ titleBtn.addEventListener('click', () => {
     });
   }
 
-  // ===========================
-  // UI for logged in / logged out
-  // ===========================
+  
 async function updateUIForLoggedInUser(user) {
-    // Mark body as logged-in so CSS can hide auth-only links in navbar
+    
     document.body.classList.add('cf-logged-in');
     document.body.classList.remove('cf-logged-out');
 
-    // Points for this user
+    
     const userPoints = await getUserPoints(user);
     updateHeaderPoints(userPoints);    // NAVBAR ONLY
     updateProfilePoints(userPoints);   // OPTIONAL (profile page)
 
-    // ----- Slide nav (left hamburger menu) -----
+    
     if (slideNav) {
       const loginBtn = slideNav.querySelector('.login-btn');
       const loginText = slideNav.querySelector('p');
@@ -988,15 +965,15 @@ async function updateUIForLoggedInUser(user) {
         loginText.style.display = 'none';
       }
 
-      // Remove any old profile widget first
+      
       const existingProfile = slideNav.querySelector('.profile-container');
       if (existingProfile) existingProfile.remove();
 
-      // Also remove any old action buttons block (.slide-nav-buttons)
+      
       const existingActions = slideNav.querySelector('.slide-nav-buttons');
       if (existingActions) existingActions.remove();
 
-      // Build logged-in profile block (ONLY profile pic + username + Profile button)
+      
       const profileContainer = document.createElement('div');
       profileContainer.className = 'profile-container';
       profileContainer.innerHTML = `
@@ -1006,7 +983,7 @@ async function updateUIForLoggedInUser(user) {
 `;
       slideNav.appendChild(profileContainer);
 
-      // Build a completely separate block for Create / Reading Hub / Points & Rewards / Log out
+      
       const actionsContainer = document.createElement('div');
       actionsContainer.className = 'slide-nav-buttons';
       actionsContainer.innerHTML = `
@@ -1036,7 +1013,7 @@ async function updateUIForLoggedInUser(user) {
       if (createBtn) {
         createBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          // upload.html is in "Slide nav buttons/Create"
+          
           window.location.href = '../Slide nav buttons/Create/upload.html';
         });
       }
@@ -1044,7 +1021,7 @@ async function updateUIForLoggedInUser(user) {
       if (readingHubBtn) {
         readingHubBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          // Navigate to the reading hub root page
+          
           window.location.href = '../readinghub.html';
         });
       }
@@ -1069,19 +1046,19 @@ async function updateUIForLoggedInUser(user) {
       }
     }
 
-    // ----- HOME PAGE: swap Explore ↔ Reading Hub button -----
+    
     if (isChapterFlowPage) {
       if (exploreBtn)  exploreBtn.style.display = 'none';
       if (homeHubBtn)  homeHubBtn.style.display = 'inline-block';
     }
 
-    // ----- READING HUB PAGE: show cards, hide lock message -----
+    
     if (isReadingHubPage) {
       if (readingHubSection)  readingHubSection.style.display = 'block';
       if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'none';
     }
 
-    // ----- Edit profile page extra UI -----
+   
     if (isEditProfilePage) {
       const userName  = document.getElementById('user-name');
       const userEmail = document.getElementById('user-email');
@@ -1092,18 +1069,18 @@ async function updateUIForLoggedInUser(user) {
       await applyProfilePictureToUI(user);
       setupEditableUsername(user);
 
-      // 🔹 First sync this user's stories from Appwrite → localStorage, then render
+      
       await syncSeriesFromAppwriteToStorage(user);
       renderProfileStories();
       revealEditProfileSectionWhenReady();
 
-      // Edit-profile "Create" button → upload page
+      
       const profileCreateBtn = document.querySelector('.points-create-btn');
       if (profileCreateBtn && !profileCreateBtn.dataset.bound) {
         profileCreateBtn.dataset.bound = '1';
         profileCreateBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          // edit-profile.html is in "Slide nav buttons", upload.html is in "Slide nav buttons/Create"
+          
           window.location.href = './Create/upload.html';
         });
       }
@@ -1111,28 +1088,28 @@ async function updateUIForLoggedInUser(user) {
   }
 
 function updateUIForLoggedOutUser() {
-    // Mark body as logged-out so CSS shows auth-only links in navbar
+    
     document.body.classList.remove('cf-logged-in');
     document.body.classList.add('cf-logged-out');
 
-    // Show "Log in / Sign up" again (if they exist)
+    
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach((link) => {
       const text = (link.textContent || '').trim();
       if (text === 'Log in' || text === 'Sign up') {
-        // Let CSS control display in most cases, but clear any inline override
+        
         link.style.display = '';
       }
     });
 
-    // Remove header points badge when logged out
+    
     const navContainer = document.querySelector('.nav-links');
     if (navContainer) {
       const badge = navContainer.querySelector('.nav-points-display');
       if (badge) badge.remove();
     }
 
-    // Clear profile stories list on edit-profile page
+    
     if (profileStoriesContainer) {
       profileStoriesContainer.innerHTML = '';
     }
@@ -1140,7 +1117,7 @@ function updateUIForLoggedOutUser() {
       profileStoriesEmptyMsg.style.display = 'block';
     }
 
-    // Slide nav: remove profile, show "Please log in first"
+    
     if (slideNav) {
       const profileContainer = slideNav.querySelector('.profile-container');
       if (profileContainer) profileContainer.remove();
@@ -1154,13 +1131,13 @@ function updateUIForLoggedOutUser() {
       if (loginText) loginText.style.display = 'block';
     }
 
-    // HOME PAGE: show Explore, hide Reading Hub button
+    
     if (isChapterFlowPage) {
       if (exploreBtn)  exploreBtn.style.display = 'inline-block';
       if (homeHubBtn)  homeHubBtn.style.display = 'none';
     }
 
-    // READING HUB PAGE: hide cards, show "Please log in" message
+    
     if (isReadingHubPage) {
       if (readingHubSection)   readingHubSection.style.display = 'none';
       if (readingHubLockedMsg) readingHubLockedMsg.style.display = 'block';
@@ -1199,19 +1176,17 @@ function updateUIForLoggedOutUser() {
     });
   }
 
-  // ===========================
-  // READING BUBBLE (chapter pages only, REAL points)
-  // ===========================
+  
   (function setupReadingBubble() {
-    // only on chapter-reading pages (no header/book-info)
+    
     const isReaderPage = document.querySelector('main.reader-page');
-    const hasMeta = document.querySelector('.reader-meta'); // book info page has this
+    const hasMeta = document.querySelector('.reader-meta'); 
     const isChapterView = isReaderPage && !hasMeta;
 
     if (!isChapterView) return;
     if (typeof account === 'undefined' || !account) return;
 
-      // Only show bubble if we came from Reading Hub
+      
   let cameFromHub = false;
   try {
     cameFromHub = sessionStorage.getItem('cf_viaHub') === '1';
@@ -1222,22 +1197,22 @@ function updateUIForLoggedOutUser() {
   if (!cameFromHub) return;
 
 
-    // --- identify the book so all its chapters share progress ---
+    
     const pathname = window.location.pathname;
     const filename = pathname.split('/').pop() || '';
     const baseName = filename.replace(/\.html$/i, '');
     const bookId = baseName.replace(/-ch\d+$/i, '');
     const STORAGE_KEY = `cf_progress:${bookId || 'default'}`;
 
-    const INACTIVITY_LIMIT_MS = 60000;  // 60s no activity = pause
+    const INACTIVITY_LIMIT_MS = 60000;  
     const POINT_INTERVAL_SEC = 120;   
 
-    let secondsRead = 0;       // total seconds used for points
-    let sessionSeconds = 0;    // seconds for this reading session (label only)
-    let pointsAwarded = 0;     // how many chunks already converted to points
+    let secondsRead = 0;       
+    let sessionSeconds = 0;    
+    let pointsAwarded = 0;     
 
 
-    // --- load local progress (so time continues across chapters) ---
+    
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -1264,7 +1239,7 @@ function updateUIForLoggedOutUser() {
       }
     }
 
-    // --- bubble DOM ---
+  
     const bubble = document.createElement('div');
     bubble.className = 'reading-bubble panel-left';
 
@@ -1295,22 +1270,22 @@ function updateUIForLoggedOutUser() {
     const prevBtn     = bubble.querySelector('.rb-prev-btn');
     const nextBtn     = bubble.querySelector('.rb-next-btn');
 
-    // --- shortcuts: Reading Hub + Points & Rewards ---
+    
     if (hubBtn) {
       hubBtn.addEventListener('click', () => {
-        // chapter pages live in "Chapter - Story", hub is one level up
+        
         window.location.href = '../readinghub.html';
       });
     }
 
     if (rewardsBtn) {
       rewardsBtn.addEventListener('click', () => {
-        // points-rewards.html is in "Slide nav buttons"
+        
         window.location.href = '../Slide nav buttons/points-rewards.html';
       });
     }
 
-    // --- decide which side the panel opens on (left/right) ---
+    
     function updatePanelSide() {
       const rect = bubble.getBoundingClientRect();
       const threshold = 160;
@@ -1330,7 +1305,7 @@ function updateUIForLoggedOutUser() {
       bubble.classList.toggle('open');
     });
 
-    // --- prev / next chapter wiring (adjust filenames to your own) ---
+    
     const path = window.location.pathname;
     const isCh1 = path.includes('story-king-ch1');
     const isCh2 = path.includes('story-king-ch2');
@@ -1367,7 +1342,7 @@ function updateUIForLoggedOutUser() {
       nextBtn.style.display = 'none';
     }
 
-    // --- draggable behaviour ---
+   
     let isDragging = false;
     let offsetX = 0;
     let offsetY = 0;
@@ -1446,7 +1421,7 @@ function updateUIForLoggedOutUser() {
 
     updateLabels();
 
-    // initial points display inside bubble
+    
     (async () => {
       const userNow = await getLoggedInUserSafe();
       if (userNow && pointsLabel) {
@@ -1459,8 +1434,8 @@ function updateUIForLoggedOutUser() {
       const now = Date.now();
       const inactiveFor = now - lastActivity;
         if (inactiveFor < INACTIVITY_LIMIT_MS) {
-        secondsRead += 1;    // persists → used for Next point in
-        sessionSeconds += 1; // session-only → used for Reading time label
+        secondsRead += 1;    
+        sessionSeconds += 1; 
 
 
         const thresholds = Math.floor(secondsRead / POINT_INTERVAL_SEC);
@@ -1470,7 +1445,7 @@ function updateUIForLoggedOutUser() {
           pointsAwarded = thresholds;
           saveProgress();
 
-          // Add REAL POINTS into Appwrite prefs + update bubble label
+          
           (async () => {
             const userNow = await getLoggedInUserSafe();
             if (userNow) {
@@ -1488,18 +1463,14 @@ function updateUIForLoggedOutUser() {
         updateLabels();
       }
     }, 1000);
-   })();  // end of READING BUBBLE
-
-  // =========================
-  // POINTS POPOVER (navbar + profile)
-  // =========================
-
+   })();  
+  
   function setupPointsPopovers() {
     const path = window.location.pathname.toLowerCase();
     const inSlideNavFolder =
       path.includes('slide%20nav%20buttons') || path.includes('slide nav buttons');
 
-    // Correct links depending on where we are
+   
     const links = {
       hub: inSlideNavFolder ? '../readinghub.html' : 'readinghub.html',
       rewards: inSlideNavFolder ? 'points-rewards.html' : 'Slide nav buttons/points-rewards.html'
@@ -1518,7 +1489,7 @@ function updateUIForLoggedOutUser() {
       if (!targetEl || targetEl.dataset.pointsPopoverAttached === '1') return;
       targetEl.dataset.pointsPopoverAttached = '1';
 
-      // Wrap the element so we can position the bubble relative to it
+      
       const wrapper = document.createElement('div');
       wrapper.className = 'points-popover-wrapper';
 
@@ -1585,14 +1556,13 @@ function updateUIForLoggedOutUser() {
       wrapper.addEventListener('mouseleave', hidePopover);
     }
 
-    // Profile card "Points" in edit-profile.html
+    
     const profilePointsLabel = document.querySelector('.edit-profile-page .points-label');
     if (profilePointsLabel) {
       attachPopoverToTarget(profilePointsLabel);
     }
 
-    // Navbar points badge may be injected later by auth logic,
-    // so watch the nav-links area.
+    
     const navLinks = document.querySelector('.navbar .nav-links');
 
     function tryAttachNavBadge() {
@@ -1602,22 +1572,19 @@ function updateUIForLoggedOutUser() {
       }
     }
 
-    // Try once now
+    
     tryAttachNavBadge();
 
-    // If nav exists, observe it for child mutations so we catch the
-    // points badge as soon as auth code inserts it.
+    
     if (navLinks && typeof MutationObserver !== 'undefined') {
       const obs = new MutationObserver(tryAttachNavBadge);
       obs.observe(navLinks, { childList: true, subtree: true });
     }
   }
 
-  // ===========================
-  // POINTS & REWARDS PAGE (redeem items)
-  // ===========================
+ 
   async function setupRewardsPage() {
-    // ...
+    
 
     const isPointsPage = window.location.href.toLowerCase().includes('points-rewards.html');
     if (!isPointsPage) return;
@@ -1650,14 +1617,14 @@ function updateUIForLoggedOutUser() {
         const ok = confirm(`Redeem this reward for ${cost} points?`);
         if (!ok) return;
 
-        // Subtract points
+        
         const newBalance = currentPoints - cost;
         await setUserPoints(currentUser, newBalance);
 
-        // Generate code
+       
         const code = generateRewardCode(currentUser, rewardId);
 
-        // Show code in alert
+       
         alert(
           `Success! You redeemed this reward.\n\n` +
           `Your new balance: ${newBalance} points.\n\n` +
@@ -1665,7 +1632,7 @@ function updateUIForLoggedOutUser() {
           `Show this code to us.`
         );
 
-        // Also show the code in the card on the page
+       
         const card = btn.closest('.reward-card');
         if (card) {
           const msg = card.querySelector('.reward-code-message');
