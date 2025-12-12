@@ -728,7 +728,7 @@ body.edit-profile-page {
     transform: translateY(1px);
 }
 
-/* Designed by badge */
+
 .designed-by {
     position: absolute;
     bottom: 10px;
@@ -747,7 +747,7 @@ body.edit-profile-page {
     margin-left: 2px;
 }
 
-/* Features section */
+
 .features-section {
     background-color: var(--feature-bg);
     padding: 100px 1rem 100px;
@@ -818,7 +818,7 @@ body.edit-profile-page {
     line-height: 1.6;
 }
 
-/* Call-to-action section */
+
 .cta-section {
     background-color: var(--cta-bg);
     text-align: center;
@@ -863,7 +863,7 @@ body.edit-profile-page {
     transform: translateY(1px);
 }
 
-/* Footer (dark section) */
+
 .footer-main {
     background-color: var(--footer-bg);
     color: var(--footer-text);
@@ -967,22 +967,16 @@ body.edit-profile-page {
     margin: 0;
 }
 
-/* ========================================================================
-   Landing Page: Final Navbar Overrides
-   Placed near the end of the stylesheet to ensure the landing page
-   navigation bar matches the reference design exactly. These rules
-   override the general final navbar styles defined earlier, using
-   increased specificity (`body .navbar`) and `!important` declarations.
-*/
+
 body .navbar {
-    /* A slightly slimmer header height to mirror the original ChapterFlow header */
+
     height: 60px !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
-    /* Adjust horizontal padding so the content sits closer to the edges without being cramped */
+
     padding-left: 32px !important;
     padding-right: 150px !important;
-    /* Pure white background as requested */
+    
     background-color: #ffffff !important;
     border-bottom: 1px solid #e4d8c4 !important;
     box-shadow: none !important;
@@ -995,19 +989,19 @@ body .navbar {
     right: 0 !important;
     z-index: 1000 !important;
     overflow: visible !important;
-    /* account for the vertical scrollbar to prevent nav items from being clipped */
+    
     width: calc(100% - 15px) !important;
 }
 
 body .navbar .logo {
-    /* Adjust the logo height to sit neatly within a 60px navbar */
+    
     height: 36px !important;
     margin-right: 10px !important;
 }
 
-/* Give a little breathing room between the hamburger icon and the logo */
+
 body .hamburger {
-    /* Provide a modest gap between the hamburger and the logo; not too far, not too close */
+    
     margin-right: 16px !important;
 }
 
@@ -1020,9 +1014,8 @@ body .navbar .site-title {
 
 body .navbar .nav-links {
     position: static !important;
-    margin-left: auto !important;      /* keeps them after the title */
-    margin-right: 60px !important;     /* <-- move Home/About/Log in/Sign up LEFT */
-    display: flex !important;
+    margin-left: auto !important;     
+    margin-right: 60px !important;    
     align-items: center !important;
     gap: 20px !important;
     flex-shrink: 0 !important;
@@ -1039,7 +1032,7 @@ body .navbar .nav-link {
     border: none !important;
     display: flex !important;
     align-items: center !important;
-    /* Match nav item height to the slimmer 60px nav bar */
+    
     height: 60px !important;
     padding: 0 0.6rem !important;
     cursor: pointer !important;
@@ -1053,11 +1046,11 @@ body .navbar .nav-link:hover {
     transform: translateY(-1px) !important;
 }
 
-/* Make Home, About, and Log in hover color orangered on the navbar */
+
 body .navbar .nav-main-link:hover,
 body .navbar .nav-login-link:hover {
     color: orangered !important;
-    transform: translateY(-1px) !important; /* keep the small lift effect */
+    transform: translateY(-1px) !important; 
 }
 
 body .navbar .nav-link:active {
@@ -1068,9 +1061,9 @@ body .navbar .nav-signup-cta {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    /* Ensure the full text fits without wrapping */
+    
     min-width: 120px !important;
-    /* Match sign‑up height to the slimmer 60px nav bar */
+    
     height: 60px !important;
     padding: 0 1rem !important;
     border: 1px solid #4d3a28 !important;
@@ -1080,7 +1073,7 @@ body .navbar .nav-signup-cta {
     font-weight: 600 !important;
     box-shadow: none !important;
     white-space: nowrap !important;
-    /* Increase font size for better legibility on the slimmer header */
+    
     font-size: 14px !important;
 }
 
@@ -1091,8 +1084,8 @@ body .navbar .nav-signup-cta:hover {
 
 
 .profile-banner {
-    background-color: var(--footer-bg);  /* same brown as the footer section */
-    height: 500px;                       /* make this bigger/smaller to change strip height */
+    background-color: var(--footer-bg); 
+    height: 500px;                      
     width: 100%;
 }
 
@@ -1101,9 +1094,9 @@ body .navbar .nav-signup-cta:hover {
     position: relative;
     min-height: 100vh;
     display: flex;
-    flex-direction: column;      /* stack children: card on top, stories below */
-    align-items: center;         /* center them horizontally */
-    padding: 180px 16px 40px;    /* space above & below card */
+    flex-direction: column;       
+    align-items: center;        
+    padding: 180px 16px 40px;    
 }
 
 
@@ -1118,7 +1111,7 @@ body .navbar .nav-signup-cta:hover {
     font-size: 0.95rem;
     color: #000;
     cursor: pointer;
-    z-index: 10; /* make sure it sits above the card */
+    z-index: 10; 
     transition:
         background-color 0.15s ease,
         color 0.15s ease,
@@ -1137,19 +1130,19 @@ body .navbar .nav-signup-cta:hover {
 }
 
 
-/* Khaki band: page background from top to (about) middle of card */
+
 .profile-page::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 300px;         /* this is the cut-off; adjust if needed */
+    height: 300px;         
     background: var(--footer-bg);
-    z-index: -1;           /* behind the card */
+    z-index: -1;           
 }
 
-/* CARD BOX */
+
 .profile-section {
     position: relative;
     max-width: 1000px;
@@ -1158,7 +1151,7 @@ body .navbar .nav-signup-cta:hover {
     padding: 90px 40px 40px;
     border: none;
     border-radius: 10px;
-    background: #ffffff;    /* card is pure white */
+    background: #ffffff;   
     box-shadow: 0 10px 24px rgba(0,0,0,0.08);
     display: flex;
     flex-direction: column;
@@ -1166,11 +1159,13 @@ body .navbar .nav-signup-cta:hover {
     min-height: 125px;
 }
 
-/* ======= PROFILE PAGE: STORIES UNDER CARD ======= */
 
-/* ======= PROFILE PAGE: STORIES UNDER CARD ======= */
 
-/* Outer section that holds both the heading and the cards */
+
+
+
+
+
 .profile-stories {
     max-width: 900px;
     width: 90%;
@@ -1178,18 +1173,17 @@ body .navbar .nav-signup-cta:hover {
     font-family: 'Merriweather', serif;
 }
 
-/* TEXT ONLY (heading + empty message) */
+
 .profile-stories-header {
-    margin-bottom: 20px;  /* distance between text and card box */
-    text-align: center;   /* matches your screenshot; change if you want */
+    margin-bottom: 20px;  
+    text-align: center;   
 }
 
-/* Container where JS injects the cards – now the BIG card */
+
 .profile-stories-list {
     display: flex;
     flex-direction: column;
-    gap: 0;  /* no gaps – lines will separate the rows */
-    background-color: #ffffff;
+    gap: 0;  
     border-radius: 1px;
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.13);
     padding: 24px 28px 28px;
@@ -1210,22 +1204,22 @@ body .navbar .nav-signup-cta:hover {
     color: #555;
 }
 
-/* Each story row inside the big card */
+
 .profile-story-card {
     position: relative;
     display: flex;
     gap: 18px;
     padding: 18px 0;
-    border-radius: 0;             /* no own card corners */
-    border: none;                 /* no border around each row */
-    background: transparent;      /* background belongs to the big card */
-    box-shadow: none;             /* remove per-card shadow */
+    border-radius: 0;             
+    border: none;                
+    background: transparent;      
+    box-shadow: none;            
     min-height: 0;
     align-items: flex-start;
 }
 
 
-/* simple placeholder “cover” for now – later you can use real image URLs */
+
 .profile-story-cover {
     flex: 0 0 250px;
     height: 250px;
@@ -1240,16 +1234,16 @@ body .navbar .nav-signup-cta:hover {
     color: #555;
 }
 
-/* Image inside the cover box */
+
 .profile-story-cover img {
     width: 100%;
     height: 100%;
-    object-fit: cover;   /* change to 'contain' if you prefer no cropping */
+    object-fit: cover;   
     
     display: block;
 }
 
-/* Fallback text (when no cover image) */
+
 .profile-story-cover-inner {
     padding: 4px;
     text-align: center;
@@ -1260,11 +1254,10 @@ body .navbar .nav-signup-cta:hover {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding-left: 20px;        /* move the text slightly right from the image */
-    margin-top: 0px;   
+    padding-left: 20px;        
 }
 
-/* big title = button */
+
 .profile-story-title-btn {
     padding: 0;
     margin: 0 0 10px;
@@ -1277,8 +1270,8 @@ body .navbar .nav-signup-cta:hover {
     cursor: pointer;
     color: #1f1308;
 
-    display: inline-block;    /* don’t stretch like a block */
-    align-self: flex-start;   /* override flexbox “stretch” width */
+    display: inline-block;    
+    align-self: flex-start;  
     width: auto;       
     transition: color 0.2s ease, transform 0.2s ease; 
 }
@@ -1312,15 +1305,15 @@ body .navbar .nav-signup-cta:hover {
 }
 
 
-/* Horizontal divider between stories */
+
 .profile-story-card + .profile-story-card {
-    border-top: 1px solid rgba(0, 0, 0, 0.12);  /* dim line */
-    margin-top: 16px;      /* little gap before the line */
-    padding-top: 18px;     /* keep spacing consistent */
+    border-top: 1px solid rgba(0, 0, 0, 0.12);  
+    margin-top: 16px;      
+    padding-top: 18px;     
 }
 
 
-/* three-dot menu on each story card */
+
 .profile-story-menu {
     position: absolute;
     top: 10px;
@@ -1330,13 +1323,13 @@ body .navbar .nav-signup-cta:hover {
 .story-menu-btn {
     border: none;
     background: transparent;
-    font-size: 20px;           /* three horizontal dots */
+    font-size: 20px;           
     line-height: 1;
     padding: 2px 6px;
     cursor: pointer;
 }
 
-/* dropdown panel for Delete */
+
 .story-menu-dropdown {
     position: absolute;
     top: 26px;
@@ -1351,7 +1344,7 @@ body .navbar .nav-signup-cta:hover {
     z-index: 20;
 }
 
-/* visible when menu is "open" */
+
 .profile-story-menu.open .story-menu-dropdown {
     display: block;
 }
@@ -1374,7 +1367,7 @@ body .navbar .nav-signup-cta:hover {
 
 
 
-/* AVATAR WITH HOVER OVERLAY */
+
 .avatar-wrapper {
     position: absolute;
     top: -60px;
@@ -1410,7 +1403,7 @@ body .navbar .nav-signup-cta:hover {
     font-size: 13px;
     opacity: 0;
     transition: opacity 0.15s ease;
-    pointer-events: none; /* clicks still hit the image */
+    pointer-events: none;
 }
 
 .avatar-overlay svg {
@@ -1434,7 +1427,7 @@ body .navbar .nav-signup-cta:hover {
     box-shadow: 0 3px 8px rgba(0,0,0,0.25);
 }
 
-/* TEXT STACK */
+
 .profile-info {
     margin-top: -8px;
     display: flex;
@@ -1455,11 +1448,11 @@ body .navbar .nav-signup-cta:hover {
     color: #333;
 }
 
-/* NAME EDIT UI */
+
 #name-display-wrapper {
     position: relative;
     display: inline-block;
-    padding-right: 28px; /* room for pencil */
+    padding-right: 28px; 
 }
 
 .edit-name-btn {
@@ -1494,8 +1487,7 @@ body .navbar .nav-signup-cta:hover {
 
 .name-editor {
     margin-top: 6px;
-    display: none;          /* hidden by default */
-    gap: 8px;
+    display: none;          
     align-items: center;
     flex-wrap: wrap;
 }
@@ -1519,10 +1511,10 @@ body .navbar .nav-signup-cta:hover {
 }
 
 .name-editor.is-open {
-    display: flex;          /* only shown when JS adds .is-open */
+    display: flex;          
 }
 
-/* POINTS + CREATE BUTTON */
+
 .points-row {
     margin-top: 15px;
     display: inline-flex;
@@ -1563,52 +1555,32 @@ body .navbar .nav-signup-cta:hover {
     box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
 
-/* -------------------- THEME COLORS & TYPOGRAPHY -------------------- */
+
 :root {
-    /*
-     * Global colour definitions used throughout the site.
-     *
-     * --khaki and --page-cream remain from earlier styles for profile
-     * pages, but a new set of variables define the navigation palette
-     * so that the header matches the reference design. You can adjust
-     * these values in one place to tweak the nav bar across all pages.
-     */
+    
     --khaki: #c8b38a;
     --page-cream: #faf8f0;
     --accent-red: #e45b34;
 
-    /* Navigation palette */
-    /* Override navigation palette to match the redesigned front page */
-    --nav-bg: #ffffff;      /* pure white background for the nav bar */
-    --nav-border: #e4d8c4;  /* subtle bottom border */
-    --nav-text: #4d3a28;    /* dark brown text colour */
-    --nav-hover: #8f7958;   /* lighter brown on hover */
-    --signup-bg: #f2eee5;   /* light beige background for sign-up button */
+    
+    
+    --nav-bg: #ffffff;      
+    --nav-border: #e4d8c4;  
+    --nav-text: #4d3a28;    
+    --nav-hover: #8f7958;   
+    --signup-bg: #f2eee5;   
     --signup-hover: #e8dbc9;
 
     --silver: #c0c0c0;
 
-    /*
-     * Fallback colours used by the final navbar override further down the
-     * stylesheet. Assign them the same values as our nav palette so
-     * unexpected overrides still yield the correct design. If the
-     * `FINAL NAVBAR OVERRIDES` block changes height or padding, these
-     * variables ensure the background and border colours stay on brand.
-     */
+    
     --background-color: var(--nav-bg);
     --border-color: var(--nav-border);
     --primary-color: var(--nav-text);
     --primary-hover: var(--nav-hover);
 }
 
-/* -------------------- NAVBAR -------------------- */
 
-/*
- * Base nav bar for all pages. The bar is fixed to the top of the viewport,
- * uses the defined nav variables for colouring, and arranges its
- * children with flexbox. The height and padding ensure the content
- * sits vertically centred within the bar.
- */
 .navbar {
     background-color: var(--nav-bg);
     color: var(--nav-text);
@@ -1619,8 +1591,7 @@ body .navbar .nav-signup-cta:hover {
     border-bottom: 1px solid var(--nav-border);
 }
 
-/* Site title inherits serif font and sits next to the logo. A margin
- * on the right pushes the nav-links group to the far right. */
+
 .site-title {
     font-family: "Merriweather", serif;
     font-size: 26px;
@@ -1631,16 +1602,14 @@ body .navbar .nav-signup-cta:hover {
     margin-right: auto;
 }
 
-/* Logo inside the nav bar: scaled to fit within 70px height. */
+
 .navbar .logo {
     height: 45px;
     object-fit: contain;
     margin-right: 12px;
 }
 
-/* Nav links container sits to the right of the title, laid out with
- * equal spacing. Removing absolute positioning prevents unintended
- * whitespace and ensures responsiveness. */
+
 .navbar .nav-links {
     position: static;
     display: flex;
@@ -1649,8 +1618,7 @@ body .navbar .nav-signup-cta:hover {
     margin-left: auto;
 }
 
-/* Base nav button styles: uppercase serif text with a warm brown colour
- * and subtle hover motion. */
+
 .navbar .nav-link {
     font-family: "Merriweather", serif;
     font-size: 16px;
@@ -1665,20 +1633,18 @@ body .navbar .nav-signup-cta:hover {
     transition: color 0.2s ease, transform 0.2s ease;
 }
 
-/* Hover behaviour for all nav links: change colour and lift slightly. */
+
 .navbar .nav-link:hover {
     color: var(--nav-hover);
     transform: translateY(-1px);
 }
 
-/* Active state for links: reset transformation to mimic click feedback. */
+
 .navbar .nav-link:active {
     transform: translateY(0);
 }
 
-/* Sign up CTA: styled as a pill button using the sign-up palette.
- * It inherits the same serif font and has a slight tint to stand out
- * without overpowering the other links. */
+
 .navbar .nav-signup-cta {
     border-radius: 999px;
     border: 1px solid var(--nav-text);
@@ -1697,14 +1663,14 @@ body .navbar .nav-signup-cta:hover {
     box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
 
-/* Points badge in the navbar */
+
 .navbar .nav-points-display {
     font-family: "Merriweather", serif;
     font-size: 16px;
     letter-spacing: 0.05em;
     color: var(--nav-text);
     white-space: nowrap;
-    margin-right: 10px;   /* spacing before Home */
+    margin-right: 10px;   
 }
 
 
@@ -1716,14 +1682,15 @@ body.loading .navbar .nav-auth-link {
     display: none !important;
 }
 
-/* -------------------- EXPLORE BUTTON (like Create, NO POSITION JUMP) -------------------- */
 
-/* Base positioning (absolute center, top: 72%) comes from earlier rules;
-   here we only override look + animation so it doesn’t move on hover. */
+
+
+
+
 .explore-btn {
     padding: 0.7rem 2.3rem;
     border-radius: 999px;
-    border: 1px solid black;   /* ← changed */
+    border: 1px solid black;   
     background: silver;
     font-family: "Merriweather", serif;
     font-size: 1rem;
@@ -1741,35 +1708,36 @@ body.loading .navbar .nav-auth-link {
     background-color: lightgray;
     color: white;
     box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-    /* no transform here -> no jumping */
+    
 }
 
-/* -------------------- SLIDE NAV (both states) -------------------- */
 
-/* slide nav background khaki like edit-profile */
+
+
+
+
+
 .slide-nav {
     background-color: var(--hero-bg);
     color: var(--nav-text);
 }
 
-/* keep close button readable on khaki */
+
 .slide-nav .close-btn {
     color: var(--nav-text);
 }
 
-/* ---------- LOGGED-IN SLIDE NAV: TEXT BUTTONS ---------- */
-/* When you’re logged in, give the buttons (Profile, Upload, etc.)
-   the class "slide-link" in your HTML/JS. */
+
 
 .slide-nav .slide-link {
     display: block;
     width: 100%;
     padding: 0.4rem 0;
-    margin-bottom: 0.75rem;           /* spacing between items */
+    margin-bottom: 0.75rem;          
     text-align: left;
     background: none;
     border: none;
-    font-family: "Merriweather", serif; /* same font as navbar buttons */
+    font-family: "Merriweather", serif; 
     font-size: 0.95rem;
     color: var(--nav-text);
     cursor: pointer;
@@ -1777,7 +1745,7 @@ body.loading .navbar .nav-auth-link {
 }
 
 .slide-nav .slide-link:hover {
-    color: var(--accent-red);          /* orange-red hover */
+    color: var(--accent-red);          
     transform: translateX(4px);
 }
 
@@ -1786,7 +1754,7 @@ body.loading .navbar .nav-auth-link {
 }
 
 
-/* =============== READING HUB + STORY CARDS =============== */
+
 
 .reading-hub {  
   max-width: 1100px;
@@ -1805,27 +1773,27 @@ body.loading .navbar .nav-auth-link {
   margin-bottom: 1.25rem;
 }
 
-/* Make Reading Hub text more airy */
+
 .reading-hub > p,
 .hub-section > p {
   max-width: 800px;
-  margin: 0 auto 2.2rem !important;   /* more space under the text */
-  line-height: 1.9;                   /* more space between lines */
-  font-size: 0.98rem;                 /* tweak if needed */
+  margin: 0 auto 2.2rem !important;   
+  line-height: 1.9;                  
+  font-size: 0.98rem;                
 }
 
-/* Extra breathing room between paragraph and cards */
+
 .hub-section .stories-grid {
   margin-top: 1.5rem;
 }
 
-/* Section container spacing */
+
 .hub-section {
   max-width: 1100px;
   margin: 0 auto 3rem;
 }
 
-/* Extra separation between "Created by Students" and "Available on Campus" */
+
 .hub-section + .hub-section {
   margin-top: 3.5rem;
   padding-top: 2.3rem;
@@ -1833,16 +1801,16 @@ body.loading .navbar .nav-auth-link {
 }
 
 
-/* grid of story cards */
+
 .stories-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
 }
 
-/* individual card */
+
 .story-card {
-  position: relative;                 /* needed for tag badge */
+  position: relative;                 
   background-color: #f5f5f5;
   border-radius: 0px;
   overflow: hidden;
@@ -1851,14 +1819,14 @@ body.loading .navbar .nav-auth-link {
   flex-direction: column;
 }
 
-/* cover image */
+
 .story-card img {
   width: 100%;
   height: 220px;
   object-fit: cover;
 }
 
-/* card content */
+
 .story-card-body {
   padding: 1rem 1.1rem 1.25rem;
 }
@@ -1879,7 +1847,7 @@ body.loading .navbar .nav-auth-link {
   color: #333;
 }
 
-/* Read button inside card */
+
 .story-card-body .read-btn {
   padding: 0.4rem 0.9rem;
   border-radius: 999px;
@@ -1893,7 +1861,7 @@ body.loading .navbar .nav-auth-link {
   background-color: lightgray;
 }
 
-/* GENRE TAG BADGE */
+
 .tag {
   position: absolute;
   top: 10px;
@@ -1908,25 +1876,25 @@ body.loading .navbar .nav-auth-link {
   letter-spacing: 0.03em;
 }
 
-/* CATEGORY COLORS */
+
 .tag.novel {
-  background-color: #0077ff;  /* blue */
+  background-color: #0077ff;  
 }
 
 .tag.lightnovel {
-  background-color: #ff9800;  /* orange */
+  background-color: #ff9800; 
 }
 
 .tag.poetry {
-  background-color: #d65cff;  /* purple */
+  background-color: #d65cff;  
 }
 
 
-/* ========== READER PAGE LAYOUT ========== */
+
 
 .reader-page {
   max-width: 900px;
-  margin: 110px auto 40px;  /* leave space for fixed navbar */
+  margin: 110px auto 40px; 
   padding: 0 1.5rem 3rem;
   font-family: "Merriweather", serif;
 }
@@ -1947,7 +1915,7 @@ body.loading .navbar .nav-auth-link {
   background-color: lightgray;
 }
 
-/* Meta section */
+
 .reader-meta {
   display: flex;
   gap: 1.5rem;
@@ -1994,7 +1962,7 @@ body.loading .navbar .nav-auth-link {
   padding-left: 1.2rem;
 }
 
-/* Chapters list */
+
 .reader-chapters h2 {
   margin-bottom: 0.4rem;
 }
@@ -2019,14 +1987,14 @@ body.loading .navbar .nav-auth-link {
   color: orangered;
 }
 
-/* Divider */
+
 .reader-divider {
   margin: 1.5rem 0 1.5rem;
   border: none;
   border-top: 1px solid rgba(0,0,0,0.15);
 }
 
-/* Chapter text */
+
 .reader-content {
   line-height: 1.8;
 }
@@ -2132,7 +2100,7 @@ body.loading .navbar .nav-auth-link {
 
 }
 
-/* Smaller Sign Up pill in navbar */
+
 body .navbar .nav-signup-cta {
     height: 38px !important;
     padding: 0 0.1rem !important;
@@ -2141,9 +2109,7 @@ body .navbar .nav-signup-cta {
 }
 
 
-/* =========================
-   POINTS POPOVER (navbar + profile)
-   ========================= */
+
 
 .points-popover-wrapper {
   position: relative;
@@ -2151,7 +2117,7 @@ body .navbar .nav-signup-cta {
   align-items: center;
 }
 
-/* so text still looks normal but can be hovered */
+
 .points-popover-toggle {
   cursor: pointer;
 }
@@ -2162,7 +2128,7 @@ body .navbar .nav-signup-cta {
   right: 0;
   min-width: 220px;
   padding: 0.75rem 1rem;
-  background-color: var(--hero-bg);   /* same bg as under navbar */
+  background-color: var(--hero-bg);  
   color: var(--nav-text);
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
@@ -2226,29 +2192,27 @@ body .navbar .nav-signup-cta {
   box-shadow: 0 3px 8px rgba(0,0,0,0.18);
 }
 
-/* Hover styling for "Points" text (nav + profile) */
+
 .points-popover-toggle {
   transition: color 0.15s ease;
 }
 
 .points-popover-toggle:hover {
-  color: orangered; /* same as slide-nav button hover */
+  color: orangered; 
   
 }
 
 
-/* Points & Rewards page — use same bg as ChapterFlow below navbar */
+
 body.points-page {
     margin: 0;
     padding: 0;
-    background-color: var(--hero-bg);  /* same beige used on ChapterFlow */
+    background-color: var(--hero-bg);  
 }
 
-/* =======================
-   GLOBAL MOBILE TWEAKS
-   ======================= */
+
 @media (max-width: 768px) {
-  /* Navbar: keep it compact on phones */
+}
   .navbar {
     height: 64px;
     padding: 0 12px;
@@ -2263,33 +2227,32 @@ body.points-page {
     font-size: 1.1rem;
   }
 
-  /* Make links smaller so they don't feel cramped */
+  
   .nav-links {
     gap: 8px;
     font-size: 0.85rem;
     margin-left: 8px;
   }
 
-    /* Move Points to the right, close to Home on mobile */
+    
   .nav-points-display {
-    margin-left: auto;   /* pushes Points towards the right side */
+    margin-left: auto;  
     margin-right: 8px;
     font-size: 0.9rem;
   }
 
-  /* Make the points popover open fully on screen for mobile */
+  
   .points-popover {
     left: 0;
-    right: auto;         /* bubble extends to the right instead of off-screen */
-  }
+    right: auto;         
 
   .points-popover::before {
     left: 22px;
-    right: auto;         /* little arrow lines up with the text again */
+    right: auto;        
   }
 
 
-  /* Hero section (index.html) */
+  
   .hero-section {
     padding: 110px 1.3rem 2.5rem;
   }
@@ -2323,7 +2286,7 @@ body.points-page {
     justify-content: center;
   }
 
-  /* Generic cards that appear in many pages */
+  
   .cf-card,
   .features-card,
   .profile-section,
@@ -2333,7 +2296,7 @@ body.points-page {
     margin-right: 1rem;
   }
 
-  /* Make common grids stack to 1 column on small screens */
+  
   .features-grid,
   .stories-grid,
   .cards-grid {
@@ -2341,10 +2304,10 @@ body.points-page {
   }
 }
 
-/* ===== MOBILE NAVBAR (phones) ===== */
+
 @media (max-width: 768px) {
 
-  /* Navbar can grow taller and wrap to 2 rows if needed */
+  
   body .navbar {
     height: auto !important;
     padding: 6px 10px !important;
@@ -2362,13 +2325,13 @@ body.points-page {
     margin-right: 6px;
   }
 
-  /* Row for Home / About / Log in / Sign up */
+ 
   .nav-links {
     width: 100%;
     margin-top: 4px;
-    justify-content: space-between;  /* spread items across */
-    gap: 4px;                        /* smaller gaps */
-    flex-wrap: nowrap;               /* keep them on ONE line */
+    justify-content: space-between;  
+    gap: 4px;                        
+    flex-wrap: nowrap;              
   }
 
   .navbar .nav-link {
@@ -2376,7 +2339,7 @@ body.points-page {
     padding: 4px 6px;
   }
 
-  /* Make the Sign Up pill narrower so it fits with the others */
+  
   body .navbar .nav-signup-cta {
     min-width: 90px !important;
     height: 32px !important;
@@ -2385,34 +2348,33 @@ body.points-page {
   }
 }
 
-/* ===== MOBILE LAYOUT FOR PROFILE STORIES ===== */
+
 @media (max-width: 768px) {
 
-  /* Make the whole stories section use full width on phones */
+  
   .profile-stories {
     max-width: 100%;
     width: 100%;
     margin: 26px auto 40px;
   }
 
-  /* Slightly tighter padding inside the big white card */
+  
   .profile-stories-list {
     padding: 16px 14px 20px;
   }
 
-  /* Stack each story vertically: cover on top, text below */
+  
   .profile-story-card {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
 
-  /* Cover image: full-width (but not too huge) and responsive */
+  
   .profile-story-cover {
     flex: 0 0 auto;
     width: 100%;
-    max-width: 320px;   /* adjust if you want it smaller */
-    height: auto;
+    max-width: 320px;   
   }
 
   .profile-story-cover img {
@@ -2421,28 +2383,31 @@ body.points-page {
     object-fit: cover;
   }
 
-  /* Text block: no left padding so it lines up with the image */
+ 
   .profile-story-content {
     padding-left: 0;
     margin-top: 4px;
     width: 100%;
   }
 
-  /* Slightly smaller title on mobile so it doesn’t feel cramped */
+  
   .profile-story-title-btn {
     font-size: 1.4rem;
   }
 }
 
-/* === FINAL OVERRIDES: SLIDE NAV LOGIN + HERO ABOUT US === */
 
-/* Slide-nav "Log in" button – smaller + same color as Get Started */
+
+
+
+
+
 .slide-nav .login-btn {
   margin: 1rem auto 0;
   padding: 0.4rem 1.2rem;
-  border-radius: 999px;                 /* pill shape */
+  border-radius: 999px;                
   border: 1px solid black;
-  background-color: silver ;            /* same as .cta-btn */
+  background-color: silver ;          
   color: black;
   font-family: 'Merriweather', serif;
   font-size: 0.95rem;
@@ -2457,7 +2422,7 @@ body.points-page {
 }
 
 .slide-nav .login-btn:hover {
-  background-color: burlywood;            /* same hover as .cta-btn */
+  background-color: burlywood;            
   color: white;
   box-shadow: 0 4px 10px rgba(0,0,0,0.18);
   transform: translateY(-1px);
@@ -2468,7 +2433,7 @@ body.points-page {
   box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
 
-/* Hero "About us" button – same look as Get Started */
+
 .hero-explore-btn {
   padding: 0.8rem 2.4rem;
   border-radius: 999px;
@@ -2478,7 +2443,7 @@ body.points-page {
   cursor: pointer;
   white-space: nowrap;
   border: none !important;
-  background-color: #5d4a3b !important;  /* same as .cta-btn */
+  background-color: #5d4a3b !important; 
   color: #ffffff !important;
   transition:
     background-color 0.2s ease,
