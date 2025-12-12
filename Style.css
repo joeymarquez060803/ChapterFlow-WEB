@@ -590,34 +590,28 @@ body.loading .nav-links a {
     --signup-bg: #f2eee5;          
     --signup-hover: #e8dbc9;        
 
-    /* Section backgrounds */
-    --hero-bg: #F2EEE5;             /* warm beige for hero and CTA sections */
-    --feature-bg: #ffffff;          /* white background for features */
-    --cta-bg: #F2EEE5;              /* CTA background matches hero */
-    --footer-bg: #5d4a3b;           /* dark brown for footer */
-    --footer-text: #ffffff;         /* light text for footer */
-    --feature-card-border: #eaeaea;  /* subtle border for feature cards */
-    --feature-card-bg: #ffffff;      /* white card background */
+
+    --hero-bg: #F2EEE5;             
+    --feature-bg: #ffffff;          
+    --cta-bg: #F2EEE5;              
+    --footer-bg: #5d4a3b;           
+    --footer-text: #ffffff;         
+    --feature-card-border: #eaeaea;  
+    --feature-card-bg: #ffffff;     
 }
 
-/* Only edit-profile page body uses this class */
+
 body.edit-profile-page {
     margin: 0;
     font-family: 'Merriweather', serif;
     background: var(--page-cream);
 }
 
-/* =========================================================
-   FRONT PAGE LAYOUT STYLES
-   These rules style the hero, features, call‑to‑action and footer
-   sections on the ChapterFlow landing page. They use the colour
-   variables defined above to mirror the reference design exactly.
-*/
 
-/* Hero section */
+
 .hero-section {
     background-color: var(--hero-bg);
-    padding: 120px 1rem 100px;             /* space above/below hero content */
+    padding: 120px 1rem 100px;             
     text-align: center;
     position: relative;
 }
@@ -631,7 +625,7 @@ body.edit-profile-page {
 }
 
 .hero-logo {
-    /* Make the center logo more prominent without overpowering the hero */
+
     height: 280px;
     width: auto;
     margin-bottom: 1rem;
@@ -670,9 +664,7 @@ body.edit-profile-page {
     justify-content: center;
 }
 
-/* Buttons in hero section */
-/* Buttons within the hero section. Use !important to override
-   earlier global button styles. */
+
 .hero-section .reading-hub-btn {
     padding: 0.8rem 2.4rem;
     border-radius: 999px;
